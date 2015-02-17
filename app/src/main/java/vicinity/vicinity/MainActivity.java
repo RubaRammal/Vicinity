@@ -42,10 +42,6 @@ public class MainActivity extends ActionBarActivity {
         submit_button = (Button) findViewById(R.id.button);
         submit_button.setEnabled(false);
 
-// DB handler and query
-        // String query = "CREATE TABLE User (_id INTEGER PRIMARY KEY AUTOINCREMENT, username TEXT);";
-        //dbHandler = new DBHandler(this, null, null, 1, "User", query);
-
 
 
 //Validating username input
