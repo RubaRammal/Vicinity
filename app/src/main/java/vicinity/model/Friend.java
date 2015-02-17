@@ -10,7 +10,7 @@ public class Friend extends User{
     private Message[] _privateMessages;
     private boolean _status;
     private String _aliasName;
-
+//testing
 
 
     //Constructor
