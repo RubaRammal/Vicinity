@@ -1,7 +1,6 @@
 package vicinity.model;
 
-
-//rubaaaa3
+//Github test
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
 import android.database.sqlite.SQLiteException;
