@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <string name="app_name">Vicinity</string>
+    <string name="action_settings">Settings</string>
+    <string name="title_activity_tabs">Vicinity</string>
+    <string name="goButton">Go</string>
+    <string name="launchScreen">Join the neighborhood</string>
+
+</resources>
