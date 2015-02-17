@@ -20,7 +20,7 @@ import java.sql.SQLException;
 import vicinity.model.CurrentUser;
 import vicinity.model.DBHandler;
 
-
+//AFNAN
 public class MainActivity extends ActionBarActivity {
 
     private static final String TAG = "rubasMessage";
