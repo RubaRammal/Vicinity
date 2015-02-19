@@ -32,7 +32,7 @@ public class MainActivity extends ActionBarActivity {
     DBHandler dbHandler;
 
     @Override
-    protected void onCreate(Bundle savedInstanceState) {
+    protected void onCreate(Bundle savedInstanceState) {//Lama
 
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
@@ -175,4 +175,9 @@ public class MainActivity extends ActionBarActivity {
         Log.i(TAG, "onOptionsItemSelected");
         return super.onOptionsItemSelected(item);
     }
+
+    /*public void getWifiActivity(View view) {
+        Intent intent = new Intent(getApplicationContext(), WiFiActivity.class);
+        startActivity(intent);
+    }*/
 }
