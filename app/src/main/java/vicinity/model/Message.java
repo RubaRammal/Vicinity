@@ -1,5 +1,9 @@
 package vicinity.model;
 
+import android.content.Context;
+import android.database.Cursor;
+import android.database.sqlite.SQLiteDatabase;
+
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.Date;
@@ -7,16 +11,20 @@ import java.util.Date;
 
 public class Message {
     private static final String TAG = "MessageClass";
+    //private final Context getApplicationContext;
 
     //Message Attributes
     private String sentAt;
     private Friend sender;
     private Friend receiver;
     private String messageBody; //I'll leave it as a String for now.
+    DBHandler dbHandler;/*I'm just trying out some db functions so there might be better ways of
+                          accessing the db from different classes other than this way - Amal */
 
 
     //Constructor
-    public Message(Friend sender, Friend receiver, String messageBody){
+    public Message(Context getApplicationContext, Friend sender, Friend receiver, String messageBody){
+        //this.getApplicationContext = getApplicationContext;
 
         Date currentDate = new Date();
         DateFormat dF=  new SimpleDateFormat("yyyy/MM/dd HH:mm:ss");
@@ -24,6 +32,9 @@ public class Message {
         this.sender=sender;
         this.receiver=receiver;
         this.messageBody=messageBody;
+       // dbHandler = new DBHandler(this.getApplicationContext);
+
+
     }
 
     //Setters & Getters
@@ -59,10 +70,22 @@ public class Message {
 
     //Message Methods [to implement after adding the database]
     public boolean saveImage(){
+
+
         return false;
     }
-    public void viewMessage(int messageID){
+    public void viewMessage(int messageID)  {
 
+
+
+        //"FetchAll" should be used
+        /*
+        SQLiteDatabase db = dbHandler.getReadableDatabase();
+        Cursor cur = null;
+
+        db.close();
+        */
     }
+
 
 }
