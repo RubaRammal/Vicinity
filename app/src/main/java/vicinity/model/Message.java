@@ -1,8 +1,6 @@
 package vicinity.model;
 
 import android.content.Context;
-import android.database.Cursor;
-import android.database.sqlite.SQLiteDatabase;
 
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
@@ -18,7 +16,7 @@ public class Message {
     private Friend sender;
     private Friend receiver;
     private String messageBody; //I'll leave it as a String for now.
-    DBHandler dbHandler;/*I'm just trying out some db functions so there might be better ways of
+     DBHandler dbHandler;/*I'm just trying out some db functions so there might be better ways of
                           accessing the db from different classes other than this way - Amal */
 
 

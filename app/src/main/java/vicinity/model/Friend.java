@@ -10,12 +10,17 @@ public class Friend extends User{
     private Message[] _privateMessages;
     private boolean _status;
     private String _aliasName;
+    private DBHandler dbHandler;
 //testing
 
 
     //Constructor
-    public Friend(String username) {
+    public Friend(String username, Message[] privateMessages) {
         super(username);
+       /* for (Message message : _privateMessages = privateMessages) {
+
+        }
+        ;*/
         UUID randomID = UUID.randomUUID();//UUID Generates a universally unique ID for each friend
         _id= randomID.toString();
 
@@ -55,10 +60,13 @@ public class Friend extends User{
     //[after database implementation]
     public void viewFriend(){
 
+       // dbHandler.getReadableDatabase();
     }
 
     public boolean sendMessage(Message newMessage){
+       //dbHandler.getWritableDatabase();
         return false;
+
     }
 
 
