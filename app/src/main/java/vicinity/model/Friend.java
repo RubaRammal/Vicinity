@@ -50,7 +50,7 @@ public class Friend extends User{
     }
     /**
      *
-//
+///
 
     public boolean changeUsername(String newUsername)throws SQLException{
     boolean isUpdated=false;
