@@ -1,37 +1,61 @@
 package vicinity.model;
 
 import android.content.Context;
-import android.database.SQLException;
 import android.database.sqlite.SQLiteDatabase;
+import java.sql.SQLException;
 import java.io.IOException;
+import android.provider.Settings;
 import android.util.Log;
+import android.database.Cursor;
+
+
+//There's something wrong with the logic of this class ._. -AFNAN
+//I thought we could only have the super class User
+//and then Friend extends it and overrides methods like createProfile since it uses a different table in the db
+//but still we have a problem with Stranger.class, we don't need all of these methods there.
 
 public class CurrentUser extends User {
 
-    private int _id;
     private SQLiteDatabase database;
     private DBHandler dbH;
+    private String _userID;
     private static final String TAG = "CurrentUser";
 
-//Setters and Getters
-    public int getId() {
-        return _id;
+
+
+    /**Getters/Setters
+    */
+    public String getId() {
+        return _userID;
     }
-    public void setId(int id) {
-        this._id = id;
+    public void setId(String id) {
+        this._userID = id;
     }
 
 
-
-//Constructor (it must take a Context object in order to be passed to the database
+    /**
+     * Public Constructor
+     * @param context
+     * @param username
+     */
     public CurrentUser(Context context, String username){
         super(username);
         dbH=new DBHandler(context);
+        _userID = Settings.Secure.getString(context.getContentResolver(),
+                Settings.Secure.ANDROID_ID);
+        //ANDROID_ID is a 64-bit number (as a hex string) that is randomly generated when the user first sets up the device
+        //and should remain constant for the lifetime of the user's device.
     }
 
-
-
-//Methods
+    /**
+     * This constructor is user for the methods bellow
+     * @param username
+     * @param _userID
+     */
+    public CurrentUser(String username, String _userID){
+        super(username);
+        this._userID=_userID;
+    }
 
     /**
      * Creates a Profile table for the user when the app is first launched
@@ -39,35 +63,63 @@ public class CurrentUser extends User {
      * @throws IOException
      * @throws java.sql.SQLException
      */
-    public void createProfile (CurrentUser newUser)throws IOException, java.sql.SQLException{
+    public void createProfile (CurrentUser newUser)throws SQLException{
 
         database = dbH.getReadableDatabase();
-
         try{
-            dbH.createDataBase();
             dbH.openDataBase();
-            database.execSQL("INSERT INTO User (username) VALUES ('"+newUser.getUsername()+"');");
+            database.execSQL("INSERT INTO User (username) VALUES ('" + newUser.getUsername() + "');");
             Log.i(TAG, "User added from CurrentUser class");
+            Log.i(TAG,"This is the user ID: "+_userID);
             dbH.close();
-        }
-        catch(IOException e){
-            Log.i(TAG,"DATABASE ERROR IN createProfile > currentUser");
         }
         catch (SQLException e){
             Log.i(TAG,"SQLEXception IN createProfile > currentUser");
         }
-
     }
 
 
     /**
-     * Retrieves user profile from database
-     * @param user
+     *
+     * Retrieves current user's information
+     * @return a CurrentUser object
+     * @throws IOException
+     * @throws java.sql.SQLException
+     * This method could be used in order to send friend requests.
      */
-    public void retrieveProfile(CurrentUser user){
-        String _username = user.getUsername();
+    public CurrentUser retrieveCurrentUser()throws SQLException{
 
-        Log.i(TAG, "retrieveProfile test");
+        try {
+            CurrentUser thisUser;
+            String un, id;
+            database = dbH.getReadableDatabase();
+            dbH.openDataBase();
+            String query="SELECT * FROM User";
+            Cursor c = database.rawQuery(query,null);
+            c.moveToFirst();
+            //There's no loop because we'll be retrieving the only row in the db
+            un=c.getString(c.getColumnIndex("username"));
+            id=c.getString(c.getColumnIndex("_id"));
+            thisUser= new CurrentUser(un,id);
 
+            dbH.close();
+            return thisUser;
+        }
+        catch (SQLException e){
+            Log.i(TAG,"SQLEXception IN retrieveCurrentUser > currentUser");
+        }
+
+        return null;
     }
+
+    /**
+     * This method wipes out the user's account along with its data (friends, messages..etc)
+     * If the user wants to start a new account.
+     * @return boolean if the operation is successful
+     */
+    //WE'LL DISCUSS THIS METHOD LATER
+    public boolean destroyUser(){
+        return false;
+    }
+
 }

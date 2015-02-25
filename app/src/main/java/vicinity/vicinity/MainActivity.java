@@ -13,14 +13,10 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.TextView;
-
-import java.io.IOException;
-import java.sql.SQLException;
-
 import vicinity.model.CurrentUser;
-import vicinity.model.DBHandler;
+import vicinity.model.User;
 
-//AFNAN
+
 public class MainActivity extends ActionBarActivity {
 
     private static final String TAG = "rubasMessage";
@@ -29,7 +25,7 @@ public class MainActivity extends ActionBarActivity {
     TextView launchScreen;
     final Context context = this;
     public String username;
-    DBHandler dbHandler;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {//Lama
@@ -42,9 +38,7 @@ public class MainActivity extends ActionBarActivity {
         submit_button = (Button) findViewById(R.id.button);
         submit_button.setEnabled(false);
 
-
-
-//Validating username input
+        //Validating username input
 
         username_input.addTextChangedListener(new TextWatcher() {
             @Override
@@ -60,8 +54,6 @@ public class MainActivity extends ActionBarActivity {
             public void afterTextChanged(Editable s) {
                 username=username_input.getText().toString();
                 submit_button.setEnabled(usernameValidation(username));
-
-
             }
         });
 
@@ -74,7 +66,6 @@ public class MainActivity extends ActionBarActivity {
                         //Add the username to the database
                         CurrentUser user = new CurrentUser(MainActivity.this,username_input.getText().toString());
                         user.createProfile(user);
-
                         Intent intent = new Intent(context, Tabs.class);
                         startActivity(intent);}
                         catch(Exception e){
@@ -85,9 +76,11 @@ public class MainActivity extends ActionBarActivity {
                 }
         );
 
-    }
+    }//End onCreate
 
-    //This method validates the username (letters, numbers dash and underscore are allowed no spaces)
+
+
+//This method validates the username (letters, numbers dash and underscore are allowed, no spaces)
     private boolean usernameValidation(String username){
         if(username.isEmpty() ||!username.matches("[a-zA-Z0-9_-]+"))
             return false;

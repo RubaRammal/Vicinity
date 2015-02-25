@@ -12,18 +12,16 @@ public class Request {
     private User requestedTo; //receiver
     private String requestedAt;
     private boolean requestStatus; //is accepted?
-    private String deviceID;
 
 
     //Constructor
-    public Request(User requestedBy, User requestedTo ,String deviceID){
+    public Request(User requestedBy, User requestedTo){
 
         Date currentDate= new Date();
         DateFormat dF=  new SimpleDateFormat("yyyy/MM/dd HH:mm:ss");
         requestedAt= dF.format(currentDate);
         this.requestedBy=requestedBy;
-        this.deviceID=deviceID; //the sender of the request must send the device ID cause I dunno if we're able to get others' device IDs!
-        requestStatus=false; //since it's just been sent and not accepted
+        requestStatus=false; //since it's just been sent and not accepted, yet
 
     }
 

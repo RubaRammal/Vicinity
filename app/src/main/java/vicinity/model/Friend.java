@@ -14,11 +14,9 @@ public class Friend extends User{
 
 
     //Constructor
-    public Friend(String username) {
+    public Friend(String username,String _id) {
         super(username);
-        UUID randomID = UUID.randomUUID();//UUID Generates a universally unique ID for each friend
-        _id= randomID.toString();
-
+        this._id=_id;
     }
 
 
@@ -50,7 +48,30 @@ public class Friend extends User{
        this._aliasName = aliasName;
         return true;
     }
+    /**
+     *
 
+
+    public boolean changeUsername(String newUsername)throws SQLException{
+    boolean isUpdated=false;
+    try {
+
+    database = dbH.getReadableDatabase();
+    dbH.openDataBase();
+    ContentValues args = new ContentValues();
+    args.put("username", newUsername);
+    isUpdated= database.update("User", args, "_id=" + 1, null)>0;
+    Log.i(TAG,"Is Updated? "+isUpdated);
+    dbH.close();
+
+    }
+    catch (SQLException e){
+    Log.i(TAG,"SQLEXception IN retrieveCurrentUser > currentUser");
+    }
+
+    return isUpdated;
+    }
+     */
 
     //[after database implementation]
     public void viewFriend(){
