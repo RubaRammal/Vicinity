@@ -94,7 +94,7 @@ public class DBHandler extends SQLiteOpenHelper {
         }
         if(checkDB != null){
 
-            checkDB.close();//
+            checkDB.close();///
         }
         return checkDB != null ? true : false;
     }
