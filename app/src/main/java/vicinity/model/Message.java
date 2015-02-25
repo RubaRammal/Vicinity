@@ -32,7 +32,6 @@ public class Message {
         this.messageBody=messageBody;
        // dbHandler = new DBHandler(this.getApplicationContext);
 //amal
-
     }
 
     //Setters & Getters
