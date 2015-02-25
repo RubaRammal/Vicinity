@@ -31,7 +31,7 @@ public class Message {
         this.receiver=receiver;
         this.messageBody=messageBody;
        // dbHandler = new DBHandler(this.getApplicationContext);
-
+//amal
 
     }
 
