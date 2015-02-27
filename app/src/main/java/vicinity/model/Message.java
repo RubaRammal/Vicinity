@@ -163,27 +163,6 @@ public class Message {
             }
                 db.close();
 
-
-
-        /*public String[]  getAppCategorydetail(){
-
-            String Table_Name="name of table";
-
-            String selectQuery = "SELECT  * FROM " + Table_Name;
-            SQLiteDatabase db = this.getReadableDatabase();
-            Cursor cursor = db.rawQuery(selectQuery, null);
-            String[] data = null;
-            if (cursor.moveToFirst()) {
-                do {
-                    // get  the  data into array,or class variable
-                } while (cursor.moveToNext());
-            }
-            db.close();
-            return data;
-        }
-*/
-
-
         }
 
 
