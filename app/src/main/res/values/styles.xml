@@ -1,8 +1,84 @@
 <resources>
 
     <!-- Base application theme. -->
-    <style name="AppTheme" parent="Theme.AppCompat.Light.DarkActionBar">
-        <!-- Customize your theme here. -->
+    <style name="AppTheme" parent="Theme.AppCompat.Light">
+        <item name="android:theme">@style/TabTheme</item>
+        <item name="android:windowBackground">@drawable/app_background</item>
+        <item name="android:listViewStyle">@style/TransparentListView</item>
+        <item name="android:expandableListViewStyle">@style/TransparentExpandableListView</item>
     </style>
+
+    <style name="TabTheme" parent="android:Theme.Holo.Light">
+        <item name="android:actionBarItemBackground">@drawable/selectable_background_style</item>
+        <item name="android:popupMenuStyle">@style/PopupMenu.Style</item>
+        <item name="android:dropDownListViewStyle">@style/DropDownListView.Style</item>
+        <item name="android:actionBarTabStyle">@style/ActionBarTabStyle.Style</item>
+        <item name="android:actionDropDownStyle">@style/DropDownNav.Style</item>
+        <item name="android:actionBarStyle">@style/ActionBar.Solid.Style</item>
+        <item name="android:actionModeBackground">@drawable/cab_background_top_style</item>
+        <item name="android:actionModeSplitBackground">@drawable/cab_background_bottom_style</item>
+        <item name="android:actionModeCloseButtonStyle">@style/ActionButton.CloseMode.Style</item>
+        <item name="android:actionBarTabTextStyle">@style/tabtextcolor</item>
+        <item name="android:divider">@null</item>
+    </style>
+
+    <style name="ActionBar.Solid.Style" parent="@android:style/Widget.Holo.Light.ActionBar.Solid">
+        <item name="android:background">@drawable/ab_solid_style</item>
+        <item name="android:backgroundStacked">@drawable/ab_stacked_solid_style</item>
+        <item name="android:backgroundSplit">@drawable/ab_bottom_solid_style</item>
+        <item name="android:progressBarStyle">@style/ProgressBar.Style</item>
+    </style>
+
+    <style name="ActionBar.Transparent.Style" parent="@android:style/Widget.Holo.Light.ActionBar">
+        <item name="android:background">@drawable/ab_transparent_style</item>
+        <item name="android:progressBarStyle">@style/ProgressBar.Style</item>
+    </style>
+
+    <style name="PopupMenu.Style" parent="@android:style/Widget.Holo.Light.ListPopupWindow">
+        <item name="android:popupBackground">@drawable/menu_dropdown_panel_style</item>
+    </style>
+
+    <style name="DropDownListView.Style" parent="@android:style/Widget.Holo.Light.ListView.DropDown">
+        <item name="android:listSelector">@drawable/selectable_background_style</item>
+    </style>
+
+    <style name="ActionBarTabStyle.Style" parent="@android:style/Widget.Holo.Light.ActionBar.TabView">
+        <item name="android:background">@drawable/tab_indicator</item>
+    </style>
+
+    <style name="DropDownNav.Style" parent="@android:style/Widget.Holo.Light.Spinner">
+        <item name="android:background">@drawable/spinner_background_ab_style</item>
+        <item name="android:popupBackground">@drawable/menu_dropdown_panel_style</item>
+        <item name="android:dropDownSelector">@drawable/selectable_background_style</item>
+    </style>
+
+    <style name="ProgressBar.Style" parent="@android:style/Widget.Holo.Light.ProgressBar.Horizontal">
+        <item name="android:progressDrawable">@drawable/progress_horizontal_style</item>
+    </style>
+
+    <style name="ActionButton.CloseMode.Style" parent="@android:style/Widget.Holo.Light.ActionButton.CloseMode">
+        <item name="android:background">@drawable/btn_cab_done_style</item>
+    </style>
+
+    <!-- this style is only referenced in a Light.DarkActionBar based theme -->
+    <style name="Theme.Style.Widget" parent="@android:style/Theme.Holo">
+        <item name="android:popupMenuStyle">@style/PopupMenu.Style</item>
+        <item name="android:dropDownListViewStyle">@style/DropDownListView.Style</item>
+    </style>
+
+    <style name="tabtextcolor" parent="@android:style/Widget.Holo.Light.ActionBar.TabText">
+        <item name="android:textColor">@android:color/white</item>
+        <item name="android:textStyle">bold</item>
+    </style>
+
+    <style name="TransparentListView" parent="@android:style/Widget.ListView">
+        <item name="android:cacheColorHint">@android:color/transparent</item>
+    </style>
+
+    <style name="TransparentExpandableListView" parent="@android:style/Widget.ExpandableListView">
+        <item name="android:cacheColorHint">@android:color/transparent</item>
+    </style>
+
+
 
 </resources>

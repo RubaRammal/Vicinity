@@ -18,11 +18,11 @@ public class Post {
 
     //Constructor
     public Post(User postedBy, String postBody){
-        Date currentDate= new Date();
-        DateFormat dF=  new SimpleDateFormat("yyyy/MM/dd HH:mm:ss");
-        postedAt= dF.format(currentDate);
-        this.postBody=postBody;
-        this.postedBy=postedBy;
+        Date currentDate = new Date();
+        DateFormat dF =  new SimpleDateFormat("yyyy/MM/dd HH:mm:ss");
+        postedAt = dF.format(currentDate);
+        this.postBody = postBody;
+        this.postedBy = postedBy;
     }
 
     //Setters and getters
@@ -33,14 +33,14 @@ public class Post {
         return this.postedAt;
     }
     public boolean setPostedBy(User postedBy){
-        this.postedBy=postedBy;
+        this.postedBy = postedBy;
         return true;
     }
     public User getPostedBy(){
         return this.postedBy;
     }
     public boolean setPostBody(String postBody){
-        this.postBody=postBody;
+        this.postBody = postBody;
         return true;
     }
     public String getPostBody(){

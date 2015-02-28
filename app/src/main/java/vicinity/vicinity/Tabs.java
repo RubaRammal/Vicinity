@@ -17,6 +17,7 @@ public class Tabs extends FragmentActivity implements ActionBar.TabListener {
     AppSectionsPagerAdapter mAppSectionsPagerAdapter;
     ViewPager mViewPager;
 
+
     public void onCreate(Bundle savedInstanceState) {
 
         super.onCreate(savedInstanceState);
@@ -25,9 +26,12 @@ public class Tabs extends FragmentActivity implements ActionBar.TabListener {
         mAppSectionsPagerAdapter = new AppSectionsPagerAdapter(getSupportFragmentManager());
         final ActionBar actionBar = getActionBar();// Set up the action bar.
 
+
         // Specify that the Home/Up button should not be enabled, since there is no hierarchical
         // parent.
         actionBar.setHomeButtonEnabled(false);
+        actionBar.setDisplayShowHomeEnabled(false);
+        actionBar.setDisplayShowTitleEnabled(false);
 
         // Specify that we will be displaying tabs in the action bar.
         actionBar.setNavigationMode(ActionBar.NAVIGATION_MODE_TABS);

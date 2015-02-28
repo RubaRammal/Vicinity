@@ -1,9 +1,9 @@
 package vicinity.vicinity;
 
+import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
-import android.support.v7.app.ActionBarActivity;
 import android.text.Editable;
 import android.text.TextWatcher;
 import android.util.Log;
@@ -13,11 +13,11 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.TextView;
+
 import vicinity.model.CurrentUser;
-import vicinity.model.User;
 
 
-public class MainActivity extends ActionBarActivity {
+public class MainActivity extends Activity {
 
     private static final String TAG = "rubasMessage";
     EditText username_input;
@@ -52,7 +52,7 @@ public class MainActivity extends ActionBarActivity {
 
             @Override
             public void afterTextChanged(Editable s) {
-                username=username_input.getText().toString();
+                username = username_input.getText().toString();
                 submit_button.setEnabled(usernameValidation(username));
             }
         });
@@ -64,7 +64,7 @@ public class MainActivity extends ActionBarActivity {
                     public void onClick(View v) {
                         try{
                         //Add the username to the database
-                        CurrentUser user = new CurrentUser(MainActivity.this,username_input.getText().toString());
+                        CurrentUser user = new CurrentUser(MainActivity.this, username_input.getText().toString());
                         user.createProfile(user);
                         Intent intent = new Intent(context, Tabs.class);
                         startActivity(intent);}

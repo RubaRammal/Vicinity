@@ -6,5 +6,7 @@
     <string name="title_activity_tabs">Vicinity</string>
     <string name="goButton">Go</string>
     <string name="launchScreen">Join the neighborhood</string>
+    <string name="title_activity_post_comment">PostComment</string>
+    <string name="hello_world">Hello world!</string>
 
 </resources>
