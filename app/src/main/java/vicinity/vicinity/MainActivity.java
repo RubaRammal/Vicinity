@@ -13,8 +13,8 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.TextView;
-import vicinity.model.CurrentUser;
-import vicinity.model.User;
+import android.widget.Toast;
+import vicinity.Controller.MainController;
 
 
 public class MainActivity extends ActionBarActivity {
@@ -25,6 +25,7 @@ public class MainActivity extends ActionBarActivity {
     TextView launchScreen;
     final Context context = this;
     public String username;
+    public final MainController controller = new MainController(MainActivity.this);
 
 
     @Override
@@ -38,7 +39,7 @@ public class MainActivity extends ActionBarActivity {
         submit_button = (Button) findViewById(R.id.button);
         submit_button.setEnabled(false);
 
-        //Validating username input
+
 
         username_input.addTextChangedListener(new TextWatcher() {
             @Override
@@ -53,25 +54,26 @@ public class MainActivity extends ActionBarActivity {
             @Override
             public void afterTextChanged(Editable s) {
                 username=username_input.getText().toString();
-                submit_button.setEnabled(usernameValidation(username));
+                submit_button.setEnabled(controller.nameValidation(username));//Username validation
             }
         });
 
         //Submit button event handler
-        //when clicked, user must be navigated to timeline and username shall be saved
+        //when clicked, user must be navigated to timeline
         submit_button.setOnClickListener(
                 new Button.OnClickListener(){
                     public void onClick(View v) {
-                        try{
-                        //Add the username to the database
-                        CurrentUser user = new CurrentUser(MainActivity.this,username_input.getText().toString());
-                        user.createProfile(user);
-                        Intent intent = new Intent(context, Tabs.class);
-                        startActivity(intent);}
-                        catch(Exception e){
 
+                        //Controller will add the user to the database
+                        if(controller.createNewUser(username_input.getText().toString()))
+                        {
+                            CharSequence text = "Welcome to Vicinity!";
+                            int duration = Toast.LENGTH_SHORT;
+                            Toast toast = Toast.makeText(context, text, duration);
+                            toast.show();
+                            Intent intent = new Intent(context, Tabs.class);
+                            startActivity(intent);
                         }
-
                     }
                 }
         );
@@ -79,13 +81,6 @@ public class MainActivity extends ActionBarActivity {
     }//End onCreate
 
 
-
-//This method validates the username (letters, numbers dash and underscore are allowed, no spaces)
-    private boolean usernameValidation(String username){
-        if(username.isEmpty() ||!username.matches("[a-zA-Z0-9_-]+"))
-            return false;
-        return true;
-    }
 
 
 

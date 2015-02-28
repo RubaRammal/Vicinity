@@ -23,7 +23,8 @@ public class CurrentUser extends User {
 
 
 
-    /**Getters/Setters
+    /**
+     * Getters/Setters
     */
     public String getId() {
         return _userID;
@@ -43,6 +44,7 @@ public class CurrentUser extends User {
         dbH=new DBHandler(context);
         _userID = Settings.Secure.getString(context.getContentResolver(),
                 Settings.Secure.ANDROID_ID);
+        Log.i(TAG,"This is the user ID: "+_userID);
         //ANDROID_ID is a 64-bit number (as a hex string) that is randomly generated when the user first sets up the device
         //and should remain constant for the lifetime of the user's device.
     }
@@ -57,33 +59,11 @@ public class CurrentUser extends User {
         this._userID=_userID;
     }
 
-    /**
-     * Creates a Profile table for the user when the app is first launched
-     * @param newUser
-     * @throws IOException
-     * @throws java.sql.SQLException
-     */
-    public void createProfile (CurrentUser newUser)throws SQLException{
-
-        database = dbH.getReadableDatabase();
-        try{
-            dbH.openDataBase();
-            database.execSQL("INSERT INTO User (username) VALUES ('" + newUser.getUsername() + "');");
-            Log.i(TAG, "User added from CurrentUser class");
-            Log.i(TAG,"This is the user ID: "+_userID);
-            dbH.close();
-        }
-        catch (SQLException e){
-            Log.i(TAG,"SQLEXception IN createProfile > currentUser");
-        }
-    }
-
 
     /**
      *
      * Retrieves current user's information
      * @return a CurrentUser object
-     * @throws IOException
      * @throws java.sql.SQLException
      * This method could be used in order to send friend requests.
      */
@@ -106,7 +86,7 @@ public class CurrentUser extends User {
             return thisUser;
         }
         catch (SQLException e){
-            Log.i(TAG,"SQLEXception IN retrieveCurrentUser > currentUser");
+            Log.i(TAG,"SQLException IN retrieveCurrentUser > currentUser");
         }
 
         return null;
