@@ -1,13 +1,7 @@
 package vicinity.Controller;
 
 
-import vicinity.model.CurrentUser;
-import vicinity.model.DBHandler;
-import vicinity.model.Friend;
-import vicinity.model.Message;
-import vicinity.model.Post;
-import vicinity.model.Request;
-import vicinity.model.User;
+import vicinity.model.*;
 import android.content.ContentValues;
 import android.content.Context;
 import android.database.Cursor;
@@ -23,6 +17,7 @@ public class MainController {
     private SQLiteDatabase database;
     private DBHandler dbH;
     private Context context;
+
     private ArrayList<User> onlineUsers;
     private ArrayList<Friend> friendsList;
     private ArrayList<Request> requestsList;
@@ -66,22 +61,28 @@ public class MainController {
     }
 
 
-    //NOTE ON nameVaildation: this method was implemented twice in Friend's class and MainActivity
-    //so i thought I'd implement it here then it'd only be called, to avoid code redundancy -AFNAN
+
     /**
      * Validates an input string (username) that shall contain letters, numbers, "-" and "_" ONLY
      * @param username A string
      * @return true if username matches the criteria, false other wise
      */
     public boolean nameValidation(String username){
-        if(username.isEmpty() ||!username.matches("[a-zA-Z0-9_-]+"))
-            return false;
-        return true;
+        return !(username.isEmpty() || !username.matches("[a-zA-Z0-9_-]+"));
     }
 
-    public User[] viewOnlineUsers(){return null;}
 
-    public boolean muteUser(User user){ return true;}
+
+    /**
+     * NOTE: //Should be implemented after integrating p2p code
+     * @return onlineUsers all online users (either friends or neighbors)
+     */
+    public ArrayList<User> viewOnlineUsers(){return null;}
+
+
+    public boolean muteUser(User user){
+
+        return true;}
 
 
     //works but we need to edit _id column in database -AFNAN
@@ -103,6 +104,7 @@ public class MainController {
             dbH.close();
         }
         catch(SQLException e){
+            Log.i(TAG,"SQLException > addFriend > MainController");
             e.printStackTrace();
         }
         return isAdded;
@@ -125,19 +127,21 @@ public class MainController {
             dbH.close();
         }
         catch(SQLException e){
+            Log.i(TAG,"SQLException > deleteFriend > MainController");
             e.printStackTrace();
         }
         return isDeleted;
     }
 
-    //INCOMPLETE
+    //UNTESTED: DB needs editing
     /**
      * Fetches user's friends from the database
+     * In order to be displayed.
      * @return friendsList
      */
     public ArrayList<Friend> viewFriendsList(){
 
-        friendsList=new ArrayList<Friend>();
+        friendsList=new ArrayList<>();
 
         try{
             database=dbH.getReadableDatabase();
@@ -146,17 +150,32 @@ public class MainController {
             Cursor c = database.rawQuery(query,null);
             if (c.moveToFirst()) {
                 do {
-                    //STORING DATA HERE
+
+                    Friend myFriend = new Friend();
+                    myFriend.setUsername(c.getString(1)); //getting username from database column #: 1
+                    myFriend.setStatus(myFriend.isOnline());
+                    myFriend.setAliasName(c.getString(3));
+                    myFriend.setID(c.getString(0));
+                    friendsList.add(myFriend);
+
                 } while (c.moveToNext());
+            }
+            else{
+                Log.i(TAG, "There are no friends in the DB.");
             }
             dbH.close();
         }
         catch(SQLException e){
+            Log.i(TAG,"SQLException > viewFriendsList > MainController");
             e.printStackTrace();
         }
 
-        return null;}
+        return friendsList;}//end of viewFriendsList
 
+    /**
+     *
+     * @return
+     */
     public ArrayList<Request> viewAllRequests(){return null;}
 
     public boolean acceptRequest(int num){return true;}

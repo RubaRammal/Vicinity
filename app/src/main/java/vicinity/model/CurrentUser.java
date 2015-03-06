@@ -3,16 +3,11 @@ package vicinity.model;
 import android.content.Context;
 import android.database.sqlite.SQLiteDatabase;
 import java.sql.SQLException;
-import java.io.IOException;
 import android.provider.Settings;
 import android.util.Log;
 import android.database.Cursor;
 
 
-//There's something wrong with the logic of this class ._. -AFNAN
-//I thought we could only have the super class User
-//and then Friend extends it and overrides methods like createProfile since it uses a different table in the db
-//but still we have a problem with Stranger.class, we don't need all of these methods there.
 
 public class CurrentUser extends User {
 
@@ -35,9 +30,11 @@ public class CurrentUser extends User {
 
 
     /**
-     * Public Constructor
-     * @param context
-     * @param username
+     * Public Constructor initializes username, opens database and sets user ID
+     * to 64-bit number (as a hex string) that is randomly generated when the user first sets up the device
+     * and should remain constant for the lifetime of the user's device.
+     * @param context an activity context
+     * @param username New user's username.
      */
     public CurrentUser(Context context, String username){
         super(username);
@@ -45,8 +42,6 @@ public class CurrentUser extends User {
         _userID = Settings.Secure.getString(context.getContentResolver(),
                 Settings.Secure.ANDROID_ID);
         Log.i(TAG,"This is the user ID: "+_userID);
-        //ANDROID_ID is a 64-bit number (as a hex string) that is randomly generated when the user first sets up the device
-        //and should remain constant for the lifetime of the user's device.
     }
 
     /**

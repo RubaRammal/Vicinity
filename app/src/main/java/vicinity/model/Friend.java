@@ -1,5 +1,4 @@
 package vicinity.model;
-import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.content.ContentValues;
 import java.sql.SQLException;
@@ -17,13 +16,18 @@ public class Friend extends User{
 
     private String _id;
     private ArrayList<Message> _privateMessages;//I don't think we need this array here -AFNAN
-    private boolean _status;
     private String _aliasName;
 
+    /**
+     * Default public constructor
+     */
+    public Friend (){
+
+    }
 
     /**
      * Public constructor
-     * @param context
+     * @param context application context
      * @param username A String that contains the friend's name
      * @param _id A User's device ID
      */
@@ -38,22 +42,17 @@ public class Friend extends User{
      *
      * Setters-getters
      */
-
+    public void setID(String id){this._id=id;}
     public String getFriendID(){
         return this._id;
     }
     public String getAliasName(){
         return this._aliasName;
     }
+    public void setAliasName(String newName){_aliasName=newName;}
     public ArrayList<Message> getPrivateMessages(){
         return this._privateMessages;
     }
-    public void setStatus(boolean status){
-        this._status = status;
-    }
-    public boolean isOnline(){
-        return this._status;
-    }
 
 
 
@@ -61,7 +60,8 @@ public class Friend extends User{
 
 
 
-    //INCOMPLETE -AFNAN
+
+    //INCOMPLETE: must add column: AliasName to the db in Friend's table. -AFNAN
     /**
      * This method calls nameValidation from MainController to validate the new username
      * then adds it to the database as an alias name
@@ -84,7 +84,8 @@ public class Friend extends User{
             dbH.close();
            }
             catch(SQLiteException e){
-
+                Log.i(TAG,"SQLiteException > Friend > ChangeName");
+            e.printStackTrace();
             }
        }
         Log.i(TAG,"Is Updated? "+isUpdated);
