@@ -7,8 +7,6 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
-import android.widget.ArrayAdapter;
-import android.widget.ListAdapter;
 import android.widget.ListView;
 
 import java.util.ArrayList;
@@ -32,15 +30,15 @@ public class TimelineSectionFragment extends Fragment {
                              Bundle savedInstanceState) {
         View rootView = inflater.inflate(R.layout.fragment_timeline, container, false);
 
-        String[] testPosts = {"Hello", "Wassap", "Hey"};
 
         ArrayList<Post> posts = GetPosts();
 
-        ListView lv = (ListView)rootView.findViewById(R.id.timlineList);
-        ListAdapter adapter = new ArrayAdapter<String>(getActivity(), android.R.layout.simple_list_item_1, testPosts);
-        lv.setAdapter(adapter);
 
-        //lv.setAdapter(new PostListAdapter(getActivity(), posts));
+        final ListView lv = (ListView) rootView.findViewById(R.id.timlineList);
+        //ListAdapter adapter = new ArrayAdapter<String>(getActivity(), android.R.layout.simple_list_item_1, testPosts);
+        //lv.setAdapter(adapter);
+
+        lv.setAdapter(new PostListAdapter(this.getActivity(), posts));
 
         lv.setOnItemClickListener(
            new AdapterView.OnItemClickListener(){
@@ -60,12 +58,16 @@ public class TimelineSectionFragment extends Fragment {
     private ArrayList<Post> GetPosts(){
         ArrayList<Post> posts = new ArrayList<Post>();
 
+
+        //We should get these from the db and create a loop
         Post post = new Post(new User("Ruba"), "Hello World");
         posts.add(post);
 
         post = new Post(new User("Afnan"), "Hi World");
         posts.add(post);
 
+        post = new Post(new User("Amal"), "Lorem ipsum dolor sit amet, consectetuer adipiscing elit. Aenean commodo ligula eget dolor. Aenean massa. Cum sociis natoque penatibus et magnis dis parturient montes, nascetur ridiculus mus. ");
+        posts.add(post);
 
         return posts;
     }

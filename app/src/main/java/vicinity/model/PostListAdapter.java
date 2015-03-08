@@ -19,9 +19,9 @@ public class PostListAdapter  extends BaseAdapter {
     private LayoutInflater mInflater;
 
 
-    public PostListAdapter(Context timelineFragment, ArrayList<Post> posts){
+    public PostListAdapter(Context context, ArrayList<Post> posts){
         this.posts = posts;
-        mInflater = LayoutInflater.from(timelineFragment);
+        mInflater = LayoutInflater.from(context);
     }
 
     @Override
@@ -43,25 +43,25 @@ public class PostListAdapter  extends BaseAdapter {
     public View getView(int position, View convertView, ViewGroup parent) {
         ViewHolder holder;
         if(convertView == null){
-            convertView = mInflater.inflate(R.layout.activity_tabs, null);
+            convertView = mInflater.inflate(R.layout.custom_row_view, null);
 
 
             holder = new ViewHolder();
-            //holder.txtname = (TextView) convertView.findViewById(R.id.name);
-            //holder.txtphone = (TextView) convertView.findViewById(R.id.post);
+            holder.txtName = (TextView) convertView.findViewById(R.id.name);
+            holder.txtPost = (TextView) convertView.findViewById(R.id.post);
 
             convertView.setTag(holder);
         } else {
             holder = (ViewHolder) convertView.getTag();
         }
 
-        holder.txtname.setText(posts.get(position).getPostedBy().getUsername());
-        holder.txtphone.setText(posts.get(position).getPostID());
+        holder.txtName.setText(posts.get(position).getPostedBy().getUsername());
+        holder.txtPost.setText(posts.get(position).getPostBody());
 
         return convertView;
     }
 
     static class ViewHolder{
-        TextView txtname, txtphone;
+        TextView txtName, txtPost;
     }
 }

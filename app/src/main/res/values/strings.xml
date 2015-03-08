@@ -8,5 +8,7 @@
     <string name="launchScreen">Join the neighborhood</string>
     <string name="title_activity_post_comment">PostComment</string>
     <string name="hello_world">Hello world!</string>
+    <string name="title_activity_launch">LaunchActivity</string>
+    <string name="username_input">Username</string>
 
 </resources>

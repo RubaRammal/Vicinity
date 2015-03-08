@@ -17,7 +17,6 @@ public class Tabs extends FragmentActivity implements ActionBar.TabListener {
     AppSectionsPagerAdapter mAppSectionsPagerAdapter;
     ViewPager mViewPager;
 
-
     public void onCreate(Bundle savedInstanceState) {
 
         super.onCreate(savedInstanceState);
@@ -26,14 +25,13 @@ public class Tabs extends FragmentActivity implements ActionBar.TabListener {
         mAppSectionsPagerAdapter = new AppSectionsPagerAdapter(getSupportFragmentManager());
         final ActionBar actionBar = getActionBar();// Set up the action bar.
 
-
         // Specify that the Home/Up button should not be enabled, since there is no hierarchical
         // parent.
         actionBar.setHomeButtonEnabled(false);
         actionBar.setDisplayShowHomeEnabled(false);
         actionBar.setDisplayShowTitleEnabled(false);
 
-        // Specify that we will be displaying tabs in the action bar.
+        // Specify that we will be displaying tab_timeline_layout in the action bar.
         actionBar.setNavigationMode(ActionBar.NAVIGATION_MODE_TABS);
 
         // Set up the ViewPager, attaching the adapter and setting up a listener for when the
@@ -50,19 +48,42 @@ public class Tabs extends FragmentActivity implements ActionBar.TabListener {
             }
         });
 
+
+
+        final int[] LAYOUTS = new int[] {
+                R.layout.tab_timeline_layout,
+                R.layout.tab_user_layout,
+                R.layout.tab_chat_layout,
+                R.layout.tab_request_layout
+
+
+        };
+
+
         String [] tabsTitles={"Timeline" , "Friends", "Chats", "Requests"};
+
+
         // For each of the sections in the app, add a tab to the action bar.
-        for (int i = 0; i < mAppSectionsPagerAdapter.getCount(); i++) {
+       for (int i = 0; i < mAppSectionsPagerAdapter.getCount(); i++) {
             // Create a tab with text corresponding to the page title defined by the adapter.
             // Also specify this Activity object, which implements the TabListener interface, as the
             // listener for when this tab is selected.
+
+
             actionBar.addTab(
                     actionBar.newTab()
-                            .setText(tabsTitles[i])
-                            .setTabListener(this));
-        }
-    }//end onCreate
 
+                            .setCustomView(LAYOUTS[i])
+                                    //.setIcon(getResources().getDrawable(ICONS[i]))
+                                    //.setText(tabsTitles[i])
+                            .setTabListener(this));
+
+       }
+
+
+
+
+    }//end onCreate
 
 
     @Override
@@ -103,8 +124,7 @@ public class Tabs extends FragmentActivity implements ActionBar.TabListener {
 
                 default:
                     // The other sections of the app are dummy placeholders.
-                    Fragment fragment = new Fragment();
-                    return fragment;
+                    return new TimelineSectionFragment();
             }
         }
 
