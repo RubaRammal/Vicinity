@@ -1,5 +1,6 @@
 package vicinity.model;
 
+import android.content.ContentValues;
 import android.content.Context;
 import android.content.ContextWrapper;
 import android.database.Cursor;
@@ -7,6 +8,7 @@ import android.database.DatabaseUtils;
 import android.database.sqlite.SQLiteDatabase;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+import android.util.Log;
 import android.widget.ImageView;
 
 import java.io.File;
@@ -29,7 +31,8 @@ public class Message {
     private String sentAt;
     private Friend sender;
     private Friend receiver;
-    private String messageBody; //I'll leave it as a String for now.
+    private String messageBody; //I'll leave it as a String for now.(I think we should keep it as a string - Amal)
+
 
 
 
@@ -43,6 +46,9 @@ public class Message {
         this.sender = sender;
         this.receiver = receiver;
         this.messageBody = messageBody;
+        //this.senderID = sender.getFriendID();
+        //this.receiverID = receiver.getFriendID();
+
 
 
 
@@ -89,6 +95,9 @@ public class Message {
     //Message Methods [to implement after adding the database]
     //we might not need this method since i read that android provides the option of saving an image by default
     private String saveImage(Bitmap bitmapImage){
+        //this single line of code is only if we want to save the image to the phone gallery along with all the images
+        //MediaStore.Images.Media.insertImage(getContentResolver(), yourBitmap, yourTitle , yourDescription);
+
 
         ContextWrapper cw = new ContextWrapper(getApplicationContext());
         // path to /data/data/Vicinity/app_data/imageDir
@@ -150,12 +159,13 @@ public class Message {
 
 
         Cursor cursor = db.rawQuery(selectQuery, null);
-            String[] data = null;
+            String[] data = null;// we need to use this later in order to store the message
 
             if (cursor.moveToFirst()) {
                 do {
-                    // get  the  data into array,or class variable, instead i'm printing it for now
-                  System.out.print(DatabaseUtils.dumpCursorToString(cursor));
+                    // get the  data into array,or class variable, instead i'm printing it for now
+
+                    Log.i(TAG, DatabaseUtils.dumpCursorToString(cursor));
 
                 } while (cursor.moveToNext());
 
@@ -165,6 +175,45 @@ public class Message {
 
         }
 
+      //we could instead make this method receive nothing and make it call the above setters and getters in case we don't need the ID's
+      public void insertMessage(Friend sender, Friend receiver, String messageBody ) throws SQLException {
+
+          String Table_Name = "Message";
+
+          //I think we need to add reciever_id to the message table, what do you think?
+          // so that we can retrieve the message using both the sender and the receiver ID along with message id
+          //the message id should be supplied by the database automatically
+
+          //String insertQuery = "INSERT INTO"+ Table_Name +"(friend_id , reciever_id , message ) VALUES ('" + sender.getFriendID() + "','" + receiver.getFriendID() +"','"+ messageBody + "')";
+          // Log.v("Test Saving", insertQuery);
+          //db.rawQuery(insertQuery , null );
+
+          try {
+              db = dbh.getWritableDatabase();
+              dbh.openDataBase();
+          } catch (Exception e) {
+              e.printStackTrace();
+          }
+
+
+
+          ContentValues values = new ContentValues();
+
+          values.put("friend_id" , sender.getFriendID());
+
+          values.put("reciever_id" , receiver.getFriendID());
+
+          values.put("Message" , messageBody);
+
+          db.insertOrThrow("Message" , null , values);
+
+
+          db.close();
+
+
+
+
+      }
 
 
 }
