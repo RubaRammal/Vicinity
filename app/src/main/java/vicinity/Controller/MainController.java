@@ -2,6 +2,8 @@ package vicinity.Controller;
 
 
 import vicinity.model.*;
+
+
 import android.content.ContentValues;
 import android.content.Context;
 import android.database.Cursor;
@@ -11,7 +13,7 @@ import java.sql.SQLException;
 import java.util.ArrayList;
 
 
-public class MainController {
+public class MainController{
 
     private static final String TAG = "Main Controller";
     private SQLiteDatabase database;
@@ -28,6 +30,8 @@ public class MainController {
      * Default constructor
      */
     public MainController(){}
+
+
     /**
      * Public constructor
      * @param context An application context to instantiate the database

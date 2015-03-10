@@ -67,6 +67,7 @@ public class MainActivity extends ActionBarActivity {
                         //Controller will add the user to the database
                         if(controller.createNewUser(username_input.getText().toString()))
                         {
+
                             CharSequence text = "Welcome to Vicinity!";
                             int duration = Toast.LENGTH_SHORT;
                             Toast toast = Toast.makeText(context, text, duration);
