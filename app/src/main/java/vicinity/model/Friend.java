@@ -3,6 +3,8 @@ import android.database.sqlite.SQLiteDatabase;
 import android.content.ContentValues;
 import java.sql.SQLException;
 import java.util.ArrayList;
+import java.util.Observable;
+
 import android.content.Context;
 import android.database.sqlite.SQLiteException;
 import android.util.Log;
@@ -11,8 +13,7 @@ import vicinity.Controller.MainController;
 public class Friend extends User{
 
     private static final String TAG = "FriendClass";
-    private SQLiteDatabase database;
-    private DBHandler dbH;
+
 
     private String _id;
     private ArrayList<Message> _privateMessages;//I don't think we need this array here -AFNAN
@@ -53,12 +54,6 @@ public class Friend extends User{
     public ArrayList<Message> getPrivateMessages(){
         return this._privateMessages;
     }
-
-
-
-
-
-
 
 
     //INCOMPLETE: must add column: AliasName to the db in Friend's table. -AFNAN

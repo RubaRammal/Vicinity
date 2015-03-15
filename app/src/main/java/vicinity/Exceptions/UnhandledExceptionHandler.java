@@ -1,4 +1,4 @@
-package vicinity.Controller;
+package vicinity.Exceptions;
 
 import java.io.PrintWriter;
 import java.io.StringWriter;
@@ -10,7 +10,7 @@ import vicinity.vicinity.Tabs;
  * This class must handle the uncaught exceptions to avoid sudden crash
  *
  */
-public class VicinityExceptionHandler implements java.lang.Thread.UncaughtExceptionHandler {
+public class UnhandledExceptionHandler implements java.lang.Thread.UncaughtExceptionHandler {
 
     private final Activity activityContext;
     private final String LINE_SEPARATOR = "\n";
@@ -19,14 +19,14 @@ public class VicinityExceptionHandler implements java.lang.Thread.UncaughtExcept
      * Public constructor
      * @param activityContext takes an activity
      */
-    public VicinityExceptionHandler(Activity activityContext){
+    public UnhandledExceptionHandler(Activity activityContext){
         this.activityContext=activityContext;
     }
 
     /**
      * Implemented abstract method from UncaughtExceptionHandler
-     * @param thread
-     * @param exception
+     * @param thread Thread
+     * @param exception Throwable exception
      */
     public void uncaughtException(Thread thread, Throwable exception) {
         StringWriter stackTrace = new StringWriter();

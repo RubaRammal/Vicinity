@@ -11,8 +11,6 @@ import android.database.Cursor;
 
 public class CurrentUser extends User {
 
-    private SQLiteDatabase database;
-    private DBHandler dbH;
     private String _userID;
     private static final String TAG = "CurrentUser";
 
