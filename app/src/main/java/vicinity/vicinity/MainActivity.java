@@ -70,7 +70,7 @@ public class MainActivity extends ActionBarActivity {
 
                             CharSequence text = "Welcome to Vicinity!";
                             int duration = Toast.LENGTH_SHORT;
-                            Toast toast = Toast.makeText(context, text, duration);
+                            Toast toast = Toast.makeText(context, text, duration);//we can customize this Toast later -Afnan
                             toast.show();
                             Intent intent = new Intent(context, Tabs.class);
                             startActivity(intent);
