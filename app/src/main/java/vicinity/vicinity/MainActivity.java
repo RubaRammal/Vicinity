@@ -15,9 +15,7 @@ import android.widget.EditText;
 import android.widget.TextView;
 import android.widget.Toast;
 import vicinity.Controller.MainController;
-import vicinity.model.*;
-import java.util.ArrayList;
-import java.sql.SQLException;
+
 
 public class MainActivity extends ActionBarActivity {
 
