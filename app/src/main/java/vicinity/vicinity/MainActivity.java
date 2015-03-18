@@ -15,7 +15,9 @@ import android.widget.EditText;
 import android.widget.TextView;
 import android.widget.Toast;
 import vicinity.Controller.MainController;
-
+import vicinity.model.*;
+import java.util.ArrayList;
+import java.sql.SQLException;
 
 public class MainActivity extends ActionBarActivity {
 
@@ -77,7 +79,30 @@ public class MainActivity extends ActionBarActivity {
                         }
                     }
                 }
+
         );
+
+        /*
+        Post post = new Post();
+        post.setPostBody("SHIT JUST GOT REAL");
+        controller.addPost(post);
+
+        ArrayList<Post> postsList;
+        postsList=controller.viewAllPosts();
+
+        if (! postsList.isEmpty()) {
+            Log.i("sarah's message", String.valueOf(postsList.size()));
+            Post postTry;
+            for (int i = 0;  postsList.size() >= i+1; i++)
+            {
+                postTry = postsList.get(i);
+                Log.i("sarah's message", postTry.toString());
+            }
+        } else
+            Log.i("sarah's message", "the list is empty");
+            */
+
+
 
     }//End onCreate
 
