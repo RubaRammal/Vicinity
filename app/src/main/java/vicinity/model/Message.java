@@ -36,6 +36,7 @@ public class Message {
     private long msgTimestamp;
     private String sentAt;
     private String friendID;
+    private String friendName;
     private boolean isMyMsg;
     private String messageBody;
 
@@ -48,7 +49,7 @@ public class Message {
      * @param isMyMsg boolean
      * @param messageBody string
      */
-    public Message(Context context, String friendID, boolean isMyMsg, String messageBody){
+    public Message(Context context, String friendID ,boolean isMyMsg, String messageBody){
 
         getApplicationContext=context;
         this.friendID=friendID;
@@ -74,7 +75,40 @@ public class Message {
     public void setFriendID(String friendID){
         this.friendID=friendID;
     }
-    public String getFriendID(){return friendID;}
+
+    public String getFriendID(){return  friendID;}
+    public void  setFriendName(String friendName){ this.friendName = friendName;}
+
+    public String getFriendName(String friendID){
+
+        String Table_Name = "Friend";
+        String selectQuery = "SELECT username FROM" + Table_Name + "WHERE _ID=" + friendID;
+
+
+        try {
+            db = dbh.getReadableDatabase();
+            dbh.openDataBase();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
+
+        Cursor cursor = db.rawQuery(selectQuery, null);
+
+        if (cursor.moveToFirst()) {
+            do {
+                friendName = cursor.getString(0);
+
+            } while (cursor.moveToNext());
+
+
+        }
+        db.close();
+
+        return friendName;
+
+    }
+
     public String getDate() {
         return this.sentAt;
     }
