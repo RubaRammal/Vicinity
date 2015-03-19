@@ -35,6 +35,11 @@ public class Message {
     private boolean isMyMsg;
     private String messageBody;
 
+    // i need this in the MainController -Sarah
+    public Message()
+    {
+
+    }
 
     /**
      * Public constructor, initiates a message
@@ -88,6 +93,16 @@ public class Message {
         return this.messageBody;
     }
 
+    public void setTime(String time)
+    {
+        sentAt=time;
+    }
+
+    public String getTime()
+    {
+        return sentAt;
+    }
+
 
     //UNTESTED
     /**
@@ -105,7 +120,7 @@ public class Message {
             dbh.openDataBase();
             ContentValues values = new ContentValues();
             values.put("message", newMessage.getMessageBody());
-           //values.put("time", newMessage.getMsgTimestamp()); // I think we need generate time automatically in the db -AFNAN
+            //values.put("time", newMessage.getMsgTimestamp()); // I think we need generate time automatically in the db -AFNAN
             values.put("isMyMsg",newMessage.isMyMsg());
             values.put("friend_id",newMessage.getFriendID());
             isAdded=db.insert("Message", null, values)>0;
@@ -172,6 +187,7 @@ public class Message {
     }
 
     //Why do we need this method
+    //i believe this method should be replaced by toString (i wrote toString() below this method). - Sarah
     public void viewMessage(int messageID) throws SQLException{
 
         String Table_Name = "Message";
@@ -201,6 +217,13 @@ public class Message {
         }
         db.close();
 
+    }
+
+
+
+    public String toString()
+    {
+        return "Message: "+ messageBody+" Friend id: "+ friendID+ " Date: "+ sentAt;
     }
 
 

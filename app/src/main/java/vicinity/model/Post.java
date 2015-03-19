@@ -17,6 +17,13 @@ public class Post {
     private String picture;   //this might take another type i'll look it up later
 
     //Constructor
+
+    //we need this in the MainController -Sarah
+    public Post()
+    {
+
+    }
+
     public Post(User postedBy, String postBody){
         Date currentDate= new Date();
         DateFormat dF=  new SimpleDateFormat("yyyy/MM/dd HH:mm:ss");
@@ -51,5 +58,11 @@ public class Post {
     }
 
 //Methods
+
+    //I wrote this -Sarah
+    public String toString()
+    {
+        return "Posted by: "+postedBy.getUsername()+ " Post Content: "+ postBody+" Date: "+ postedAt;
+    }
 
 }
