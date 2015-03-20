@@ -52,7 +52,7 @@ public class Tabs extends FragmentActivity implements ActionBar.TabListener {
 
         final int[] LAYOUTS = new int[] {
                 R.layout.tab_timeline_layout,
-                R.layout.tab_user_layout,
+                R.layout.tab_neighbor_layout,
                 R.layout.tab_chat_layout,
                 R.layout.tab_request_layout
 
@@ -114,7 +114,7 @@ public class Tabs extends FragmentActivity implements ActionBar.TabListener {
                     return new TimelineSectionFragment();
 
                 case 1:
-                    return new UsersSectionFragment();
+                    return new NeighborSectionFragment();
 
                 case 2:
                     return new MessagesSectionFragment();

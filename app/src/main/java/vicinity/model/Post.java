@@ -23,6 +23,7 @@ public class Post {
         postedAt = dF.format(currentDate);
         this.postBody = postBody;
         this.postedBy = postedBy;
+        postComments = null;
     }
 
     //Setters and getters
@@ -49,6 +50,7 @@ public class Post {
     public Comment[] getComments(){
         return this.postComments;
     }
+
 
 //Methods
 

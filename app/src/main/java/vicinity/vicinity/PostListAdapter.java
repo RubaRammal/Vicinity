@@ -1,4 +1,4 @@
-package vicinity.model;
+package vicinity.vicinity;
 
 import android.content.Context;
 import android.view.LayoutInflater;
@@ -9,6 +9,7 @@ import android.widget.TextView;
 
 import java.util.ArrayList;
 
+import vicinity.model.Post;
 import vicinity.vicinity.R;
 
 /**
@@ -43,12 +44,13 @@ public class PostListAdapter  extends BaseAdapter {
     public View getView(int position, View convertView, ViewGroup parent) {
         ViewHolder holder;
         if(convertView == null){
-            convertView = mInflater.inflate(R.layout.custom_row_view, null);
+            convertView = mInflater.inflate(R.layout.timeline_row_view, null);
 
 
             holder = new ViewHolder();
             holder.txtName = (TextView) convertView.findViewById(R.id.name);
             holder.txtPost = (TextView) convertView.findViewById(R.id.post);
+            holder.txtComments  = (TextView) convertView.findViewById(R.id.comments);
 
             convertView.setTag(holder);
         } else {
@@ -57,11 +59,12 @@ public class PostListAdapter  extends BaseAdapter {
 
         holder.txtName.setText(posts.get(position).getPostedBy().getUsername());
         holder.txtPost.setText(posts.get(position).getPostBody());
+        holder.txtComments.setText("0 comments");
 
         return convertView;
     }
 
     static class ViewHolder{
-        TextView txtName, txtPost;
+        TextView txtName, txtPost, txtComments;
     }
 }

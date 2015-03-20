@@ -23,5 +23,13 @@
         android:layout_height="wrap_content"
         android:textSize="17sp"/>
 
+    <TextView
+        android:id="@+id/comments"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:textSize="12sp"
+        android:textColor="#813e3e3d"
+        />
+
 
 </LinearLayout>

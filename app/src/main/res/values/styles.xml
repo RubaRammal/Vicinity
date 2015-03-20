@@ -6,17 +6,18 @@
     </style>
 
     <style name="TabTheme" parent="android:Theme.Holo.Light">
-        <item name="android:actionBarTabStyle">@style/ActionBarTabStyle.Style</item>
-        <item name="android:actionBarStyle">@style/ActionBar.Solid.Style</item>
-        <item name="android:actionModeBackground">@drawable/cab_background_top_style</item>
-        <item name="android:actionModeSplitBackground">@drawable/cab_background_bottom_style</item>
-        <item name="android:actionBarTabTextStyle">@style/TabCustomStyle</item>
-        <item name="android:actionBarDivider">@null</item>
-        <item name="android:actionBarSize">50dip</item>
+    <item name="android:actionBarTabStyle">@style/ActionBarTabStyle.Style</item>
+    <item name="android:actionBarStyle">@style/ActionBar.Solid.Style</item>
+    <item name="android:actionModeBackground">@drawable/cab_background_top_style</item>
+    <item name="android:actionModeSplitBackground">@drawable/cab_background_bottom_style</item>
+    <item name="android:actionBarTabTextStyle">@style/TabCustomStyle</item>
+    <item name="android:actionBarDivider">@null</item>
+    <item name="android:actionBarSize">50dip</item>
 
 
 
-    </style>
+</style>
+
 
     <style name="ActionBar.Solid.Style" parent="@android:style/Widget.Holo.Light.ActionBar.Solid">
         <item name="android:background">@drawable/ab_solid_style</item>

@@ -4,16 +4,9 @@
     android:paddingRight="@dimen/activity_horizontal_margin"
     android:paddingTop="@dimen/activity_vertical_margin"
     android:paddingBottom="@dimen/activity_vertical_margin"
-    tools:context="vicinity.vicinity.LaunchActivity"
-    android:id="@+id/launchScreen">
+    tools:context="vicinity.vicinity.AddPost">
 
-    <ImageView
-        android:layout_width="150dp"
-        android:layout_height="wrap_content"
-        android:id="@+id/imageView2"
-        android:src="@drawable/vicinity_logo"
-        android:contentDescription="Launcher logo"
-        android:layout_centerVertical="true"
-        android:layout_centerHorizontal="true" />
+    <TextView android:text="@string/hello_world" android:layout_width="wrap_content"
+        android:layout_height="wrap_content" />
 
 </RelativeLayout>

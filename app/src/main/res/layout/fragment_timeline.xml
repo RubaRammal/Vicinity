@@ -1,18 +1,46 @@
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:tools="http://schemas.android.com/tools"
+
+
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+xmlns:tools="http://schemas.android.com/tools"
+
+android:layout_width="wrap_content"
+android:layout_height="wrap_content"
+android:orientation="vertical"
+tools:context=".Tabs"
+android:id="@+id/timeline">
+
+<RelativeLayout
     android:layout_width="fill_parent"
-    android:layout_height="fill_parent"
-    tools:context=".Tabs"
-    android:id="@+id/timeline"
-    android:orientation="vertical">
+    android:layout_height="wrap_content"
+    android:id="@+id/top_control_bar">
 
-    <ListView
-        android:layout_width="match_parent"
+</RelativeLayout>
+
+<LinearLayout
+    android:id="@+id/bottom_control_bar"
+    android:layout_width="fill_parent"
+    android:layout_height="wrap_content"
+    android:layout_alignParentBottom="true">
+
+    <Button
+        android:layout_width="fill_parent"
         android:layout_height="wrap_content"
-        android:id="@+id/timlineList">
-
-        </ListView>
-
-
-
+        android:text="Post"
+        android:id="@+id/add_post" />
 </LinearLayout>
+
+<ListView
+    android:id="@android:id/list"
+    android:layout_width="fill_parent"
+    android:layout_height="0dip"
+    android:choiceMode="multipleChoice"
+    android:layout_below="@id/top_control_bar"
+    android:layout_above="@id/bottom_control_bar"></ListView>
+
+<TextView android:id="@android:id/empty"
+    android:layout_width="wrap_content"
+    android:layout_height="wrap_content"
+    android:layout_below="@id/top_control_bar"
+    android:layout_above="@id/bottom_control_bar" />
+
+</RelativeLayout>

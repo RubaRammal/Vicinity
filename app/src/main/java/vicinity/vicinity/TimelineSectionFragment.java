@@ -7,12 +7,12 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
+import android.widget.Button;
 import android.widget.ListView;
 
 import java.util.ArrayList;
 
 import vicinity.model.Post;
-import vicinity.model.PostListAdapter;
 import vicinity.model.User;
 
 
@@ -32,9 +32,10 @@ public class TimelineSectionFragment extends Fragment {
 
 
         ArrayList<Post> posts = GetPosts();
+        Button addPost = (Button) rootView.findViewById(R.id.add_post);
 
 
-        final ListView lv = (ListView) rootView.findViewById(R.id.timlineList);
+        final ListView lv = (ListView) rootView.findViewById(android.R.id.list);
         //ListAdapter adapter = new ArrayAdapter<String>(getActivity(), android.R.layout.simple_list_item_1, testPosts);
         //lv.setAdapter(adapter);
 
@@ -51,22 +52,40 @@ public class TimelineSectionFragment extends Fragment {
         );
 
 
+        addPost.setOnClickListener(
+                new Button.OnClickListener(){
+                    public void onClick(View v) {
+                        Intent intent = new Intent(getActivity(), AddPost.class);
+                        startActivity(intent);
+                    }
+                }
+        );
 
         return rootView;
     }
+
 
     private ArrayList<Post> GetPosts(){
         ArrayList<Post> posts = new ArrayList<Post>();
 
 
         //We should get these from the db and create a loop
-        Post post = new Post(new User("Ruba"), "Hello World");
+        Post post = new Post(new User("Ruba"), "Vicinity is a great way to communicate with people around you!");
         posts.add(post);
 
-        post = new Post(new User("Afnan"), "Hi World");
+        post = new Post(new User("Afnan"), "\"The best way to predict your future is to create it.\"");
         posts.add(post);
 
-        post = new Post(new User("Amal"), "Lorem ipsum dolor sit amet, consectetuer adipiscing elit. Aenean commodo ligula eget dolor. Aenean massa. Cum sociis natoque penatibus et magnis dis parturient montes, nascetur ridiculus mus. ");
+        post = new Post(new User("Amal"), "Cool app!");
+        posts.add(post);
+
+        post = new Post(new User("Sarah"), "\"Be nice to nerds. Chances are you'll end up working for one.\" - Bill gates");
+        posts.add(post);
+
+        post = new Post(new User("Lama"), "On my way to KSU...");
+        posts.add(post);
+
+        post = new Post(new User("Amjad"), "\"My advice is to never do tomorrow what you can do today. Procrastination is the thief of time.\" - Charles Dickens");
         posts.add(post);
 
         return posts;
