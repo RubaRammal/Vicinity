@@ -176,11 +176,49 @@ public class MainController{
 
         return friendsList;}//end of viewFriendsList
 
+
     /**
-     *
-     * @return
+     * Fetches user's Requests from the database
+     * @return requestsList
      */
-    public ArrayList<Request> viewAllRequests(){return null;}
+    public ArrayList<Request> viewAllRequests()
+    {
+
+        requestsList=new ArrayList<Request>();
+        Log.i("Sarah's message", "entered the view all requests method");
+
+
+
+        try
+        {
+            database=dbH.getReadableDatabase();
+            dbH.openDataBase();
+            String query="SELECT * FROM Request";
+            Cursor c = database.rawQuery(query,null);
+            if (c.moveToFirst())
+            {
+                do
+                {
+                    Request requestObj= new Request();
+                    requestObj.setReqBy(new User (c.getString(1)));
+                    requestObj.setRequestStatus(c.getString(2));
+                    // Adding message to allMessages
+                    requestsList.add(requestObj);
+                } while (c.moveToNext());
+            }
+            else
+            {
+                Log.i(TAG, "There are no requests in the DB.");
+            }
+            dbH.close();
+        }
+        catch(SQLException e)
+        {
+            e.printStackTrace();
+        }
+
+        return requestsList;
+    }
 
     public boolean acceptRequest(int num){return true;}
 
@@ -188,23 +226,141 @@ public class MainController{
 
     public boolean sendRequest(User user){return true;}
 
-    public ArrayList<Post> viewAllPosts(){ return null;}
+    /**
+     * Fetches posts from the database
+     * @return postList
+     */
+    public ArrayList<Post> viewAllPosts()
 
-    public boolean addPost(Post post){return true;}
+    {
+        postList = new ArrayList<Post>();
 
-    public ArrayList<Message> viewAllMessages(){return null;}
+        try
+        {
+            database = dbH.getReadableDatabase();
+            dbH.openDataBase();
+            String query = "SELECT * FROM Post";
+            Cursor c = database.rawQuery(query, null);
+            if (c.moveToFirst())
+            {
+                do
+                {
+                    Post post = new Post();
+                    post.setPostBody(c.getString(1));
+                    post.setPostedBy(new User(c.getString(2)));
+                    //contact.setPicture(c.getBlob(3));
 
-    public boolean deleteMessage(int num){return true;}
+                    // Adding post to postList
+                    postList.add(post);
+                } while (c.moveToNext());
+            }
+
+            else
+            {
+                Log.i(TAG, "There are no posts in the DB.");
+            }
+            dbH.close();
+        }
+        catch (SQLException e)
+        {
+            e.printStackTrace();
+        }
+        return postList;
+    }
 
 
+    /**
+     * Adds a new Post to the database.
+     * @param post An object of class Post
+     * @return isAdded true if the post was added successfully, false otherwise.
+     * @throws SQLException
+     */
+    public boolean addPost(Post post) throws SQLException
+    {
+        boolean isAdded=false;
+        try
+        {
+            database = dbH.getReadableDatabase();
+            dbH.openDataBase();
+            ContentValues values = new ContentValues();
+            values.put("post", post.getPostBody());
+            isAdded=database.insert("Post", null, values)>0;
+            dbH.close();
+        }
+        catch(SQLException e)
+        {
+            e.printStackTrace();
+        }
+        return isAdded;}
+
+    /**
+     * Fetches user's Chats from the database
+     * @return allMessages
+     */
+    public ArrayList<Message> viewAllMessages()
+
+    {
+
+        allMessages = new ArrayList<Message>();
+
+        try
+        {
+            database=dbH.getReadableDatabase();
+            dbH.openDataBase();
+            String query="SELECT * FROM Message";
+            Cursor c = database.rawQuery(query,null);
+            if (c.moveToFirst())
+            {
+                do
+                {
+                    Message msg = new Message();
+                    msg.setMessageBody(c.getString(2));
+                    msg.setFriendID(c.getString(1));
+                    msg.setTime(c.getString(4));
+                    //contact.setPicture(c.getBlob(3));
+
+                    // Adding message to allMessages
+                    allMessages.add(msg);
+                } while (c.moveToNext());
+            }
+            else
+            {
+                Log.i(TAG, "There are no messages in the DB.");
+            }
+
+            dbH.close();
+        }
+        catch(SQLException e)
+        {
+            e.printStackTrace();
+        }
 
 
+        return allMessages;
+    }
 
-
-
-
-
-
+    /**
+     * Deletes a message from the database given an ID
+     * @param messageID A to-be deleted Message's ID.
+     * @return isDeleted A boolean that equals true if operation is successful, false otherwise.
+     */
+    public boolean deleteMessage(int messageID)
+    {
+        boolean isDeleted=false;
+        try
+        {
+            database=dbH.getReadableDatabase();
+            dbH.openDataBase();
+            isDeleted=database.delete("Message","_id="+"'"+messageID+"'",null)==1;
+            Log.i(TAG,"Is Message deleted? "+isDeleted);
+            dbH.close();
+        }
+        catch(SQLException e)
+        {
+            e.printStackTrace();
+        }
+        return isDeleted;
+    }
 
 
 }

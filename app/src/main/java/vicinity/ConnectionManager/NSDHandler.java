@@ -5,6 +5,7 @@ import android.net.nsd.NsdServiceInfo;
 import android.util.Log;
 import android.annotation.TargetApi;
 import android.content.Context;
+import android.widget.Toast;
 import java.io.IOException;
 import java.net.ServerSocket;
 import java.net.InetAddress;
@@ -18,9 +19,10 @@ import java.net.InetAddress;
 @TargetApi(16)
 public class NSDHandler {
 
-    private static final String TAG = "NSDHelper";
+    private static final String TAG = "NSDHandler";
     public String service_name = "_vicinityapp";
-    public static final String SERVICE_TYPE="_vicinityapp.tcp.";
+    public static final String SERVICE_TYPE="_presence.tcp.";
+
     NsdManager.RegistrationListener registrationListener;
     NsdManager.DiscoveryListener discoveryListener;
     NsdManager nsdManager;
@@ -38,10 +40,22 @@ public class NSDHandler {
     }
 
     /**
+     * This method MUST be called from the activity
+     * you want to start service discovery from
+     */
+    public void initializeNsd() {
+
+        initializeResolveListener();
+        initializeDiscoveryListener();
+        initializeRegistrationListener();
+        Toast toast = Toast.makeText(context, "Initializing NSD", Toast.LENGTH_LONG);//we can customize this Toast later -Afnan
+        toast.show();
+        //mNsdManager.init(mContext.getMainLooper(), this);
+    }
+    /**
      * This method registers Vicinity's service on the local network
      * @param portNumber port number
      */
-
     public void registerService(int portNumber){
         Log.i(TAG,"registerService");
         //This object provides the information that other devices on the network use
@@ -73,6 +87,8 @@ public class NSDHandler {
      *  of the success or failure of service registration and unregistration.
      */
     public void initializeRegistrationListener(){
+        Log.i(TAG,"Registering service");
+
         registrationListener = new NsdManager.RegistrationListener() {
 
             @Override
@@ -107,11 +123,12 @@ public class NSDHandler {
         }
 
     /**
-     * This method make our app see the available services in the local network
+     * This method makes our app see the available services in the local network
      * Here we can filter services: meaning that we can choose to only connect
      * with devices that advertise _vicinityapp service
      */
         public void initializeDiscoveryListener(){
+            Log.i(TAG,"Discovering service");
         discoveryListener = new NsdManager.DiscoveryListener() {
 
 
@@ -119,6 +136,8 @@ public class NSDHandler {
             @Override
             public void onDiscoveryStarted(String regType) {
                 Log.d(TAG, "Service discovery started");
+                Toast toast = Toast.makeText(context, "Service discovery started", Toast.LENGTH_LONG);//we can customize this Toast later -Afnan
+                toast.show();
             }
 
             @Override
@@ -131,6 +150,8 @@ public class NSDHandler {
                 } else if (service.getServiceName().equals(service_name)) {
                     Log.d(TAG, "Same service: " + service_name);
                 } else if (service.getServiceName().contains(service_name)){
+                    Toast toast = Toast.makeText(context, "Found the same service", Toast.LENGTH_LONG);//we can customize this Toast later -Afnan
+                    toast.show();
                     nsdManager.resolveService(service, resolveListener);
                 }
             }
@@ -171,6 +192,7 @@ public class NSDHandler {
      * including ip address and port number.
      */
     public void initializeResolveListener(){
+        Log.i(TAG,"Resolving service");
         resolveListener = new NsdManager.ResolveListener() {
 
             @Override
@@ -187,6 +209,8 @@ public class NSDHandler {
                     Log.d(TAG, "Same IP.");
                     return;
                 }
+                Toast toast = Toast.makeText(context, "Service resolved", Toast.LENGTH_LONG);//we can customize this Toast later -Afnan
+                toast.show();
                 serviceInfo = serviceInfo2;
                 int port = serviceInfo.getPort();
                 InetAddress host = serviceInfo.getHost();
