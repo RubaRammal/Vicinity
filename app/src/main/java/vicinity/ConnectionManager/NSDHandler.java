@@ -39,7 +39,7 @@ public class NSDHandler {
         nsdManager = (NsdManager) context.getSystemService(Context.NSD_SERVICE);
     }
 
-    /**
+    /**k
      * This method MUST be called from the activity
      * you want to start service discovery from
      */
