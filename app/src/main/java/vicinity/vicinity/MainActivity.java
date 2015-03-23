@@ -77,7 +77,30 @@ public class MainActivity extends ActionBarActivity {
                         }
                     }
                 }
+
         );
+
+        /*
+        Post post = new Post();
+        post.setPostBody("SHIT JUST GOT REAL");
+        controller.addPost(post);
+
+        ArrayList<Post> postsList;
+        postsList=controller.viewAllPosts();
+
+        if (! postsList.isEmpty()) {
+            Log.i("sarah's message", String.valueOf(postsList.size()));
+            Post postTry;
+            for (int i = 0;  postsList.size() >= i+1; i++)
+            {
+                postTry = postsList.get(i);
+                Log.i("sarah's message", postTry.toString());
+            }
+        } else
+            Log.i("sarah's message", "the list is empty");
+            */
+
+
 
     }//End onCreate
 
