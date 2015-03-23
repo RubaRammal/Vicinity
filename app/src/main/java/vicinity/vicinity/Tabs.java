@@ -2,6 +2,7 @@ package vicinity.vicinity;
 
 import android.app.ActionBar;
 import android.app.FragmentTransaction;
+import android.content.Intent;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentActivity;
@@ -10,18 +11,26 @@ import android.support.v4.app.FragmentPagerAdapter;
 import android.support.v4.view.ViewPager;
 import android.view.Window;
 
-
+/**
+ * Implements the ActionBar to create a tabbed view.
+ */
 public class Tabs extends FragmentActivity implements ActionBar.TabListener {
 
 
     AppSectionsPagerAdapter mAppSectionsPagerAdapter;
     ViewPager mViewPager;
+    static NeighborSectionFragment neighborFragment;
 
     public void onCreate(Bundle savedInstanceState) {
 
         super.onCreate(savedInstanceState);
+        //Starting the service
+        startService(new Intent(this, ConnectAndDiscoverService.class));
+
         requestWindowFeature(Window.FEATURE_ACTION_BAR);
         setContentView(R.layout.activity_tabs);
+
+
         mAppSectionsPagerAdapter = new AppSectionsPagerAdapter(getSupportFragmentManager());
         final ActionBar actionBar = getActionBar();// Set up the action bar.
 
@@ -48,19 +57,13 @@ public class Tabs extends FragmentActivity implements ActionBar.TabListener {
             }
         });
 
-
-
+        //Tabs layout (icons + text)
         final int[] LAYOUTS = new int[] {
                 R.layout.tab_timeline_layout,
                 R.layout.tab_neighbor_layout,
                 R.layout.tab_chat_layout,
                 R.layout.tab_request_layout
-
-
         };
-
-
-        String [] tabsTitles={"Timeline" , "Friends", "Chats", "Requests"};
 
 
         // For each of the sections in the app, add a tab to the action bar.
@@ -68,24 +71,44 @@ public class Tabs extends FragmentActivity implements ActionBar.TabListener {
             // Create a tab with text corresponding to the page title defined by the adapter.
             // Also specify this Activity object, which implements the TabListener interface, as the
             // listener for when this tab is selected.
-
-
             actionBar.addTab(
                     actionBar.newTab()
 
                             .setCustomView(LAYOUTS[i])
-                                    //.setIcon(getResources().getDrawable(ICONS[i]))
-                                    //.setText(tabsTitles[i])
                             .setTabListener(this));
 
-       }
-
-
+        }
 
 
     }//end onCreate
 
 
+    /********************Overridden Activity methods****************************/
+    @Override
+    public void onResume() {
+        super.onResume();
+        //receiver = new WiFiDirectBroadcastReceiver(manager, channel, this);
+        //registerReceiver(receiver, intentFilter);
+    }
+
+    @Override
+    public void onPause() {
+        super.onPause();
+       // unregisterReceiver(receiver);
+    }
+    @Override
+    protected void onRestart() {
+        super.onRestart();
+    }
+
+    @Override
+    protected void onStop() {
+        super.onStop();
+    }
+    /************************************************/
+
+
+    /********************Tabs Methods****************************/
     @Override
     public void onTabUnselected(ActionBar.Tab tab, FragmentTransaction fragmentTransaction) {
     }
@@ -107,6 +130,9 @@ public class Tabs extends FragmentActivity implements ActionBar.TabListener {
             super(fm);
         }
 
+        /**
+         * Returns a fragment according to the chosen tab.
+         */
         @Override
         public Fragment getItem(int i) {
             switch (i) {
@@ -139,5 +165,8 @@ public class Tabs extends FragmentActivity implements ActionBar.TabListener {
         }
     }
 
+    public NeighborSectionFragment getNeighborFragment(){
+        return neighborFragment;
+    }
 
 }

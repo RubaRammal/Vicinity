@@ -9,30 +9,30 @@ import android.widget.TextView;
 
 import java.util.ArrayList;
 
-import vicinity.model.Message;
-import vicinity.vicinity.R;
+import vicinity.model.VicinityMessage;
 
 /**
- * Created by macproretina on 3/10/15.
+ * This class takes a list of messages and turns it into a list
+ * that displays all the current chats the user has
  */
 public class MessageListAdapter  extends BaseAdapter {
-    ArrayList<Message> messages;
+    ArrayList<VicinityMessage> vicinityMessages;
     private LayoutInflater mInflater;
 
 
-    public MessageListAdapter(Context context, ArrayList<Message> messages){
-        this.messages = messages;
+    public MessageListAdapter(Context context, ArrayList<VicinityMessage> vicinityMessages){
+        this.vicinityMessages = vicinityMessages;
         mInflater = LayoutInflater.from(context);
     }
 
     @Override
     public int getCount() {
-        return messages.size();
+        return vicinityMessages.size();
     }
 
     @Override
     public Object getItem(int position) {
-        return messages.get(position);
+        return vicinityMessages.get(position);
     }
 
     @Override
@@ -58,9 +58,9 @@ public class MessageListAdapter  extends BaseAdapter {
             holder = (ViewHolder) convertView.getTag();
         }
 
-        holder.textDate.setText(messages.get(position).getDate());
-        holder.textName.setText(messages.get(position).getFriendID());
-        holder.textMessage.setText(messages.get(position).getMessageBody());
+        holder.textDate.setText(vicinityMessages.get(position).getDate());
+        holder.textName.setText(vicinityMessages.get(position).getFriendID());
+        holder.textMessage.setText(vicinityMessages.get(position).getMessageBody());
 
 
         return convertView;

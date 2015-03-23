@@ -17,13 +17,19 @@ public class Post {
     private String picture;   //this might take another type i'll look it up later
 
     //Constructor
+
+    //we need this in the MainController -Sarah
+    public Post()
+    {
+
+    }
+
     public Post(User postedBy, String postBody){
-        Date currentDate = new Date();
-        DateFormat dF =  new SimpleDateFormat("yyyy/MM/dd HH:mm:ss");
-        postedAt = dF.format(currentDate);
-        this.postBody = postBody;
-        this.postedBy = postedBy;
-        postComments = null;
+        Date currentDate= new Date();
+        DateFormat dF=  new SimpleDateFormat("yyyy/MM/dd HH:mm:ss");
+        postedAt= dF.format(currentDate);
+        this.postBody=postBody;
+        this.postedBy=postedBy;
     }
 
     //Setters and getters
@@ -34,14 +40,14 @@ public class Post {
         return this.postedAt;
     }
     public boolean setPostedBy(User postedBy){
-        this.postedBy = postedBy;
+        this.postedBy=postedBy;
         return true;
     }
     public User getPostedBy(){
         return this.postedBy;
     }
     public boolean setPostBody(String postBody){
-        this.postBody = postBody;
+        this.postBody=postBody;
         return true;
     }
     public String getPostBody(){
@@ -51,7 +57,12 @@ public class Post {
         return this.postComments;
     }
 
-
 //Methods
+
+    //I wrote this -Sarah
+    public String toString()
+    {
+        return "Posted by: "+postedBy.getUsername()+ " Post Content: "+ postBody+" Date: "+ postedAt;
+    }
 
 }

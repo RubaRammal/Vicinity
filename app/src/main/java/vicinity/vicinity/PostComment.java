@@ -5,7 +5,10 @@ import android.os.Bundle;
 import android.view.Menu;
 import android.view.MenuItem;
 
-
+/**
+ * Post comment activity
+ * Still blank
+ */
 public class PostComment extends ActionBarActivity {
 
     @Override

@@ -13,41 +13,46 @@ import android.view.ViewGroup.LayoutParams;
 import java.util.ArrayList;
 import java.util.List;
 
-import vicinity.model.Message;
+import vicinity.model.VicinityMessage;
 
 /**
- * Created by macproretina on 3/10/15.
+ * This class is responsible for displaying
+ * message objects in activity_chat
  */
-public class ChatAdapter extends ArrayAdapter<Message> {
+public class ChatAdapter extends ArrayAdapter<VicinityMessage> {
 
-    private List<Message> messages;
+    private List<VicinityMessage> vicinityMessages;
     private LayoutInflater mInflater;
     private Context ctx;
 
+    //Constructor
     public ChatAdapter(Context context, int resource) {
         super(context, resource);
-        messages = new ArrayList<>();
+        vicinityMessages = new ArrayList<>();
         mInflater = LayoutInflater.from(context);
         ctx = context;
 
     }
 
     @Override
-    public void add(Message object) {
-        messages.add(object);
+    public void add(VicinityMessage object) {
+        vicinityMessages.add(object);
         super.add(object);
     }
 
     @Override
     public int getCount() {
-        return messages.size();
+        return vicinityMessages.size();
     }
 
     @Override
-    public Message getItem(int position) {
-        return messages.get(position);
+    public VicinityMessage getItem(int position) {
+        return vicinityMessages.get(position);
     }
 
+    /**
+     * Google this method if you wanna understand it. - Ruba
+     */
     @Override
     public View getView(int position, View convertView, ViewGroup parent) {
         ViewHolder holder;
@@ -63,16 +68,16 @@ public class ChatAdapter extends ArrayAdapter<Message> {
             holder = (ViewHolder) convertView.getTag();
         }
 
-        holder.chat_text.setText(messages.get(position).getMessageBody());
+        holder.chat_text.setText(vicinityMessages.get(position).getMessageBody());
 
-            holder.chat_text.setBackgroundDrawable(messages.get(position).isMyMsg() ?
+            holder.chat_text.setBackgroundDrawable(vicinityMessages.get(position).isMyMsg() ?
                     ctx.getResources().getDrawable(R.drawable.chatboxright) : ctx.getResources().getDrawable(R.drawable.chatboxleft));
 
-        holder.name_text.setText(messages.get(position).isMyMsg() ? "" : "Sarah");
+        holder.name_text.setText(vicinityMessages.get(position).isMyMsg() ? "" : "Sarah");
 
         LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(LayoutParams.WRAP_CONTENT, LayoutParams.WRAP_CONTENT);
 
-        if(!messages.get(position).isMyMsg()){
+        if(!vicinityMessages.get(position).isMyMsg()){
             params.gravity = Gravity.LEFT;
         }
         else{

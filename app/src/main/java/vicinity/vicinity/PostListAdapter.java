@@ -13,7 +13,8 @@ import vicinity.model.Post;
 import vicinity.vicinity.R;
 
 /**
- * Created by macproretina on 2/26/15.
+ * An adapter that takes a list of posts and displays it in a ListView
+ * inside the TimelineSectionFragment
  */
 public class PostListAdapter  extends BaseAdapter {
     ArrayList<Post> posts;

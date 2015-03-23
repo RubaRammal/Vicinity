@@ -10,7 +10,10 @@ import android.content.Context;
 import java.util.Timer;
 import java.util.TimerTask;
 
-
+/**
+ * Launch activity displays the app's logo
+ * for several seconds.
+ */
 public class LaunchActivity extends Activity {
 
     Context context = this;

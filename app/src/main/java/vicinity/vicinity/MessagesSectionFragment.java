@@ -1,8 +1,11 @@
 package vicinity.vicinity;
 
+import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
+import android.support.v4.app.FragmentManager;
+import android.support.v4.app.FragmentTransaction;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -11,32 +14,39 @@ import android.widget.ListView;
 
 import java.util.ArrayList;
 
-import vicinity.model.Friend;
-import vicinity.model.Message;
+import vicinity.model.VicinityMessage;
 
 /**
- * Created by macproretina on 2/13/15.
+ * This class is where a list of all the current chats a user has is displayed.
  */
 
 public class MessagesSectionFragment extends Fragment {
+
+    private Context ctx;
+
+    public MessagesSectionFragment(){}
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         View rootView = inflater.inflate(R.layout.fragment_messages, container, false);
 
-        ArrayList<Message> messages = GetMessages();
+        ctx = this.getActivity();
 
+        ArrayList<VicinityMessage> vicinityMessages = GetMessages();
 
+        //Get the fragment_messages layout ListView
         final ListView lv = (ListView) rootView.findViewById(R.id.messagesList);
 
-        lv.setAdapter(new MessageListAdapter(this.getActivity(), messages));
+        //Create the message rows (message_row_view) in the ListView
+        lv.setAdapter(new MessageListAdapter(this.getActivity(), vicinityMessages));
 
+        //List item click listener
         lv.setOnItemClickListener(
                 new AdapterView.OnItemClickListener(){
                     @Override
                     public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-                        Intent intent = new Intent(getActivity(), ChatActivity.class);
+                        Intent intent = new Intent(ctx, ChatActivity.class);
                         startActivity(intent);
                     }
                 }
@@ -45,19 +55,18 @@ public class MessagesSectionFragment extends Fragment {
         return rootView;
     }
 
-    private ArrayList<Message> GetMessages(){
-        ArrayList<Message> messages = new ArrayList<Message>();
 
-        Message message = new Message(this.getActivity(), "1", true, "Hey");
-        messages.add(message);
+    //The PRIVATE METHOD SHOULD BE DELETED AND THE METHOD THAT
+    // RETURNS THE MESSAGES ARRAY LIST SHOULD BE CALLED IN THIS CLASS
+    private ArrayList<VicinityMessage> GetMessages(){
+        ArrayList<VicinityMessage> vicinityMessages = new ArrayList<VicinityMessage>();
 
-        message = new Message(this.getActivity(), "2", true, "Hello...");
-        messages.add(message);
+        VicinityMessage vicinityMessage = new VicinityMessage(this.getActivity(), "1", true, "Hey");
+        vicinityMessages.add(vicinityMessage);
 
+        vicinityMessage = new VicinityMessage(this.getActivity(), "1", true, "Hey");
+        vicinityMessages.add(vicinityMessage);
 
-        //THIS PRIVATE METHOD SHOULD BE DELETED AND THE METHOD THAT
-        // RETURNS THE MESSAGES ARRAY LIST SHOULD BE CALLED IN THIS CLASS
-
-        return messages;
+        return vicinityMessages;
     }
 }

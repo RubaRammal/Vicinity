@@ -13,23 +13,25 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.TextView;
+import android.widget.Toast;
 
-import vicinity.model.CurrentUser;
+import vicinity.Controller.MainController;
+
 
 
 public class MainActivity extends Activity {
 
-    private static final String TAG = "rubasMessage";
+    private static final String TAG = "Username Activity";
     EditText username_input;
     Button submit_button;
     TextView launchScreen;
     final Context context = this;
     public String username;
-
+    MainController controller;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {//Lama
-
+        controller = new MainController(MainActivity.this);
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         Log.i(TAG, "onCreate");
@@ -53,7 +55,7 @@ public class MainActivity extends Activity {
             @Override
             public void afterTextChanged(Editable s) {
                 username = username_input.getText().toString();
-                submit_button.setEnabled(usernameValidation(username));
+                submit_button.setEnabled(controller.nameValidation(username));//Username validation;
             }
         });
 
@@ -62,15 +64,18 @@ public class MainActivity extends Activity {
         submit_button.setOnClickListener(
                 new Button.OnClickListener(){
                     public void onClick(View v) {
-                        try{
-                        //Add the username to the database
-                        CurrentUser user = new CurrentUser(MainActivity.this, username_input.getText().toString());
-                        user.createProfile(user);
-                        Intent intent = new Intent(context, Tabs.class);
-                        startActivity(intent);}
-                        catch(Exception e){
+                            //Controller will add the user to the database
+                            if(controller.createNewUser(username_input.getText().toString()))
+                            {
 
-                        }
+                                CharSequence text = "Welcome to Vicinity!";
+                                int duration = Toast.LENGTH_SHORT;
+                                Toast toast = Toast.makeText(context, text, duration);//we can customize this Toast later -Afnan
+                                toast.show();
+                                Intent intent = new Intent(context, Tabs.class);
+                                startActivity(intent);
+                            }
+
 
                     }
                 }
@@ -82,12 +87,6 @@ public class MainActivity extends Activity {
 
 
 
-//This method validates the username (letters, numbers dash and underscore are allowed, no spaces)
-    private boolean usernameValidation(String username){
-        if(username.isEmpty() ||!username.matches("[a-zA-Z0-9_-]+"))
-            return false;
-        return true;
-    }
 
 
 

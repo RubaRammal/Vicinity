@@ -7,7 +7,9 @@ import android.view.View;
 import android.view.ViewGroup;
 
 /**
- * Created by macproretina on 2/13/15.
+ * Request fragment
+ * Still blank
+ * May be deleted
  */
 public class RequestsSectionFragment extends Fragment {
 

@@ -18,7 +18,7 @@ import vicinity.model.User;
 
 
 /**
- * Created by macproretina on 2/13/15.
+ * A list of all the posts is displayed in this class.
  */
 
 public class TimelineSectionFragment extends Fragment {
@@ -36,8 +36,7 @@ public class TimelineSectionFragment extends Fragment {
 
 
         final ListView lv = (ListView) rootView.findViewById(android.R.id.list);
-        //ListAdapter adapter = new ArrayAdapter<String>(getActivity(), android.R.layout.simple_list_item_1, testPosts);
-        //lv.setAdapter(adapter);
+
 
         lv.setAdapter(new PostListAdapter(this.getActivity(), posts));
 
@@ -51,7 +50,7 @@ public class TimelineSectionFragment extends Fragment {
            }
         );
 
-
+    //When Post is clicked
         addPost.setOnClickListener(
                 new Button.OnClickListener(){
                     public void onClick(View v) {
@@ -64,12 +63,11 @@ public class TimelineSectionFragment extends Fragment {
         return rootView;
     }
 
-
+    //The PRIVATE METHOD SHOULD BE DELETED AND THE METHOD THAT
+    // RETURNS THE POSTS ARRAY LIST SHOULD BE CALLED IN THIS CLASS
     private ArrayList<Post> GetPosts(){
         ArrayList<Post> posts = new ArrayList<Post>();
 
-
-        //We should get these from the db and create a loop
         Post post = new Post(new User("Ruba"), "Vicinity is a great way to communicate with people around you!");
         posts.add(post);
 

@@ -1,5 +1,6 @@
 package vicinity.model;
 
+import android.content.ContentResolver;
 import android.content.ContentValues;
 import android.content.Context;
 import android.content.ContextWrapper;
@@ -22,24 +23,22 @@ import java.text.SimpleDateFormat;
 import java.util.Date;
 
 
-public class Message {
+public class VicinityMessage {
 
     private static final String TAG = "MessageClass";
     private static Context getApplicationContext;
     DBHandler dbh;
     SQLiteDatabase db;
+    ContentResolver contentResolver = getContentResolver();
+    CapturePhotoUtils capturePhotoUtils;
+    ContextWrapper cw = new ContextWrapper(getApplicationContext);
 
-    private long msgTimestamp;//Which attribute shall become the PK? -AFNAN
+    private long msgTimestamp;
     private String sentAt;
     private String friendID;
     private boolean isMyMsg;
     private String messageBody;
 
-    // i need this in the MainController -Sarah
-    public Message()
-    {
-
-    }
 
     /**
      * Public constructor, initiates a message
@@ -49,18 +48,18 @@ public class Message {
      * @param isMyMsg boolean
      * @param messageBody string
      */
-    public Message(Context context, String friendID, boolean isMyMsg, String messageBody){
+    public VicinityMessage(Context context, String friendID, boolean isMyMsg, String messageBody){
 
-        getApplicationContext=context;
-        this.friendID=friendID;
-        this.messageBody=messageBody;
+        getApplicationContext = context;
+        this.friendID = friendID;
+        this.messageBody = messageBody;
         this.isMyMsg = isMyMsg;
         //The following lines will create a string of the time & date the message was sent at
         //in order to be displayed with the message
-        Date msgSentAt= new Date();
-        DateFormat dF = new SimpleDateFormat("yyyy/MM/dd HH:mm:ss");
+        Date msgSentAt = new Date();
+        DateFormat dF = new SimpleDateFormat("yyyy/MM/dd");
         sentAt = dF.format(msgSentAt);
-        //Message's timestamp: Messages for each friend shall be ordered according to this attribute.
+        //VicinityMessage's timestamp: Messages for each friend shall be ordered according to this attribute.
         msgTimestamp = msgSentAt.getTime();
 
     }
@@ -69,8 +68,11 @@ public class Message {
     /**
      * setters/getters
      */
+    public ContentResolver getContentResolver() {
+        return contentResolver;
+    }
     public void setFriendID(String friendID){
-        this.friendID=friendID;
+        this.friendID = friendID;
     }
     public String getFriendID(){return friendID;}
     public String getDate() {
@@ -83,7 +85,7 @@ public class Message {
         return isMyMsg;
     }
     public void setIsMyMsg(boolean isMyMsg){
-        this.isMyMsg=isMyMsg;
+        this.isMyMsg = isMyMsg;
     }
     public boolean setMessageBody(String messageBody) {
         this.messageBody = messageBody;
@@ -93,37 +95,27 @@ public class Message {
         return this.messageBody;
     }
 
-    public void setTime(String time)
-    {
-        sentAt=time;
-    }
-
-    public String getTime()
-    {
-        return sentAt;
-    }
 
 
-    //UNTESTED
     /**
      * Adds a single message to the database.
-     * @param newMessage a new Message object to be added in the db
+     * @param newVicinityMessage a new VicinityMessage object to be added in the db
      * @return isAdded a boolean that is true if the operation is successful, false otherwise
      * @throws SQLException
      */
-    public boolean addMessage(Message newMessage ) throws SQLException {
+    public boolean addMessage(VicinityMessage newVicinityMessage) throws SQLException {
 
-        boolean isAdded=false;
+        boolean isAdded = false;
 
         try {
             db = dbh.getWritableDatabase();
             dbh.openDataBase();
             ContentValues values = new ContentValues();
-            values.put("message", newMessage.getMessageBody());
-            //values.put("time", newMessage.getMsgTimestamp()); // I think we need generate time automatically in the db -AFNAN
-            values.put("isMyMsg",newMessage.isMyMsg());
-            values.put("friend_id",newMessage.getFriendID());
-            isAdded=db.insert("Message", null, values)>0;
+            values.put("message", newVicinityMessage.getMessageBody());
+            //values.put("time", newVicinityMessage.getMsgTimestamp()); // I think we need generate time automatically in the db -AFNAN
+            values.put("isMyMsg", newVicinityMessage.isMyMsg());
+            values.put("friend_id", newVicinityMessage.getFriendID());
+            isAdded=db.insert("VicinityMessage", null, values)>0;
 
             dbh.close();
         } catch (Exception e) {
@@ -132,16 +124,31 @@ public class Message {
         return isAdded;
     }
 
+    /** UNTESTED METHODS
+     *  WILL BE TESTED AFTER CONNECTING
+     *  TO THE INTERFACES
+     * */
 
+    /**
+     * this method saves the image to the gallery and not to the DB
+     * */
 
-    //Message Methods [to implement after adding the database]
-    //we might not need this method since i read that android provides the option of saving an image by default
-    private String saveImage(Bitmap bitmapImage){
+   private void saveImage(Bitmap bitmapImage){
+
         //this single line of code is only if we want to save the image to the phone gallery along with all the images
         //MediaStore.Images.Media.insertImage(getContentResolver(), yourBitmap, yourTitle , yourDescription);
 
+        capturePhotoUtils = new CapturePhotoUtils();
+        capturePhotoUtils.insertImage(contentResolver, bitmapImage, " " , " ");
+    }
 
-        ContextWrapper cw = new ContextWrapper(getApplicationContext);
+    /**
+     * Inserts image to the DB
+     * */
+
+    private String insertImage(Bitmap bitmapImage){//inserts the Image to the DB
+
+
         // path to /data/data/Vicinity/app_data/imageDir
         File directory = cw.getDir("imageDir" , Context.MODE_PRIVATE);
         // Create imageDir
@@ -169,7 +176,9 @@ public class Message {
 
     }
 
-
+    /**
+     * Retrieves image from DB
+     * */
 
     private void loadImage(String path){
         try {
@@ -186,11 +195,10 @@ public class Message {
 
     }
 
-    //Why do we need this method
-    //i believe this method should be replaced by toString (i wrote toString() below this method). - Sarah
+    //this method can be replaced by alternatives (e.g. list) after connecteing to the interfaces
     public void viewMessage(int messageID) throws SQLException{
 
-        String Table_Name = "Message";
+        String Table_Name = "VicinityMessage";
         String selectQuery = "SELECT * FROM" + Table_Name + "WHERE _ID=" + messageID;
 
 
@@ -218,16 +226,4 @@ public class Message {
         db.close();
 
     }
-
-
-
-    public String toString()
-    {
-        return "Message: "+ messageBody+" Friend id: "+ friendID+ " Date: "+ sentAt;
-    }
-
-    }
-
-
-
-
+}

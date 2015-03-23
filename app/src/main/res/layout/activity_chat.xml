@@ -1,8 +1,10 @@
-<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools" android:layout_width="fill_parent"
     android:layout_height="fill_parent"
     android:orientation="vertical"
-    tools:context="vicinity.vicinity.ChatActivity">
+    tools:context="vicinity.vicinity.Chat">
+
+
 
     <ListView
         android:id="@+id/chatList"
@@ -11,38 +13,35 @@
         android:padding="10dip"
         android:divider="@null"
         android:dividerHeight="5dp"
-        ></ListView>
+        android:transcriptMode="alwaysScroll"
+        android:layout_marginBottom="50dip"></ListView>
 
-<RelativeLayout
-    android:id="@+id/chatForm"
-    android:layout_width="fill_parent"
-    android:layout_height="wrap_content"
-    android:layout_alignParentBottom="true"
-    android:orientation="vertical"
-    >
-    <EditText
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:inputType="textMultiLine"
-        android:ems="10"
-        android:id="@+id/chatText"
-        android:layout_alignParentBottom="true"
-        android:layout_alignParentLeft="true"
-        android:layout_alignParentStart="true"
-        android:layout_toLeftOf="@+id/sendButton"
-        />
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="50dip"
+        android:layout_gravity="bottom"
+        >
+        <EditText
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:inputType="textMultiLine"
+            android:ems="10"
+            android:id="@+id/chatText"
+            android:layout_gravity="bottom"
+            android:layout_weight="0.90"
+            android:focusableInTouchMode="true"
+            android:visibility="visible"/>
 
-    <Button
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="Send"
-        android:id="@+id/sendButton"
-        android:layout_alignBottom="@+id/chatText"
-        android:layout_alignParentRight="true"
-        android:layout_alignParentEnd="true"/>
+        <Button
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Send"
+            android:id="@+id/sendButton"
+            android:layout_gravity="bottom|right"
+            android:layout_weight="0.10"/>
 
-</RelativeLayout>
+    </LinearLayout>
 
 
 
-</RelativeLayout>
+</FrameLayout>

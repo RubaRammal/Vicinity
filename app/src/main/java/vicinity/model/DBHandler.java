@@ -1,6 +1,6 @@
 package vicinity.model;
 
-//Github test
+
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
 import android.database.sqlite.SQLiteException;
@@ -26,10 +26,10 @@ public class DBHandler extends SQLiteOpenHelper {
     //private static final String INSERT_ANDROID_VALUES="INSERT INTO \"android_metadata\" VALUES ('en_US');";
 
 
-
-
-
-//CONSTRUCTOR
+    /**
+     * Public constructor
+     * @param context ,
+     */
     public DBHandler(Context context){
         super(context, DB_NAME , null, DATABASE_VERSION);
         this.myContext=context;
@@ -39,7 +39,7 @@ public class DBHandler extends SQLiteOpenHelper {
     @Override
     public void onCreate(SQLiteDatabase db) {
         try{
-        createDataBase();}
+            createDataBase();}
         catch (Exception e){
             Log.i(TAG,"Error in database creation");
         }
@@ -52,7 +52,7 @@ public class DBHandler extends SQLiteOpenHelper {
 
     }
 
-//Database methods
+
     /**
      * createDatabase()
      * Creates a empty database on the system and rewrites it with your own database.
@@ -62,16 +62,12 @@ public class DBHandler extends SQLiteOpenHelper {
         boolean dbExist = checkDataBase();
 
         if(dbExist){
-                Log.i(TAG,"External DB exists.");
+            Log.i(TAG,"External DB exists.");
         }
         else{
-            //By calling this method and empty database will be created into the default system path
-            //of your application so we are gonna be able to overwrite that database with our database.
             this.getReadableDatabase();
-
             try {
                 copyDataBase();
-
             }
             catch (IOException e) {
                 throw new Error("Error copying database");
@@ -81,7 +77,8 @@ public class DBHandler extends SQLiteOpenHelper {
     }
 
     /**
-     * Check if the database already exist to avoid re-copying the file each time you open the application.
+     * Check if the database already exist to avoid re-copying
+     * the file each time you open the application.
      * @return true if it exists, false if it doesn't
      */
     private boolean checkDataBase(){
@@ -125,6 +122,10 @@ public class DBHandler extends SQLiteOpenHelper {
 
     }
 
+    /**
+     *Opens database for readonly
+     * @throws SQLException
+     */
     public void openDataBase() throws SQLException{
         String myPath = DB_PATH + DB_NAME;
         vicinityDB = SQLiteDatabase.openDatabase(myPath, null, SQLiteDatabase.OPEN_READONLY);
@@ -140,38 +141,4 @@ public class DBHandler extends SQLiteOpenHelper {
 
 
 
-
-
-/**
-
- //Delete a row from the database
- public void deleteUser(String query){
- SQLiteDatabase db = getWritableDatabase();
- db.execSQL(query);
- Log.i(TAG, "User deleted!");
- //Queries to be passed to this method must have similar format - Ruba
- //Query = "DELETE FROM "+ TABLE_NAME +" WHERE " + COLUMN_USERNAME + "=\"" + username + "\";"
- }
-
- //We don't have to use this method now but I think it will become useful later - Ruba
- public String databaseToString(){
- String dbString = "";
- SQLiteDatabase db = getWritableDatabase();
- String query = "SELECT * FROM " + TABLE_NAME + "WHERE 1";
- // A cursor will point to a location in the result
- Cursor c = db.rawQuery(query, null);
- //Move to the first row in the result
- c.moveToFirst();
-
- while(!c.isAfterLast()){
- if(c.getString(c.getColumnIndex("username"))!= null){
- dbString += c.getString(c.getColumnIndex("username"));
- dbString += "\n";
- }
- }
- db.close();
-
- return dbString;
- }
- **/
 }

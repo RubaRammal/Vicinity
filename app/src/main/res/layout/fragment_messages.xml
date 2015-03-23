@@ -3,7 +3,7 @@
     android:layout_width="fill_parent"
     android:layout_height="fill_parent"
     tools:context=".Tabs"
-    android:id="@+id/messages"
+    android:id="@+id/vicinityMessages"
     android:orientation="vertical">
 
     <ListView

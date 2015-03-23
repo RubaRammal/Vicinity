@@ -2,8 +2,9 @@ package vicinity.vicinity;
 
 import android.content.Context;
 import android.database.DataSetObserver;
-import android.os.Bundle;
+import android.os.Handler;
 import android.support.v7.app.ActionBarActivity;
+import android.os.Bundle;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -11,45 +12,33 @@ import android.widget.AbsListView;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ListView;
-import android.app.ActionBar;
-import android.support.v7.widget.Toolbar;
+
 import java.sql.SQLException;
 
-import vicinity.model.Message;
+import vicinity.model.VicinityMessage;
 
 
 public class ChatActivity extends ActionBarActivity {
 
-    ListView chatListView;
-    EditText chatText;
-    Button send;
-    Boolean position = true;
-    Context ctx = this;
-    Message message;
-    Boolean added;
+
+    private ListView chatListView;
+    private EditText chatText;
+    private Button send;
+    private Boolean position;
+    private VicinityMessage vicinityMessage;
+    private ChatManager chatManager;
+    private ChatAdapter adapter;
+    private Context ctx;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_chat);
 
-/*        Toolbar actionBar = (Toolbar) findViewById(R.id.actionBar);
-
-        setSupportActionBar(actionBar);*/
-
-
-        getSupportActionBar().setDisplayShowTitleEnabled(false);
-        getSupportActionBar().setDisplayUseLogoEnabled(false);
-        getSupportActionBar().setDisplayHomeAsUpEnabled(false);
-        getSupportActionBar().setDisplayShowCustomEnabled(true);
-        getSupportActionBar().setDisplayShowHomeEnabled(false);
-        getSupportActionBar().setDisplayOptions(ActionBar.DISPLAY_SHOW_CUSTOM);
-        getSupportActionBar().setCustomView(R.layout.actionbar_layout);
-
-
-
+        //Initializations
+        ctx = this;
         chatListView = (ListView) findViewById(R.id.chatList);
-        final ChatAdapter adapter = new ChatAdapter(this, R.layout.chat_box_layout);
+        adapter = new ChatAdapter(ctx, R.layout.chat_box_layout);
         chatText = (EditText) findViewById(R.id.chatText);
         send = (Button) findViewById(R.id.sendButton);
 
@@ -59,26 +48,65 @@ public class ChatActivity extends ActionBarActivity {
             @Override
             public void onChanged() {
                 super.onChanged();
-                chatListView.setSelection(adapter.getCount()-1);
+                chatListView.setSelection(adapter.getCount() - 1);
             }
         });
 
+        //When button send message is clicked
         send.setOnClickListener(
-                new Button.OnClickListener(){
+                new Button.OnClickListener() {
                     public void onClick(View v) {
-                        message = new Message(ctx, "1", position, chatText.getText().toString());
-                        adapter.add(message);
-                        try {
-                             added = message.addMessage(message);
-                        } catch (SQLException e) {
-                            e.printStackTrace();
+                        if (chatManager != null) {
+
+                            //Message
+                            vicinityMessage = new VicinityMessage(ctx, "1", true, chatText.getText().toString());
+
+                            //Display Message to user
+                            pushMessage(vicinityMessage);
+
+                            //Send vicinityMessage to ChatManager
+                            chatManager.write(chatText.getText().toString().getBytes());
+                            System.out.print("Writing vicinityMessage successful");
+
+
+                            //To add vicinityMessage to db
+                            try {
+                                vicinityMessage.addMessage(vicinityMessage);
+                            } catch (SQLException e) {
+                                e.printStackTrace();
+                            }
+
+                            //Clear EditText
+                            chatText.setText(null);
                         }
-                        position = !position;
-                        chatText.setText(null);
                     }
                 }
         );
 
+    }
+
+    /**
+     * Sets obj ChatManager
+     * Used in WiFiServiceDiscoveryActivity
+     **/
+    public void setChatManager(ChatManager obj) {
+        chatManager = obj;
+    }
+
+    /**
+    * Sends an object VicinityMessage to the Message adapter
+    * to be displayed in the ChatActivity
+    **/
+    public void pushMessage(VicinityMessage readVicinityMessage) {
+        adapter.add(readVicinityMessage);
+        adapter.notifyDataSetChanged();
+    }
+
+    /**
+     * Used in ChatManager
+     **/
+    public interface MessageTarget {
+        public Handler getHandler();
     }
 
 
@@ -103,4 +131,5 @@ public class ChatActivity extends ActionBarActivity {
 
         return super.onOptionsItemSelected(item);
     }
+
 }
