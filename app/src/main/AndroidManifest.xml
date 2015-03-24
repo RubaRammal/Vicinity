@@ -53,7 +53,7 @@
             android:label="@string/app_name" >
         </activity>
         <activity
-            android:name=".AddPost"
+            android:name=".addPost"
             android:label="New post" >
         </activity>
         <activity

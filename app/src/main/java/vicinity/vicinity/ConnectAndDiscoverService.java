@@ -33,21 +33,19 @@ import vicinity.vicinity.NeighborSectionFragment.DeviceClickListener;
 import vicinity.model.VicinityMessage;
 
 
-/**
- * I ADDED THIS
- */
+
 public class ConnectAndDiscoverService extends Service
         implements Handler.Callback, WifiP2pManager.ConnectionInfoListener, NeighborSectionFragment.DeviceClickListener{
 
 
-    public final String TAG = "SERVIIICEE";
+    public final String TAG = "SERVICE";
     public Context ctx;
     /*
      *Service attributes
      */
     public static final String TXTRECORD_PROP_AVAILABLE = "available";
     //Our service's name and protocol
-    public static final String SERVICE_NAME = "_vicinityapp";
+    public static final String SERVICE_NAME = "_VicinityApp";
     public static final String SERVICE_REG_TYPE = "_presence._tcp";
     static final int SERVER_PORT = 4142;
 
@@ -71,7 +69,7 @@ public class ConnectAndDiscoverService extends Service
     public void setHandler(Handler handler) {
         this.handler = handler;
     }
-    public static ArrayList<String> neighbors = new ArrayList<String>();
+    public static ArrayList<WiFiP2pService> neighbors = new ArrayList<WiFiP2pService>();
     static public NeighborListAdapter neighborListAdapter;
 
     public ConnectAndDiscoverService() {
@@ -81,6 +79,7 @@ public class ConnectAndDiscoverService extends Service
     @Override
     public void onCreate(){
         Log.i(TAG,"Service started");
+        Log.i(TAG,"Our service is: "+SERVICE_NAME);
 
         intentFilter.addAction(WifiP2pManager.WIFI_P2P_STATE_CHANGED_ACTION);
         intentFilter.addAction(WifiP2pManager.WIFI_P2P_PEERS_CHANGED_ACTION);
@@ -148,6 +147,19 @@ public class ConnectAndDiscoverService extends Service
 
                         // A service has been discovered here, we need to see if it's our app.
                         if (instanceName.equalsIgnoreCase(SERVICE_NAME)) {
+                            Log.i(TAG,instanceName+" =? "+ SERVICE_NAME);
+
+                            WiFiP2pService service = new WiFiP2pService();
+                            service.device = srcDevice;
+                            service.instanceName = instanceName;
+                            service.serviceRegistrationType = registrationType;
+                            neighbors.add(service);
+                            Log.i(TAG,"Device: "+srcDevice.toString());
+                            neighborListAdapter.setServices(neighbors);
+                            neighborListAdapter.notifyDataSetChanged();
+
+                            Log.d(TAG,
+                                    neighbors.get(0) + " : Ruba + Afnan + Element");
 
 
                             // update the UI and add the item the discovered
@@ -180,17 +192,10 @@ public class ConnectAndDiscoverService extends Service
                     public void onDnsSdTxtRecordAvailable(
                             String fullDomainName, Map<String, String> record,
                             WifiP2pDevice device) {
-
-                        neighbors.add(device.deviceName);
-
-                        neighborListAdapter.setServices(neighbors);
-                        neighborListAdapter.notifyDataSetChanged();
-
-                        Log.d(TAG,
-                                neighbors.get(0) + " : Ruba + Afnan + Element");
                         Log.d(TAG,
                                 device.deviceName + " is "
                                         + record.get(TXTRECORD_PROP_AVAILABLE));
+
                     }
                 });
 
@@ -360,7 +365,7 @@ public class ConnectAndDiscoverService extends Service
 
     }
 
-    static public ArrayList<String> getNeighbors(){
+    static public ArrayList<WiFiP2pService> getNeighbors(){
         return neighbors;}
 
 

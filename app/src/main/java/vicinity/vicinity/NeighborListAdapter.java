@@ -16,14 +16,14 @@ import java.util.ArrayList;
  */
 public class NeighborListAdapter extends BaseAdapter {
     private LayoutInflater mInflater;
-    ArrayList<String> services;
-    public NeighborListAdapter(Context context, ArrayList<String> services){
+    ArrayList<WiFiP2pService> services;
+    public NeighborListAdapter(Context context, ArrayList<WiFiP2pService> services){
         this.services = services;
         mInflater = LayoutInflater.from(context);
 
     }
 
-    public void setServices(ArrayList<String> s){
+    public void setServices(ArrayList<WiFiP2pService> s){
         for (int i = 0; i < s.size(); i++) {
             services.add(s.get(i));
         }
@@ -60,7 +60,7 @@ public class NeighborListAdapter extends BaseAdapter {
             holder = (ViewHolder) convertView.getTag();
         }
 
-        holder.textName.setText(services.get(position));
+        holder.textName.setText(services.get(position).instanceName);
 
 
         return convertView;

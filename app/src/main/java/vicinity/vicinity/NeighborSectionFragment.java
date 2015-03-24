@@ -32,7 +32,7 @@ public class NeighborSectionFragment extends Fragment {
     public final String TAG = "Neighbors";
 
     private Context ctx;
-    private ArrayList<String> listOfServices;
+    private ArrayList<WiFiP2pService> listOfServices;
     private ListView lv;
     private NeighborListAdapter neighborListAdapter;
 
@@ -46,7 +46,7 @@ public class NeighborSectionFragment extends Fragment {
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         View rootView = inflater.inflate(R.layout.fragment_neighbor, container, false);
-        listOfServices = new ArrayList<String>();
+        listOfServices = new ArrayList<WiFiP2pService>();
         ctx = this.getActivity();
 
         lv = (ListView) rootView.findViewById(R.id.neighborList);
@@ -84,8 +84,17 @@ public class NeighborSectionFragment extends Fragment {
                     new AdapterView.OnItemClickListener() {
                         @Override
                         public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-                            Intent intent = new Intent(ctx, ChatActivity.class);
-                            startActivity(intent);
+                            //Intent intent = new Intent(ctx, ChatActivity.class);
+                            //startActivity(intent);
+                            lv.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+
+                                @Override
+                                public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+                                    ((DeviceClickListener) getActivity()).connectP2p((WiFiP2pService) parent
+                                            .getItemAtPosition(position))   ;
+                                }
+                            });
+
                         }
                     }
             );
@@ -93,5 +102,7 @@ public class NeighborSectionFragment extends Fragment {
 
         return rootView;
     }
+
+
 
 }

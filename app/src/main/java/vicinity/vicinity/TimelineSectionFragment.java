@@ -54,7 +54,7 @@ public class TimelineSectionFragment extends Fragment {
         addPost.setOnClickListener(
                 new Button.OnClickListener(){
                     public void onClick(View v) {
-                        Intent intent = new Intent(getActivity(), AddPost.class);
+                        Intent intent = new Intent(getActivity(), vicinity.vicinity.addPost.class);
                         startActivity(intent);
                     }
                 }
