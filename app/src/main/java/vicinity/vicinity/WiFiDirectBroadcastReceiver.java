@@ -14,7 +14,7 @@ import android.net.wifi.p2p.WifiP2pManager.Channel;
 import android.net.wifi.p2p.WifiP2pManager.ConnectionInfoListener;
 import android.util.Log;
 
-import vicinity.vicinity.WiFiServiceDiscoveryActivity;
+import vicinity.vicinity.ConnectAndDiscoverService;
 
 /**
  * this class is a WiFi BroadcastReceiver
@@ -49,7 +49,7 @@ public class WiFiDirectBroadcastReceiver extends BroadcastReceiver {
     @Override
     public void onReceive(Context context, Intent intent) {
         String action = intent.getAction();
-        Log.d(WiFiServiceDiscoveryActivity.TAG, action);
+        //Log.d(ConnectAndDiscoverService.TAG, action);
 
 
         if (WifiP2pManager.WIFI_P2P_CONNECTION_CHANGED_ACTION.equals(action)) {

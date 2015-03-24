@@ -30,7 +30,7 @@ public class ClientSocketHandler extends Thread {
         try {
             socket.bind(null);
             socket.connect(new InetSocketAddress(mAddress.getHostAddress(),
-                    WiFiServiceDiscoveryActivity.SERVER_PORT), 5000);
+                    ConnectAndDiscoverService.SERVER_PORT), 5000);
             Log.d(TAG, "Launching the I/O handler");
             chat = new ChatManager(socket, handler);
             new Thread(chat).start();

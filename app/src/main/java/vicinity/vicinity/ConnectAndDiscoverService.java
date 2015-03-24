@@ -19,18 +19,25 @@ import android.util.Log;
 import android.net.wifi.p2p.WifiP2pManager.Channel;
 
 
+import java.io.IOException;
 import java.lang.reflect.Method;
 
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
 
+import vicinity.vicinity.ChatActivity.MessageTarget;
+import vicinity.vicinity.NeighborSectionFragment.DeviceClickListener;
+
+
+import vicinity.model.VicinityMessage;
+
 
 /**
  * I ADDED THIS
  */
 public class ConnectAndDiscoverService extends Service
-        implements Handler.Callback, WifiP2pManager.ConnectionInfoListener,WiFiDirectServicesFragment.DeviceClickListener{
+        implements Handler.Callback, WifiP2pManager.ConnectionInfoListener, NeighborSectionFragment.DeviceClickListener{
 
 
     public final String TAG = "SERVIIICEE";
@@ -55,6 +62,8 @@ public class ConnectAndDiscoverService extends Service
 
     private Handler handler = new Handler(this);
     private NeighborSectionFragment neighborSectionFragment;
+    private VicinityMessage message;
+    private ChatActivity chat;
 
     public Handler getHandler(){
         return this.handler;
@@ -63,7 +72,7 @@ public class ConnectAndDiscoverService extends Service
         this.handler = handler;
     }
     public static ArrayList<String> neighbors = new ArrayList<String>();
-
+    static public NeighborListAdapter neighborListAdapter;
 
     public ConnectAndDiscoverService() {
 
@@ -82,6 +91,7 @@ public class ConnectAndDiscoverService extends Service
 
         manager = (WifiP2pManager) getSystemService(Context.WIFI_P2P_SERVICE);
         channel = manager.initialize(this, getMainLooper(), null);
+
         changeDeviceName("Heba");
         startRegistrationAndDiscovery();
 
@@ -173,8 +183,11 @@ public class ConnectAndDiscoverService extends Service
 
                         neighbors.add(device.deviceName);
 
+                        neighborListAdapter.setServices(neighbors);
+                        neighborListAdapter.notifyDataSetChanged();
+
                         Log.d(TAG,
-                                neighbors.get(0) + "Ruba + Afnan + Element");
+                                neighbors.get(0) + " : Ruba + Afnan + Element");
                         Log.d(TAG,
                                 device.deviceName + " is "
                                         + record.get(TXTRECORD_PROP_AVAILABLE));
@@ -226,12 +239,13 @@ public class ConnectAndDiscoverService extends Service
                 // construct a string from the valid bytes in the buffer
                 String readMessage = new String(readBuf, 0, msg.arg1);
                 Log.d(TAG, readMessage);
-                // (chatFragment).pushMessage("Buddy: " + readMessage);
+                message = new VicinityMessage(this, "2", false, readMessage);
+                (chat).pushMessage(message);
                 break;
 
             case MY_HANDLE:
                 Object obj = msg.obj;
-                // (chatFragment).setChatManager((ChatManager) obj);
+                (chat).setChatManager((ChatManager) obj);
 
         }
         return true;
@@ -275,6 +289,8 @@ public class ConnectAndDiscoverService extends Service
         });
     }
 
+
+
     /**
      * After connecting to a P2P group this method is invoked
      * @param p2pInfo
@@ -283,10 +299,12 @@ public class ConnectAndDiscoverService extends Service
     public void onConnectionInfoAvailable(WifiP2pInfo p2pInfo) {
         Log.i(TAG,"onConnectionAvailable");
         Thread handler = null;
-        /*
+
+         /*
          * The group owner accepts connections using a server socket and then spawns a
          * client socket for every client. This is handled by {@code
          * GroupOwnerSocketHandler}
+         */
 
 
         if (p2pInfo.isGroupOwner) {
@@ -306,11 +324,10 @@ public class ConnectAndDiscoverService extends Service
                     p2pInfo.groupOwnerAddress);
             handler.start();
         }
-        chatFragment = new WiFiChatFragment();
-        getFragmentManager().beginTransaction()
-                .replace(R.id.container_root, chatFragment).commit();
-        statusTxtView.setVisibility(View.GONE);*/
+        Intent intent = new Intent(this, ChatActivity.class);
+        startActivity(intent);
     }
+
     /**
      * This method changes the original device name
      * to the user's username
@@ -345,4 +362,11 @@ public class ConnectAndDiscoverService extends Service
 
     static public ArrayList<String> getNeighbors(){
         return neighbors;}
+
+
+    static public void setNAdapter(NeighborListAdapter nAdapter){
+        neighborListAdapter = nAdapter;
+    }
+
+
 }

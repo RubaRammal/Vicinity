@@ -9,7 +9,6 @@ import java.io.InputStream;
 import java.io.OutputStream;
 import java.net.Socket;
 
-import vicinity.vicinity.WiFiServiceDiscoveryActivity;
 
 /**
  * This class handles reading and writing of vicinityMessages with socket buffers.
@@ -38,7 +37,7 @@ public class ChatManager implements Runnable {
             byte[] buffer = new byte[1024];
             int bytes;
 
-            handler.obtainMessage(WiFiServiceDiscoveryActivity.MY_HANDLE, this)
+            handler.obtainMessage(ConnectAndDiscoverService.MY_HANDLE, this)
                     .sendToTarget();
 
             while (true) {
@@ -53,7 +52,7 @@ public class ChatManager implements Runnable {
                     // Send the obtained bytes to the UI Activity
                     // VicinityMessage is sent to WiFiServiceDiscovery to be sent to all users
                     Log.d(TAG, "Rec:" + String.valueOf(buffer));
-                    handler.obtainMessage(WiFiServiceDiscoveryActivity.MESSAGE_READ,
+                    handler.obtainMessage(ConnectAndDiscoverService.MESSAGE_READ,
                             bytes, -1, buffer).sendToTarget();
                 } catch (IOException e) {
                     Log.e(TAG, "disconnected", e);

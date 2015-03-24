@@ -9,7 +9,6 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
-import android.widget.ArrayAdapter;
 import android.widget.ListView;
 import android.support.v4.app.Fragment;
 
@@ -36,6 +35,11 @@ public class NeighborSectionFragment extends Fragment {
     private ArrayList<String> listOfServices;
     private ListView lv;
     private NeighborListAdapter neighborListAdapter;
+
+    interface DeviceClickListener {
+        public void connectP2p(WiFiP2pService wifiP2pService);
+    }
+
     public NeighborSectionFragment(){}
 
     @Override
@@ -44,13 +48,14 @@ public class NeighborSectionFragment extends Fragment {
         View rootView = inflater.inflate(R.layout.fragment_neighbor, container, false);
         listOfServices = new ArrayList<String>();
         ctx = this.getActivity();
-        listOfServices.add("No neighbors");
 
         lv = (ListView) rootView.findViewById(R.id.neighborList);
-        neighborListAdapter = new NeighborListAdapter(ctx, listOfServices );
+        neighborListAdapter = new NeighborListAdapter(ctx, listOfServices);
+
+        ConnectAndDiscoverService.setNAdapter(neighborListAdapter);
 
 
-        int secondsDelay = 10;
+     /*   int secondsDelay = 10;
         Timer timer = new Timer();
         timer.schedule(new TimerTask() {
 
@@ -59,7 +64,6 @@ public class NeighborSectionFragment extends Fragment {
                //listOfServices.add(ConnectAndDiscoverService.neighbors.get(0));
                 //listOfServices.add(ConnectAndDiscoverService.neighbors.get(1));
                 if(!ConnectAndDiscoverService.neighbors.isEmpty()) {
-                    //listOfServices.remove(0);
                     for (int i = 0; i < ConnectAndDiscoverService.neighbors.size(); i++) {
                         listOfServices.add(ConnectAndDiscoverService.neighbors.get(i));
                     }
@@ -71,14 +75,11 @@ public class NeighborSectionFragment extends Fragment {
 
             }
 
-        }, secondsDelay * 1000);
+        }, secondsDelay * 1000); */
 
         lv.setAdapter(neighborListAdapter);
+        neighborListAdapter.notifyDataSetChanged();
 
-        //listOfServices = c.getNeighbors();
-        //listOfServices = tab.getServices();
-
-        if(!ConnectAndDiscoverService.neighbors.isEmpty()) {
             lv.setOnItemClickListener(
                     new AdapterView.OnItemClickListener() {
                         @Override
@@ -89,20 +90,8 @@ public class NeighborSectionFragment extends Fragment {
                     }
             );
 
-        }
-
-
 
         return rootView;
     }
-    /**
-     * setters
-     */
-
-
-    public ListView getListView(){
-        return lv;
-    }
-
 
 }

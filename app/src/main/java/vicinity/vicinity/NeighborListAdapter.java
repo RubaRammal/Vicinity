@@ -15,14 +15,18 @@ import java.util.ArrayList;
  * Created by macproretina on 3/23/15.
  */
 public class NeighborListAdapter extends BaseAdapter {
-
     private LayoutInflater mInflater;
     ArrayList<String> services;
-
     public NeighborListAdapter(Context context, ArrayList<String> services){
         this.services = services;
         mInflater = LayoutInflater.from(context);
 
+    }
+
+    public void setServices(ArrayList<String> s){
+        for (int i = 0; i < s.size(); i++) {
+            services.add(s.get(i));
+        }
     }
 
     @Override
