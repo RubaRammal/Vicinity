@@ -17,16 +17,7 @@ import java.util.ArrayList;
 import java.util.Timer;
 import java.util.TimerTask;
 
-import vicinity.vicinity.ChatActivity;
-import vicinity.vicinity.ConnectAndDiscoverService;
-import vicinity.vicinity.MessageListAdapter;
-import vicinity.vicinity.NeighborListAdapter;
-import vicinity.vicinity.R;
-import vicinity.vicinity.Tabs;
 
-/**
- * Created by macproretina on 3/23/15.
- */
 public class NeighborSectionFragment extends Fragment {
 
     public final String TAG = "Neighbors";
@@ -35,6 +26,7 @@ public class NeighborSectionFragment extends Fragment {
     private ArrayList<WiFiP2pService> listOfServices;
     private ListView lv;
     private NeighborListAdapter neighborListAdapter;
+
 
     interface DeviceClickListener {
         public void connectP2p(WiFiP2pService wifiP2pService);
@@ -80,25 +72,15 @@ public class NeighborSectionFragment extends Fragment {
         lv.setAdapter(neighborListAdapter);
         neighborListAdapter.notifyDataSetChanged();
 
-            lv.setOnItemClickListener(
-                    new AdapterView.OnItemClickListener() {
-                        @Override
-                        public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-                            //Intent intent = new Intent(ctx, ChatActivity.class);
-                            //startActivity(intent);
-                            lv.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+        lv.setOnItemClickListener(new AdapterView.OnItemClickListener() {
 
-                                @Override
-                                public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-                                    ((DeviceClickListener) getActivity()).connectP2p((WiFiP2pService) parent
-                                            .getItemAtPosition(position))   ;
-                                }
-                            });
-
-                        }
-                    }
-            );
-
+            @Override
+            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+               Log.i(TAG,"Clicked: "+neighborListAdapter.getItem(position).toString()) ;
+                ((DeviceClickListener) ConnectAndDiscoverService.ctx).connectP2p((WiFiP2pService) neighborListAdapter
+                     .getItem(position))   ;
+            }
+        });
 
         return rootView;
     }

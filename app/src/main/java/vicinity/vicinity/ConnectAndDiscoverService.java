@@ -35,11 +35,11 @@ import vicinity.model.VicinityMessage;
 
 
 public class ConnectAndDiscoverService extends Service
-        implements Handler.Callback, WifiP2pManager.ConnectionInfoListener, NeighborSectionFragment.DeviceClickListener{
+        implements Handler.Callback, WifiP2pManager.ConnectionInfoListener, DeviceClickListener{
 
 
     public final String TAG = "SERVICE";
-    public Context ctx;
+    static public Context ctx;
     /*
      *Service attributes
      */
@@ -90,7 +90,7 @@ public class ConnectAndDiscoverService extends Service
 
         manager = (WifiP2pManager) getSystemService(Context.WIFI_P2P_SERVICE);
         channel = manager.initialize(this, getMainLooper(), null);
-
+        ctx= ConnectAndDiscoverService.this;
         changeDeviceName("Heba");
         startRegistrationAndDiscovery();
 
@@ -151,8 +151,9 @@ public class ConnectAndDiscoverService extends Service
 
                             WiFiP2pService service = new WiFiP2pService();
                             service.device = srcDevice;
-                            service.instanceName = instanceName;
+                            service.instanceName = srcDevice.deviceName;
                             service.serviceRegistrationType = registrationType;
+
                             neighbors.add(service);
                             Log.i(TAG,"Device: "+srcDevice.toString());
                             neighborListAdapter.setServices(neighbors);
@@ -161,24 +162,6 @@ public class ConnectAndDiscoverService extends Service
                             Log.d(TAG,
                                     neighbors.get(0) + " : Ruba + Afnan + Element");
 
-
-                            // update the UI and add the item the discovered
-                            // device.
-                            /*WiFiDirectServicesList fragment = (WiFiDirectServicesList) getFragmentManager()
-                                    .findFragmentByTag("services");
-
-                            if (fragment != null) {
-                                WiFiDirectServicesList.WiFiDevicesAdapter adapter = ((WiFiDirectServicesList.WiFiDevicesAdapter) fragment
-                                        .getListAdapter());
-                                WiFiP2pService service = new WiFiP2pService();
-                                service.device = srcDevice;
-                                service.instanceName = instanceName;
-                                service.serviceRegistrationType = registrationType;
-                                adapter.add(service);
-                                adapter.notifyDataSetChanged();
-                                Log.d(TAG, "onBonjourServiceAvailable "
-                                        + instanceName);
-                            }*/
                         }
 
                     }
@@ -280,7 +263,7 @@ public class ConnectAndDiscoverService extends Service
                         }
                     });
 
-        manager.connect(channel, config, new WifiP2pManager.ActionListener() {
+            manager.connect(channel, config, new WifiP2pManager.ActionListener() {
 
             @Override
             public void onSuccess() {

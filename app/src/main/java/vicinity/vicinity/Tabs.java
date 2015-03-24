@@ -17,6 +17,7 @@ import android.view.Window;
 public class Tabs extends FragmentActivity implements ActionBar.TabListener {
 
 
+
     AppSectionsPagerAdapter mAppSectionsPagerAdapter;
     ViewPager mViewPager;
     static NeighborSectionFragment neighborFragment;

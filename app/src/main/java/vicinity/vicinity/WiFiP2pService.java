@@ -10,4 +10,9 @@ public class WiFiP2pService {
     WifiP2pDevice device;
     String instanceName = null;
     String serviceRegistrationType = null;
+
+    @Override
+    public String toString(){
+        return instanceName;
+    }
 }
