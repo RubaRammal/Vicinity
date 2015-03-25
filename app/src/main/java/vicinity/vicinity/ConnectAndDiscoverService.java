@@ -1,7 +1,9 @@
 package vicinity.vicinity;
 
 import android.app.Service;
+import android.content.ComponentName;
 import android.content.Intent;
+import android.net.NetworkInfo;
 import android.os.IBinder;
 import android.content.Context;
 import android.content.IntentFilter;
@@ -75,11 +77,62 @@ public class ConnectAndDiscoverService extends Service
     public ConnectAndDiscoverService() {
 
     }
+    /******************BroadcastReceiver******************************/
+    private final BroadcastReceiver broadcastReceiver= new BroadcastReceiver() {
+        private String TAG = "BCReceiver";
+        @Override
+        public void onReceive(Context context, Intent intent) {
+            String action = intent.getAction();
+            Log.i(TAG,"onReceive" );
 
+
+            if (WifiP2pManager.WIFI_P2P_CONNECTION_CHANGED_ACTION.equals(action)) {
+
+                if (manager == null) {
+                    return;
+                }
+                NetworkInfo networkInfo = intent.getParcelableExtra(WifiP2pManager.EXTRA_NETWORK_INFO);
+
+                if (networkInfo.isConnected()) {
+
+                    // we are connected with the other device, request connection
+                    // info to find group owner IP
+                    Log.d(TAG,"Connected to p2p network. Requesting network details...");
+                    Log.d(TAG,"Network info: "+networkInfo.toString());
+                    manager.requestConnectionInfo(channel,(WifiP2pManager.ConnectionInfoListener) context);
+                } else {
+                    Log.d(TAG,"NOT Connected to P2P network!");
+                    // It's a disconnect
+                }
+            }
+            else if (WifiP2pManager.WIFI_P2P_THIS_DEVICE_CHANGED_ACTION
+                    .equals(action)) {
+                Log.i(TAG,"WIFI_P2P_THIS_DEVICE_CHANGED_ACTION");
+                WifiP2pDevice device = (WifiP2pDevice) intent
+                        .getParcelableExtra(WifiP2pManager.EXTRA_WIFI_P2P_DEVICE);
+                Log.d(TAG, "Device status -" + device.status);
+
+            }
+            else if (WifiP2pManager.WIFI_P2P_PEERS_CHANGED_ACTION.equals(action)) {
+                Log.i(TAG,"WIFI_P2P_PEERS_CHANGED_ACTION");
+                // The peer list has changed!
+
+            } else if (WifiP2pManager.WIFI_P2P_CONNECTION_CHANGED_ACTION.equals(action)) {
+                Log.i(TAG,"WIFI_P2P_CONNECTION_CHANGED_ACTION");
+                // Connection state changed!
+            }
+        }
+    };
+
+    /*****************************************************************/
+
+
+    /******************Overridden Methods******************************/
     @Override
     public void onCreate(){
         Log.i(TAG,"Service started");
         Log.i(TAG,"Our service is: "+SERVICE_NAME);
+        ctx= ConnectAndDiscoverService.this;
 
         intentFilter.addAction(WifiP2pManager.WIFI_P2P_STATE_CHANGED_ACTION);
         intentFilter.addAction(WifiP2pManager.WIFI_P2P_PEERS_CHANGED_ACTION);
@@ -90,7 +143,11 @@ public class ConnectAndDiscoverService extends Service
 
         manager = (WifiP2pManager) getSystemService(Context.WIFI_P2P_SERVICE);
         channel = manager.initialize(this, getMainLooper(), null);
-        ctx= ConnectAndDiscoverService.this;
+
+        //Connecting WiFiBroadcastReceiver
+        //receiver = new WiFiDirectBroadcastReceiver(manager,channel,ctx);
+        registerReceiver(broadcastReceiver,intentFilter);
+
         changeDeviceName("Heba");
         startRegistrationAndDiscovery();
 
@@ -99,8 +156,15 @@ public class ConnectAndDiscoverService extends Service
     @Override
     public IBinder onBind(Intent intent) {
         Log.i(TAG, "onBind");
+
         throw new UnsupportedOperationException("Not yet implemented");
     }
+    @Override
+    public void onDestroy(){
+        Log.i(TAG,"Service destroyed");
+       unregisterReceiver(broadcastReceiver);
+    }
+    /************************************************************/
 
     /**
      * This method adds _vicinityapp local service to the network
@@ -249,6 +313,7 @@ public class ConnectAndDiscoverService extends Service
         //Wi-Fi P2p configuration for setting up a connection
         WifiP2pConfig config = new WifiP2pConfig();
         config.deviceAddress = service.device.deviceAddress;//device unique MAC address
+        final String name=service.device.deviceName;
         config.wps.setup = WpsInfo.PBC;
         if (serviceRequest != null)
             manager.removeServiceRequest(channel, serviceRequest,
@@ -267,7 +332,7 @@ public class ConnectAndDiscoverService extends Service
 
             @Override
             public void onSuccess() {
-                Log.i(TAG,"Connecting to service");
+                Log.i(TAG,"Connecting to "+ name );
             }
 
             @Override
@@ -299,7 +364,7 @@ public class ConnectAndDiscoverService extends Service
             Log.i(TAG, "Connected as group owner");
             try {
                 handler = new GroupOwnerSocketHandler(
-                        ((MessageTarget) this).getHandler());
+                       this.getHandler());
                 handler.start();
             } catch (IOException e) {
                 Log.d(TAG,"Failed to create a server thread - " + e.getMessage());
@@ -308,11 +373,17 @@ public class ConnectAndDiscoverService extends Service
         } else {
             Log.d(TAG, "Connected as peer");
             handler = new ClientSocketHandler(
-                    ((MessageTarget) this).getHandler(),
+                    this.getHandler(),
                     p2pInfo.groupOwnerAddress);
             handler.start();
         }
-        Intent intent = new Intent(this, ChatActivity.class);
+
+        Intent intent = new Intent();
+        intent.setAction(Intent.ACTION_MAIN);
+        intent.addCategory(Intent.CATEGORY_LAUNCHER);
+        intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+        ComponentName cn = new ComponentName(this, ChatActivity.class);
+        intent.setComponent(cn);
         startActivity(intent);
     }
 
@@ -322,7 +393,7 @@ public class ConnectAndDiscoverService extends Service
      * @param username registered username
      */
     public void changeDeviceName(String username){
-         String u=username;
+
         try{
             Log.i(TAG,"Changing name!!");
 
@@ -331,7 +402,7 @@ public class ConnectAndDiscoverService extends Service
                     new Class[] { WifiP2pManager.Channel.class, String.class,
                             WifiP2pManager.ActionListener.class });
 
-            m.invoke(manager,channel, u, new WifiP2pManager.ActionListener() {
+            m.invoke(manager,channel, username, new WifiP2pManager.ActionListener() {
                 public void onSuccess() {
 
                     //Code for Success in changing name

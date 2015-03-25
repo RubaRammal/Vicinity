@@ -9,6 +9,7 @@ import android.support.v4.app.FragmentActivity;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentPagerAdapter;
 import android.support.v4.view.ViewPager;
+import android.util.Log;
 import android.view.Window;
 
 /**
@@ -17,7 +18,7 @@ import android.view.Window;
 public class Tabs extends FragmentActivity implements ActionBar.TabListener {
 
 
-
+    private final String TAG ="Tabs";
     AppSectionsPagerAdapter mAppSectionsPagerAdapter;
     ViewPager mViewPager;
     static NeighborSectionFragment neighborFragment;
@@ -88,14 +89,12 @@ public class Tabs extends FragmentActivity implements ActionBar.TabListener {
     @Override
     public void onResume() {
         super.onResume();
-        //receiver = new WiFiDirectBroadcastReceiver(manager, channel, this);
-        //registerReceiver(receiver, intentFilter);
+
     }
 
     @Override
     public void onPause() {
         super.onPause();
-       // unregisterReceiver(receiver);
     }
     @Override
     protected void onRestart() {
@@ -104,7 +103,20 @@ public class Tabs extends FragmentActivity implements ActionBar.TabListener {
 
     @Override
     protected void onStop() {
+        Log.i(TAG,"Tabs are stopped");
         super.onStop();
+
+
+
+    }
+    @Override
+    protected void onDestroy(){
+        Log.i(TAG,"Tabs are destroyed");
+        //Destroying ConnectAndDiscover service
+        //This means the service is only stopped when the user shuts down the app completely
+        stopService(new Intent(this, ConnectAndDiscoverService.class));
+        super.onDestroy();
+
     }
     /************************************************/
 
