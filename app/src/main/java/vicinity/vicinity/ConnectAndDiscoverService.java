@@ -37,7 +37,7 @@ import vicinity.model.VicinityMessage;
 
 
 public class ConnectAndDiscoverService extends Service
-        implements Handler.Callback, WifiP2pManager.ConnectionInfoListener, DeviceClickListener{
+        implements Handler.Callback, WifiP2pManager.ConnectionInfoListener, DeviceClickListener, MessageTarget{
 
 
     public final String TAG = "SERVICE";
@@ -65,6 +65,7 @@ public class ConnectAndDiscoverService extends Service
     private VicinityMessage message;
     private ChatActivity chat;
 
+    @Override
     public Handler getHandler(){
         return this.handler;
     }
