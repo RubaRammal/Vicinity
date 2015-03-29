@@ -2,9 +2,12 @@ package vicinity.vicinity;
 
 import android.content.Context;
 import android.database.DataSetObserver;
+import android.net.wifi.p2p.WifiP2pManager;
 import android.os.Handler;
+import android.os.Message;
 import android.support.v7.app.ActionBarActivity;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -26,9 +29,9 @@ public class ChatActivity extends ActionBarActivity {
     private Button send;
     private Boolean position;
     private VicinityMessage vicinityMessage;
-    private ChatManager chatManager;
-    private ChatAdapter adapter;
-    private Context ctx;
+    private static ChatManager chatManager;
+    private static ChatAdapter adapter;
+    private static Context ctx;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -56,6 +59,9 @@ public class ChatActivity extends ActionBarActivity {
         send.setOnClickListener(
                 new Button.OnClickListener() {
                     public void onClick(View v) {
+
+                    Log.i(TAG,"ChatManager= "+chatManager);
+
                         if (chatManager != null) {
 
                             //Message
@@ -66,7 +72,7 @@ public class ChatActivity extends ActionBarActivity {
 
                             //Send vicinityMessage to ChatManager
                             chatManager.write(chatText.getText().toString().getBytes());
-                            System.out.print("Writing vicinityMessage successful");
+                            Log.i(TAG,"Writing vicinityMessage successful");
 
 
                             //To add vicinityMessage to db
@@ -85,29 +91,52 @@ public class ChatActivity extends ActionBarActivity {
 
     }
 
-    /**
-     * Sets obj ChatManager
-     * Used in WiFiServiceDiscoveryActivity
-     **/
-    public void setChatManager(ChatManager obj) {
-        chatManager = obj;
-    }
+    public static final int MESSAGE_READ = 0x400 + 1;
+    public static final int MY_HANDLE = 0x400 + 2;
+    public static final String TAG = "ChatActivity";
+    private static VicinityMessage message;
+
+    public static Handler handler = new Handler(){
+        /**
+         *
+         * @param msg
+         * @return
+         */
+        @Override
+        public void handleMessage(Message msg) {
+            Log.i(TAG,"handleMessage");
+            switch (msg.what) {
+                case MESSAGE_READ:
+                    byte[] readBuf = (byte[]) msg.obj;
+                    // construct a string from the valid bytes in the buffer
+                    String readMessage = new String(readBuf, 0, msg.arg1);
+                    Log.d(TAG, readMessage);
+                    message = new VicinityMessage(ctx, "2", false, readMessage);
+                    Log.i(TAG,"message"+message.getMessageBody());
+                    pushMessage(message);
+                    break;
+
+                case MY_HANDLE:
+                    Object obj = msg.obj;
+                    chatManager = ((ChatManager) obj);
+                    Log.i(TAG," "+obj.toString());
+
+            }
+        }
+    };
+
+
 
     /**
     * Sends an object VicinityMessage to the Message adapter
     * to be displayed in the ChatActivity
     **/
-    public void pushMessage(VicinityMessage readVicinityMessage) {
+    public static void pushMessage(VicinityMessage readVicinityMessage) {
         adapter.add(readVicinityMessage);
         adapter.notifyDataSetChanged();
     }
 
-    /**
-     * Used in ChatManager
-     **/
-    public interface MessageTarget {
-        public Handler getHandler();
-    }
+
 
 
     @Override
@@ -131,5 +160,6 @@ public class ChatActivity extends ActionBarActivity {
 
         return super.onOptionsItemSelected(item);
     }
+
 
 }

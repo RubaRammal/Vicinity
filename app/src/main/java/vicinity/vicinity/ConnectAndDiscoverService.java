@@ -28,7 +28,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
 
-import vicinity.vicinity.ChatActivity.MessageTarget;
+//import vicinity.vicinity.ChatActivity.MessageTarget;
 import vicinity.vicinity.NeighborSectionFragment.DeviceClickListener;
 
 
@@ -37,7 +37,7 @@ import vicinity.model.VicinityMessage;
 
 
 public class ConnectAndDiscoverService extends Service
-        implements Handler.Callback, WifiP2pManager.ConnectionInfoListener, DeviceClickListener, MessageTarget{
+        implements  WifiP2pManager.ConnectionInfoListener, DeviceClickListener{
 
 
     public final String TAG = "SERVICE";
@@ -60,18 +60,13 @@ public class ConnectAndDiscoverService extends Service
     private BroadcastReceiver receiver = null;
     private WifiP2pDnsSdServiceRequest serviceRequest;
 
-    private Handler handler = new Handler(this);
+    //private Handler handler = new Handler(this);
     private NeighborSectionFragment neighborSectionFragment;
     private VicinityMessage message;
     private ChatActivity chat;
 
-    @Override
-    public Handler getHandler(){
-        return this.handler;
-    }
-    public void setHandler(Handler handler) {
-        this.handler = handler;
-    }
+
+
     public static ArrayList<WiFiP2pService> neighbors = new ArrayList<WiFiP2pService>();
     static public NeighborListAdapter neighborListAdapter;
 
@@ -279,30 +274,7 @@ public class ConnectAndDiscoverService extends Service
 
     }//end of discoverServices
 
-    /**
-     *
-     * @param msg
-     * @return
-     */
-    @Override
-    public boolean handleMessage(Message msg) {
-        switch (msg.what) {
-            case MESSAGE_READ:
-                byte[] readBuf = (byte[]) msg.obj;
-                // construct a string from the valid bytes in the buffer
-                String readMessage = new String(readBuf, 0, msg.arg1);
-                Log.d(TAG, readMessage);
-                message = new VicinityMessage(this, "2", false, readMessage);
-                (chat).pushMessage(message);
-                break;
 
-            case MY_HANDLE:
-                Object obj = msg.obj;
-                (chat).setChatManager((ChatManager) obj);
-
-        }
-        return true;
-    }
 
     /**
      * This method connects peers with each other
@@ -365,7 +337,7 @@ public class ConnectAndDiscoverService extends Service
             Log.i(TAG, "Connected as group owner");
             try {
                 handler = new GroupOwnerSocketHandler(
-                       this.getHandler());
+                       ChatActivity.handler);
                 handler.start();
             } catch (IOException e) {
                 Log.d(TAG,"Failed to create a server thread - " + e.getMessage());
@@ -373,8 +345,12 @@ public class ConnectAndDiscoverService extends Service
             }
         } else {
             Log.d(TAG, "Connected as peer");
+            try{
+                Thread.sleep(3000);
+            }
+            catch(InterruptedException e){}
             handler = new ClientSocketHandler(
-                    this.getHandler(),
+                    ChatActivity.handler,
                     p2pInfo.groupOwnerAddress);
             handler.start();
         }
