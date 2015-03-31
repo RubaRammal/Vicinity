@@ -3,7 +3,7 @@ package vicinity.model;
 
 /**
  * This is a java practice, it's a class full of global constants
- * it prevents some code redundancies.
+ * it prevents some code redundancies..
  */
 public class Constants {
 
