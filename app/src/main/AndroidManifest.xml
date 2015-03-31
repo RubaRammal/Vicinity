@@ -62,7 +62,7 @@
         </activity>
 
         <service
-            android:name=".ConnectAndDiscoverService"
+            android:name="vicinity.ConnectionManager.ConnectAndDiscoverService"
             android:enabled="true"
             android:exported="true" >
         </service>

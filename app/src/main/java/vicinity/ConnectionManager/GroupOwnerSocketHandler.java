@@ -1,5 +1,5 @@
 
-package vicinity.vicinity;
+package vicinity.ConnectionManager;
 
 import android.os.Handler;
 import android.util.Log;
@@ -9,6 +9,8 @@ import java.net.ServerSocket;
 import java.util.concurrent.LinkedBlockingQueue;
 import java.util.concurrent.ThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
+
+import vicinity.model.Constants;
 
 /**
  * The implementation of a ServerSocket handler. This is used by the wifi p2p
@@ -29,7 +31,7 @@ public class GroupOwnerSocketHandler extends Thread {
 
     public GroupOwnerSocketHandler(Handler handler) throws IOException {
         try {
-            socket = new ServerSocket(ConnectAndDiscoverService.SERVER_PORT);
+            socket = new ServerSocket(Constants.SERVER_PORT);
             this.handler = handler;
             Log.d("GroupOwnerSocketHandler", "Socket Started");
         } catch (IOException e) {

@@ -1,5 +1,5 @@
 
-package vicinity.vicinity;
+package vicinity.ConnectionManager;
 
 import android.os.Handler;
 import android.util.Log;
@@ -8,6 +8,8 @@ import java.io.IOException;
 import java.net.InetAddress;
 import java.net.InetSocketAddress;
 import java.net.Socket;
+
+import vicinity.model.Constants;
 
 /**
  * I didn't change anything here - Ruba
@@ -30,7 +32,7 @@ public class ClientSocketHandler extends Thread {
         try {
             socket.bind(null);
             socket.connect(new InetSocketAddress(mAddress.getHostAddress(),
-                    ConnectAndDiscoverService.SERVER_PORT), 5000);
+                    Constants.SERVER_PORT), 5000);
             Log.d(TAG, "Launching the I/O handler");
             chat = new ChatManager(socket, handler);
             new Thread(chat).start();

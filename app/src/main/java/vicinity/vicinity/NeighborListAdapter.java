@@ -10,10 +10,10 @@ import android.widget.BaseAdapter;
 
 import java.util.ArrayList;
 
+import vicinity.ConnectionManager.WiFiP2pService;
 
-/**
- * Created by macproretina on 3/23/15.
- */
+
+
 public class NeighborListAdapter extends BaseAdapter {
     private LayoutInflater mInflater;
     ArrayList<WiFiP2pService> services;
@@ -60,7 +60,7 @@ public class NeighborListAdapter extends BaseAdapter {
             holder = (ViewHolder) convertView.getTag();
         }
 
-        holder.textName.setText(services.get(position).instanceName);
+        holder.textName.setText(services.get(position).getInstanceName());
 
 
         return convertView;

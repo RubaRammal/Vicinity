@@ -1,9 +1,8 @@
 
-package vicinity.vicinity;
+package vicinity.ConnectionManager;
 
 
 
-import android.app.Activity;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
@@ -13,8 +12,6 @@ import android.net.wifi.p2p.WifiP2pManager;
 import android.net.wifi.p2p.WifiP2pManager.Channel;
 import android.net.wifi.p2p.WifiP2pManager.ConnectionInfoListener;
 import android.util.Log;
-
-import vicinity.vicinity.ConnectAndDiscoverService;
 
 /**
  * this class is a WiFi BroadcastReceiver

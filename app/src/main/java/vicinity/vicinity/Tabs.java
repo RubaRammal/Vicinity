@@ -12,11 +12,12 @@ import android.support.v4.view.ViewPager;
 import android.util.Log;
 import android.view.Window;
 
+import vicinity.ConnectionManager.ConnectAndDiscoverService;
+
 /**
  * Implements the ActionBar to create a tabbed view.
  */
 public class Tabs extends FragmentActivity implements ActionBar.TabListener {
-
 
     private final String TAG ="Tabs";
     AppSectionsPagerAdapter mAppSectionsPagerAdapter;

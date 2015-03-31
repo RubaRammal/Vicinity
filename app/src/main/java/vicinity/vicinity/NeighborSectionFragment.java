@@ -1,8 +1,6 @@
 package vicinity.vicinity;
 
-import android.app.ActionBar;
 import android.content.Context;
-import android.content.Intent;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -14,8 +12,9 @@ import android.support.v4.app.Fragment;
 
 
 import java.util.ArrayList;
-import java.util.Timer;
-import java.util.TimerTask;
+
+import vicinity.ConnectionManager.ConnectAndDiscoverService;
+import vicinity.ConnectionManager.WiFiP2pService;
 
 
 public class NeighborSectionFragment extends Fragment {
@@ -28,7 +27,7 @@ public class NeighborSectionFragment extends Fragment {
     private NeighborListAdapter neighborListAdapter;
 
 
-    interface DeviceClickListener {
+    public interface DeviceClickListener {
         public void connectP2p(WiFiP2pService wifiP2pService);
     }
 

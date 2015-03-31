@@ -2,7 +2,6 @@ package vicinity.vicinity;
 
 import android.content.Context;
 import android.database.DataSetObserver;
-import android.net.wifi.p2p.WifiP2pManager;
 import android.os.Handler;
 import android.os.Message;
 import android.support.v7.app.ActionBarActivity;
@@ -18,6 +17,8 @@ import android.widget.ListView;
 
 import java.sql.SQLException;
 
+import vicinity.ConnectionManager.ChatManager;
+import vicinity.model.Constants;
 import vicinity.model.VicinityMessage;
 
 
@@ -91,8 +92,7 @@ public class ChatActivity extends ActionBarActivity {
 
     }
 
-    public static final int MESSAGE_READ = 0x400 + 1;
-    public static final int MY_HANDLE = 0x400 + 2;
+
     public static final String TAG = "ChatActivity";
     private static VicinityMessage message;
 
@@ -106,7 +106,7 @@ public class ChatActivity extends ActionBarActivity {
         public void handleMessage(Message msg) {
             Log.i(TAG,"handleMessage");
             switch (msg.what) {
-                case MESSAGE_READ:
+                case Constants.MESSAGE_READ:
                     byte[] readBuf = (byte[]) msg.obj;
                     // construct a string from the valid bytes in the buffer
                     String readMessage = new String(readBuf, 0, msg.arg1);
@@ -116,7 +116,7 @@ public class ChatActivity extends ActionBarActivity {
                     pushMessage(message);
                     break;
 
-                case MY_HANDLE:
+                case Constants.MY_HANDLE:
                     Object obj = msg.obj;
                     chatManager = ((ChatManager) obj);
                     Log.i(TAG," "+obj.toString());

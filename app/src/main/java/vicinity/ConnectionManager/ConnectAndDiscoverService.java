@@ -1,9 +1,8 @@
-package vicinity.vicinity;
+package vicinity.ConnectionManager;
 
 import android.app.Service;
 import android.content.ComponentName;
 import android.content.Intent;
-import android.net.NetworkInfo;
 import android.os.IBinder;
 import android.content.Context;
 import android.content.IntentFilter;
@@ -13,121 +12,56 @@ import android.net.wifi.p2p.WifiP2pDevice;
 import android.net.wifi.p2p.WifiP2pInfo;
 import android.net.wifi.p2p.nsd.WifiP2pDnsSdServiceInfo;
 import android.net.wifi.p2p.nsd.WifiP2pDnsSdServiceRequest;
-import android.os.Handler;
 import android.net.wifi.p2p.WifiP2pManager;
 import android.content.BroadcastReceiver;
-import android.os.Message;
 import android.util.Log;
 import android.net.wifi.p2p.WifiP2pManager.Channel;
 
 
 import java.io.IOException;
+import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
 
-//import vicinity.vicinity.ChatActivity.MessageTarget;
+
+import vicinity.model.Constants;
+import vicinity.vicinity.ChatActivity;
+import vicinity.vicinity.NeighborListAdapter;
 import vicinity.vicinity.NeighborSectionFragment.DeviceClickListener;
 
 
-import vicinity.model.VicinityMessage;
-
-
+/**
+ * ConnectAndDiscover Service starts running with the app and handles service discovery and
+ * WiFi P2P connection.
+ */
 
 public class ConnectAndDiscoverService extends Service
         implements  WifiP2pManager.ConnectionInfoListener, DeviceClickListener{
 
 
-    public final String TAG = "SERVICE";
+    public final String TAG = "ConService";
     static public Context ctx;
-    /*
-     *Service attributes
-     */
-    public static final String TXTRECORD_PROP_AVAILABLE = "available";
-    //Our service's name and protocol
-    public static final String SERVICE_NAME = "_VicinityApp";
-    public static final String SERVICE_REG_TYPE = "_presence._tcp";
-    static final int SERVER_PORT = 4142;
-
-    public static final int MESSAGE_READ = 0x400 + 1;
-    public static final int MY_HANDLE = 0x400 + 2;
     private WifiP2pManager manager;
-
     private final IntentFilter intentFilter = new IntentFilter();
     private Channel channel;
     private BroadcastReceiver receiver = null;
     private WifiP2pDnsSdServiceRequest serviceRequest;
-
-    //private Handler handler = new Handler(this);
-    private NeighborSectionFragment neighborSectionFragment;
-    private VicinityMessage message;
-    private ChatActivity chat;
-
-
-
     public static ArrayList<WiFiP2pService> neighbors = new ArrayList<WiFiP2pService>();
     static public NeighborListAdapter neighborListAdapter;
 
-    public ConnectAndDiscoverService() {
-
-    }
-    /******************BroadcastReceiver******************************/
-    private final BroadcastReceiver broadcastReceiver= new BroadcastReceiver() {
-        private String TAG = "BCReceiver";
-        @Override
-        public void onReceive(Context context, Intent intent) {
-            String action = intent.getAction();
-            Log.i(TAG,"onReceive" );
 
 
-            if (WifiP2pManager.WIFI_P2P_CONNECTION_CHANGED_ACTION.equals(action)) {
-
-                if (manager == null) {
-                    return;
-                }
-                NetworkInfo networkInfo = intent.getParcelableExtra(WifiP2pManager.EXTRA_NETWORK_INFO);
-
-                if (networkInfo.isConnected()) {
-
-                    // we are connected with the other device, request connection
-                    // info to find group owner IP
-                    Log.d(TAG,"Connected to p2p network. Requesting network details...");
-                    Log.d(TAG,"Network info: "+networkInfo.toString());
-                    manager.requestConnectionInfo(channel,(WifiP2pManager.ConnectionInfoListener) context);
-                } else {
-                    Log.d(TAG,"NOT Connected to P2P network!");
-                    // It's a disconnect
-                }
-            }
-            else if (WifiP2pManager.WIFI_P2P_THIS_DEVICE_CHANGED_ACTION
-                    .equals(action)) {
-                Log.i(TAG,"WIFI_P2P_THIS_DEVICE_CHANGED_ACTION");
-                WifiP2pDevice device = (WifiP2pDevice) intent
-                        .getParcelableExtra(WifiP2pManager.EXTRA_WIFI_P2P_DEVICE);
-                Log.d(TAG, "Device status -" + device.status);
-
-            }
-            else if (WifiP2pManager.WIFI_P2P_PEERS_CHANGED_ACTION.equals(action)) {
-                Log.i(TAG,"WIFI_P2P_PEERS_CHANGED_ACTION");
-                // The peer list has changed!
-
-            } else if (WifiP2pManager.WIFI_P2P_CONNECTION_CHANGED_ACTION.equals(action)) {
-                Log.i(TAG,"WIFI_P2P_CONNECTION_CHANGED_ACTION");
-                // Connection state changed!
-            }
-        }
-    };
-
-    /*****************************************************************/
 
 
     /******************Overridden Methods******************************/
     @Override
     public void onCreate(){
-        Log.i(TAG,"Service started");
-        Log.i(TAG,"Our service is: "+SERVICE_NAME);
+        Log.i(TAG,"Service started: "+ Constants.SERVICE_NAME);
+
+
         ctx= ConnectAndDiscoverService.this;
 
         intentFilter.addAction(WifiP2pManager.WIFI_P2P_STATE_CHANGED_ACTION);
@@ -140,9 +74,9 @@ public class ConnectAndDiscoverService extends Service
         manager = (WifiP2pManager) getSystemService(Context.WIFI_P2P_SERVICE);
         channel = manager.initialize(this, getMainLooper(), null);
 
-        //Connecting WiFiBroadcastReceiver
-        //receiver = new WiFiDirectBroadcastReceiver(manager,channel,ctx);
-        registerReceiver(broadcastReceiver,intentFilter);
+        //Attaching WiFiBroadcastReceiver
+        receiver = new WiFiDirectBroadcastReceiver(manager,channel,ctx);
+        registerReceiver(receiver,intentFilter);
 
         changeDeviceName("Heba");
         startRegistrationAndDiscovery();
@@ -152,15 +86,17 @@ public class ConnectAndDiscoverService extends Service
     @Override
     public IBinder onBind(Intent intent) {
         Log.i(TAG, "onBind");
-
         throw new UnsupportedOperationException("Not yet implemented");
     }
     @Override
     public void onDestroy(){
         Log.i(TAG,"Service destroyed");
-       unregisterReceiver(broadcastReceiver);
+        unregisterReceiver(receiver);
+        disconnectPeers();
     }
+
     /************************************************************/
+
 
     /**
      * This method adds _vicinityapp local service to the network
@@ -170,9 +106,9 @@ public class ConnectAndDiscoverService extends Service
         Log.i(TAG,"startRegistrationAndDiscovery");
 
         Map<String, String> record = new HashMap<String, String>();
-        record.put(TXTRECORD_PROP_AVAILABLE, "visible");
+        record.put(Constants.TXTRECORD_PROP_AVAILABLE, "visible");
         //WifiP2pDnsSdServiceInfo is A class for storing Bonjour service information that is advertised over a Wi-Fi peer-to-peer setup.
-        WifiP2pDnsSdServiceInfo service = WifiP2pDnsSdServiceInfo.newInstance(SERVICE_NAME, SERVICE_REG_TYPE, record);
+        WifiP2pDnsSdServiceInfo service = WifiP2pDnsSdServiceInfo.newInstance(Constants.SERVICE_NAME, Constants.SERVICE_REG_TYPE, record);
 
         //addLocalService Registers our service as a local service in order to be discovered.
         manager.addLocalService(channel, service, new WifiP2pManager.ActionListener() {
@@ -180,6 +116,7 @@ public class ConnectAndDiscoverService extends Service
             public void onSuccess() {
                 //What to do if our service got advertised in the local network
                 Log.i(TAG,"_vicinityapp Service registered");
+                discoverService();
             }
 
             @Override
@@ -188,9 +125,9 @@ public class ConnectAndDiscoverService extends Service
             }
         });
 
-        discoverService();
 
     }
+
 
     /**
      *First discoverService() registers listeners for DNS-SD services
@@ -206,13 +143,13 @@ public class ConnectAndDiscoverService extends Service
                                                         String registrationType, WifiP2pDevice srcDevice) {
 
                         // A service has been discovered here, we need to see if it's our app.
-                        if (instanceName.equalsIgnoreCase(SERVICE_NAME)) {
-                            Log.i(TAG,instanceName+" =? "+ SERVICE_NAME);
+                        if (instanceName.equalsIgnoreCase(Constants.SERVICE_NAME)) {
+                            Log.i(TAG,instanceName+" =? "+ Constants.SERVICE_NAME);
 
                             WiFiP2pService service = new WiFiP2pService();
-                            service.device = srcDevice;
-                            service.instanceName = srcDevice.deviceName;
-                            service.serviceRegistrationType = registrationType;
+                            service.setDevice(srcDevice);
+                            service.setInstanceName(srcDevice.deviceName);
+                            service.setServiceRegistrationType(registrationType);
 
                             neighbors.add(service);
                             Log.i(TAG,"Device: "+srcDevice.toString());
@@ -237,7 +174,7 @@ public class ConnectAndDiscoverService extends Service
                             WifiP2pDevice device) {
                         Log.d(TAG,
                                 device.deviceName + " is "
-                                        + record.get(TXTRECORD_PROP_AVAILABLE));
+                                        + record.get(Constants.TXTRECORD_PROP_AVAILABLE));
 
                     }
                 });
@@ -283,11 +220,13 @@ public class ConnectAndDiscoverService extends Service
     @Override
     public void connectP2p(WiFiP2pService service) {
         Log.i(TAG,"connectP2P");
+
         //Wi-Fi P2p configuration for setting up a connection
         WifiP2pConfig config = new WifiP2pConfig();
-        config.deviceAddress = service.device.deviceAddress;//device unique MAC address
-        final String name=service.device.deviceName;
+        config.deviceAddress = service.getDevice().deviceAddress;//device unique MAC address
+        final String name=service.getDevice().deviceName;//Device name
         config.wps.setup = WpsInfo.PBC;
+
         if (serviceRequest != null)
             manager.removeServiceRequest(channel, serviceRequest,
                     new WifiP2pManager.ActionListener() {
@@ -332,29 +271,35 @@ public class ConnectAndDiscoverService extends Service
          * GroupOwnerSocketHandler}
          */
 
-
+        try {
         if (p2pInfo.isGroupOwner) {
             Log.i(TAG, "Connected as group owner");
-            try {
+
                 handler = new GroupOwnerSocketHandler(
                        ChatActivity.handler);
                 handler.start();
-            } catch (IOException e) {
-                Log.d(TAG,"Failed to create a server thread - " + e.getMessage());
-                return;
-            }
-        } else {
+        }
+
+        else {
             Log.d(TAG, "Connected as peer");
-            try{
-                Thread.sleep(3000);
-            }
-            catch(InterruptedException e){}
+
+                Thread.sleep(1000);
+
+
             handler = new ClientSocketHandler(
                     ChatActivity.handler,
                     p2pInfo.groupOwnerAddress);
             handler.start();
+        }}
+        catch (IOException e) {
+            Log.d(TAG,"Failed to create a server thread - " + e.getMessage());
+            return;
+        }
+        catch(InterruptedException e){
+            e.printStackTrace();
         }
 
+        //Starting a new chat activity with a connected peer.
         Intent intent = new Intent();
         intent.setAction(Intent.ACTION_MAIN);
         intent.addCategory(Intent.CATEGORY_LAUNCHER);
@@ -388,16 +333,39 @@ public class ConnectAndDiscoverService extends Service
                 public void onFailure(int reason) {
                     //Code to be done while name change Fails
                 }
-            });
+            });}
+        catch(IllegalAccessException e){
+            e.printStackTrace();
         }
-        catch(Exception e){
+        catch(InvocationTargetException e){
+            e.printStackTrace();
 
+        }
+        catch (NoSuchMethodException e){
+            e.printStackTrace();
+        }
+
+
+
+    }
+    public void disconnectPeers(){
+        if (manager != null && channel != null) {
+            manager.removeGroup(channel, new WifiP2pManager.ActionListener() {
+
+                @Override
+                public void onFailure(int reasonCode) {
+                    Log.i(TAG, "Disconnect failed. Reason :" + reasonCode);
+                }
+
+                @Override
+                public void onSuccess() {
+                    Log.i(TAG,"Peers disconnected");
+                }
+
+            });
         }
 
     }
-
-    static public ArrayList<WiFiP2pService> getNeighbors(){
-        return neighbors;}
 
 
     static public void setNAdapter(NeighborListAdapter nAdapter){
