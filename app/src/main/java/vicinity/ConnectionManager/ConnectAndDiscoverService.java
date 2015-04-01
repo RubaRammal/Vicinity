@@ -27,7 +27,8 @@ import java.util.HashMap;
 import java.util.Map;
 
 
-import vicinity.model.Constants;
+import vicinity.model.CurrentUser;
+import vicinity.model.Globals;
 import vicinity.vicinity.ChatActivity;
 import vicinity.vicinity.NeighborListAdapter;
 import vicinity.vicinity.NeighborSectionFragment.DeviceClickListener;
@@ -59,7 +60,7 @@ public class ConnectAndDiscoverService extends Service
     /******************Overridden Methods******************************/
     @Override
     public void onCreate(){
-        Log.i(TAG,"Service started: "+ Constants.SERVICE_NAME);
+        Log.i(TAG,"Service started: "+ Globals.SERVICE_NAME);
 
 
         ctx= ConnectAndDiscoverService.this;
@@ -78,6 +79,7 @@ public class ConnectAndDiscoverService extends Service
         receiver = new WiFiDirectBroadcastReceiver(manager,channel,ctx);
         registerReceiver(receiver,intentFilter);
 
+        //Later change this to changeDeviceName(CurrentUser.retrieveCurrentUsername());
         changeDeviceName("Heba");
         startRegistrationAndDiscovery();
 
@@ -106,9 +108,9 @@ public class ConnectAndDiscoverService extends Service
         Log.i(TAG,"startRegistrationAndDiscovery");
 
         Map<String, String> record = new HashMap<String, String>();
-        record.put(Constants.TXTRECORD_PROP_AVAILABLE, "visible");
+        record.put(Globals.TXTRECORD_PROP_AVAILABLE, "visible");
         //WifiP2pDnsSdServiceInfo is A class for storing Bonjour service information that is advertised over a Wi-Fi peer-to-peer setup.
-        WifiP2pDnsSdServiceInfo service = WifiP2pDnsSdServiceInfo.newInstance(Constants.SERVICE_NAME, Constants.SERVICE_REG_TYPE, record);
+        WifiP2pDnsSdServiceInfo service = WifiP2pDnsSdServiceInfo.newInstance(Globals.SERVICE_NAME, Globals.SERVICE_REG_TYPE, record);
 
         //addLocalService Registers our service as a local service in order to be discovered.
         manager.addLocalService(channel, service, new WifiP2pManager.ActionListener() {
@@ -143,8 +145,8 @@ public class ConnectAndDiscoverService extends Service
                                                         String registrationType, WifiP2pDevice srcDevice) {
 
                         // A service has been discovered here, we need to see if it's our app.
-                        if (instanceName.equalsIgnoreCase(Constants.SERVICE_NAME)) {
-                            Log.i(TAG,instanceName+" =? "+ Constants.SERVICE_NAME);
+                        if (instanceName.equalsIgnoreCase(Globals.SERVICE_NAME)) {
+                            Log.i(TAG,instanceName+" =? "+ Globals.SERVICE_NAME);
 
                             WiFiP2pService service = new WiFiP2pService();
                             service.setDevice(srcDevice);
@@ -174,7 +176,7 @@ public class ConnectAndDiscoverService extends Service
                             WifiP2pDevice device) {
                         Log.d(TAG,
                                 device.deviceName + " is "
-                                        + record.get(Constants.TXTRECORD_PROP_AVAILABLE));
+                                        + record.get(Globals.TXTRECORD_PROP_AVAILABLE));
 
                     }
                 });

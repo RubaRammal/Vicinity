@@ -9,8 +9,7 @@ import java.io.InputStream;
 import java.io.OutputStream;
 import java.net.Socket;
 
-import vicinity.ConnectionManager.ConnectAndDiscoverService;
-import vicinity.model.Constants;
+import vicinity.model.Globals;
 
 
 /**
@@ -40,7 +39,7 @@ public class ChatManager implements Runnable {
             byte[] buffer = new byte[1024];
             int bytes;
 
-            handler.obtainMessage(Constants.MY_HANDLE, this)
+            handler.obtainMessage(Globals.MY_HANDLE, this)
                     .sendToTarget();
 
             while (true) {
@@ -55,7 +54,7 @@ public class ChatManager implements Runnable {
                     // Send the obtained bytes to the UI Activity
                     // VicinityMessage is sent to WiFiServiceDiscovery to be sent to all users
                     Log.d(TAG, "Rec:" + String.valueOf(buffer));
-                    handler.obtainMessage(Constants.MESSAGE_READ,
+                    handler.obtainMessage(Globals.MESSAGE_READ,
                             bytes, -1, buffer).sendToTarget();
                 } catch (IOException e) {
                     Log.e(TAG, "disconnected", e);

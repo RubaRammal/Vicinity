@@ -9,7 +9,7 @@ import java.net.InetAddress;
 import java.net.InetSocketAddress;
 import java.net.Socket;
 
-import vicinity.model.Constants;
+import vicinity.model.Globals;
 
 /**
  * I didn't change anything here - Ruba
@@ -32,7 +32,7 @@ public class ClientSocketHandler extends Thread {
         try {
             socket.bind(null);
             socket.connect(new InetSocketAddress(mAddress.getHostAddress(),
-                    Constants.SERVER_PORT), 5000);
+                    Globals.SERVER_PORT), 5000);
             Log.d(TAG, "Launching the I/O handler");
             chat = new ChatManager(socket, handler);
             new Thread(chat).start();

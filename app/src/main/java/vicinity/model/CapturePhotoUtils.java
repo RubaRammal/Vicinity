@@ -24,7 +24,7 @@ import java.io.OutputStream;
  */
 public class CapturePhotoUtils {
 
-    private static final String TAG = "CapturePhotoUtils Class";
+    private static final String TAG = "CapturePhotoUtils";
 
     /**
      * A copy of the Android internals  insertImage method, this method populates the

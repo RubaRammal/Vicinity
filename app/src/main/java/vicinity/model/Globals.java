@@ -1,11 +1,14 @@
 package vicinity.model;
 
 
+import android.database.sqlite.SQLiteDatabase;
+
 /**
- * This is a java practice, it's a class full of global constants
+ * This is a good java practice,
+ * it's a class full of global variables and constants
  * it prevents some code redundancies..
  */
-public class Constants {
+public class Globals {
 
 
     public static final String TXTRECORD_PROP_AVAILABLE = "available";
@@ -16,4 +19,8 @@ public class Constants {
     public static final int SERVER_PORT = 4142;
     public static final int MESSAGE_READ = 0x400 + 1;
     public static final int MY_HANDLE = 0x400 + 2;
+
+    public static DBHandler dbH;
+    public static SQLiteDatabase database;
+
 }

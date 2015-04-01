@@ -10,7 +10,7 @@ import java.util.concurrent.LinkedBlockingQueue;
 import java.util.concurrent.ThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
 
-import vicinity.model.Constants;
+import vicinity.model.Globals;
 
 /**
  * The implementation of a ServerSocket handler. This is used by the wifi p2p
@@ -31,7 +31,7 @@ public class GroupOwnerSocketHandler extends Thread {
 
     public GroupOwnerSocketHandler(Handler handler) throws IOException {
         try {
-            socket = new ServerSocket(Constants.SERVER_PORT);
+            socket = new ServerSocket(Globals.SERVER_PORT);
             this.handler = handler;
             Log.d("GroupOwnerSocketHandler", "Socket Started");
         } catch (IOException e) {

@@ -18,7 +18,7 @@ import android.widget.ListView;
 import java.sql.SQLException;
 
 import vicinity.ConnectionManager.ChatManager;
-import vicinity.model.Constants;
+import vicinity.model.Globals;
 import vicinity.model.VicinityMessage;
 
 
@@ -106,7 +106,7 @@ public class ChatActivity extends ActionBarActivity {
         public void handleMessage(Message msg) {
             Log.i(TAG,"handleMessage");
             switch (msg.what) {
-                case Constants.MESSAGE_READ:
+                case Globals.MESSAGE_READ:
                     byte[] readBuf = (byte[]) msg.obj;
                     // construct a string from the valid bytes in the buffer
                     String readMessage = new String(readBuf, 0, msg.arg1);
@@ -116,7 +116,7 @@ public class ChatActivity extends ActionBarActivity {
                     pushMessage(message);
                     break;
 
-                case Constants.MY_HANDLE:
+                case Globals.MY_HANDLE:
                     Object obj = msg.obj;
                     chatManager = ((ChatManager) obj);
                     Log.i(TAG," "+obj.toString());
