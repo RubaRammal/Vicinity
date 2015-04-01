@@ -11,9 +11,7 @@ import java.net.Socket;
 
 import vicinity.model.Globals;
 
-/**
- * I didn't change anything here - Ruba
- */
+
 public class ClientSocketHandler extends Thread {
 
     private static final String TAG = "ClientSocketHandler";

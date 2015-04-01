@@ -6,9 +6,15 @@ import java.util.ArrayList;
 import android.content.Context;
 import android.database.sqlite.SQLiteException;
 import android.util.Log;
+
+import vicinity.ConnectionManager.WiFiP2pService;
 import vicinity.Controller.MainController;
 
-public class Friend extends User{
+/**
+ * A structure class for holding friends information
+ * this class extends WiFiP2pService
+ */
+public class Friend extends WiFiP2pService{
 
     private static final String TAG = "FriendClass";
 
@@ -31,8 +37,8 @@ public class Friend extends User{
      * @param _id A User's device ID
      */
     public Friend(Context context,String username,String _id) {
-        super(username);
-        dbH = new DBHandler(context);
+        //super(username);
+        Globals.dbH = new DBHandler(context);
         this._id=_id;
     }
 
@@ -69,12 +75,12 @@ public class Friend extends User{
         {
             this._aliasName = aliasName;
             try{
-                database = dbH.getReadableDatabase();
-                dbH.openDataBase();
+                Globals.database = Globals.dbH.getReadableDatabase();
+                Globals.dbH.openDataBase();
                 ContentValues args = new ContentValues();
                 args.put("aliasname", aliasName);
-                isUpdated= database.update("User", args, "_id=" + friendID, null)>0;
-                dbH.close();
+                isUpdated= Globals.database.update("User", args, "_id=" + friendID, null)>0;
+                Globals.dbH.close();
             }
             catch(SQLiteException e){
                 Log.i(TAG,"SQLiteException > Friend > ChangeName");
@@ -86,41 +92,6 @@ public class Friend extends User{
     }
 
 
-    /**
-     *
-     * @return
-
-    public Friend retrieveFriend(String friendID){
-    Friend friend=null;
-    try{
-    String friendName;
-    boolean status;
-    database=dbH.getReadableDatabase();
-    dbH.openDataBase();
-    String query="SELECT * FROM Friend WHERE _id="+friendID;
-    Cursor c= database.rawQuery(query,null);
-    /**
-     * String un, id;
-    database = dbH.getReadableDatabase();
-    dbH.openDataBase();
-    String query="SELECT * FROM User";
-    Cursor c = database.rawQuery(query,null);
-    c.moveToFirst();
-    //There's no loop because we'll be retrieving the only row in the db
-    un=c.getString(c.getColumnIndex("username"));
-    id=c.getString(c.getColumnIndex("_id"));
-    thisUser= new CurrentUser(un,id);
-
-    dbH.close();
-    return thisUser;
-
-    }
-    catch(SQLException e){
-
-    }
-    return friend;
-    }
-     */
     public boolean sendMessage(Message newMessage){
         return false;
     }

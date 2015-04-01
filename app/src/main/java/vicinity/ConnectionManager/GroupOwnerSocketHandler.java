@@ -18,9 +18,6 @@ import vicinity.model.Globals;
  * the group owner acts as a server
  */
 
-/**
- * I didn't change anything here - Ruba
- */
 
 public class GroupOwnerSocketHandler extends Thread {
 

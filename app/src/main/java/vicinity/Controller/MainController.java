@@ -102,7 +102,7 @@ public class MainController {
             database = dbH.getReadableDatabase();
             dbH.openDataBase();
             ContentValues values = new ContentValues();
-            values.put("username", newFriend.getUsername());
+            values.put("username", newFriend.getInstanceName());
             //values.put("id", newFriend.getFriendID());
             isAdded=database.insert("Friend", null, values)>0;
             dbH.close();
@@ -156,8 +156,8 @@ public class MainController {
                 do {
 
                     Friend myFriend = new Friend();
-                    myFriend.setUsername(c.getString(1)); //getting username from database column #: 1
-                    myFriend.setStatus(myFriend.isOnline());
+                   // myFriend.setUsername(c.getString(1)); //getting username from database column #: 1
+                   // myFriend.setStatus(myFriend.isOnline());
                     myFriend.setAliasName(c.getString(3));
                     myFriend.setID(c.getString(0));
                     friendsList.add(myFriend);
