@@ -8,17 +8,14 @@ public class Post {
 
     private static final String TAG = "PostClass";
     //Post Atts
-    private int postID;
     private String postedAt;
     private User postedBy;
     private String postBody;
     private Comment[] postComments;
-    private String deviceID;  // I'm not sure why we added this attribute in the class diagram -Afnan
-    private String picture;   //this might take another type i'll look it up later
+    private String picture;
 
     //Constructor
 
-    //we need this in the MainController -Sarah
     public Post()
     {
 
@@ -33,9 +30,6 @@ public class Post {
     }
 
     //Setters and getters
-    public int getPostID(){
-        return this.postID;
-    }
     public String getPostedAt(){
         return this.postedAt;
     }

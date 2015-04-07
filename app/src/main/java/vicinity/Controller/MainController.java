@@ -24,7 +24,7 @@ public class MainController {
     private ArrayList<Friend> friendsList;
     private ArrayList<Request> requestsList;
     private ArrayList<Post> postList;
-    private ArrayList<Message> allMessages;
+    private ArrayList<VicinityMessage> allMessages;
 
     /**
      * Default constructor
@@ -156,10 +156,9 @@ public class MainController {
                 do {
 
                     Friend myFriend = new Friend();
-                   // myFriend.setUsername(c.getString(1)); //getting username from database column #: 1
-                   // myFriend.setStatus(myFriend.isOnline());
+                    myFriend.setInstanceName(c.getString(1)); //getting username from database column #: 1
+                    //myFriend.setStatus(myFriend.isOnline());
                     myFriend.setAliasName(c.getString(3));
-                    myFriend.setID(c.getString(0));
                     friendsList.add(myFriend);
 
                 } while (c.moveToNext());
@@ -202,7 +201,6 @@ public class MainController {
                     Request requestObj= new Request();
                     requestObj.setReqBy(new User (c.getString(1)));
                     requestObj.setRequestStatus(c.getString(2));
-                    // Adding message to allMessages
                     requestsList.add(requestObj);
                 } while (c.moveToNext());
             }
@@ -297,11 +295,10 @@ public class MainController {
      * Fetches user's Chats from the database
      * @return allMessages
      */
-    public ArrayList<Message> viewAllMessages()
+    public ArrayList<VicinityMessage> viewAllMessages()
 
     {
 
-        allMessages = new ArrayList<Message>();
 
         try
         {
@@ -313,10 +310,10 @@ public class MainController {
             {
                 do
                 {
-                    Message msg = new Message();
+                    VicinityMessage msg = new VicinityMessage();
                     msg.setMessageBody(c.getString(2));
                     msg.setFriendID(c.getString(1));
-                    msg.setTime(c.getString(4));
+                    //msg.setTime(c.getString(4));
                     //contact.setPicture(c.getBlob(3));
 
                     // Adding message to allMessages
@@ -359,7 +356,10 @@ public class MainController {
         {
             e.printStackTrace();
         }
+
+
         return isDeleted;
+
     }
 
 

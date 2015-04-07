@@ -9,9 +9,7 @@ import java.util.Date;
 public class Request {
     private static final String TAG = "RequestClass";
     //Request Atts
-    private int requestID;
     private User requestedBy; //sender
-    private User requestedTo; //receiver
     private String requestedAt;
     private boolean requestStatus; //is accepted?
     private String requestStatus1;

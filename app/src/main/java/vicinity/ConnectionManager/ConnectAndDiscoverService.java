@@ -67,10 +67,8 @@ public class ConnectAndDiscoverService extends Service
 
         intentFilter.addAction(WifiP2pManager.WIFI_P2P_STATE_CHANGED_ACTION);
         intentFilter.addAction(WifiP2pManager.WIFI_P2P_PEERS_CHANGED_ACTION);
-        intentFilter
-                .addAction(WifiP2pManager.WIFI_P2P_CONNECTION_CHANGED_ACTION);
-        intentFilter
-                .addAction(WifiP2pManager.WIFI_P2P_THIS_DEVICE_CHANGED_ACTION);
+        intentFilter.addAction(WifiP2pManager.WIFI_P2P_CONNECTION_CHANGED_ACTION);
+        intentFilter.addAction(WifiP2pManager.WIFI_P2P_THIS_DEVICE_CHANGED_ACTION);
 
         manager = (WifiP2pManager) getSystemService(Context.WIFI_P2P_SERVICE);
         channel = manager.initialize(this, getMainLooper(), null);
@@ -80,9 +78,8 @@ public class ConnectAndDiscoverService extends Service
         registerReceiver(receiver,intentFilter);
 
         //Later change this to changeDeviceName(CurrentUser.retrieveCurrentUsername());
-        changeDeviceName("Heba");
+        changeDeviceName("Afnan");
         startRegistrationAndDiscovery();
-
     }
 
     @Override
@@ -146,22 +143,26 @@ public class ConnectAndDiscoverService extends Service
 
                         // A service has been discovered here, we need to see if it's our app.
                         if (instanceName.equalsIgnoreCase(Globals.SERVICE_NAME)) {
-                            Log.i(TAG,instanceName+" =? "+ Globals.SERVICE_NAME);
+                           // Log.i(TAG,instanceName+" =? "+ Globals.SERVICE_NAME);
 
-                            WiFiP2pService service = new WiFiP2pService();
-                            service.setDevice(srcDevice);
-                            service.setInstanceName(srcDevice.deviceName);
-                            service.setServiceRegistrationType(registrationType);
 
+
+
+                            //Log.i(TAG,"Exists? "+alreadyExists(service.getDeviceAddress()));
+                                WiFiP2pService service = new WiFiP2pService();
+                                service.setDevice(srcDevice);
+                                service.setInstanceName(srcDevice.deviceName);
+                                service.setServiceRegistrationType(registrationType);
+                                service.setDeviceAddress(srcDevice.deviceAddress);
+                                Log.i(TAG,"Name: "+service.getInstanceName()+" Address: "+service.getDeviceAddress());
                             neighbors.add(service);
-                            Log.i(TAG,"Device: "+srcDevice.toString());
+                            //Log.i(TAG,srcDevice.toString());
                             neighborListAdapter.setServices(neighbors);
                             neighborListAdapter.notifyDataSetChanged();
 
-                            Log.d(TAG,
-                                    neighbors.get(0) + " : Ruba + Afnan + Element");
+                            Log.d(TAG, "New Neighbor: "+neighbors.get(0).getInstanceName());}
 
-                        }
+
 
                     }
                 }, new WifiP2pManager.DnsSdTxtRecordListener() {
@@ -177,6 +178,7 @@ public class ConnectAndDiscoverService extends Service
                         Log.d(TAG,
                                 device.deviceName + " is "
                                         + record.get(Globals.TXTRECORD_PROP_AVAILABLE));
+
 
                     }
                 });
@@ -285,15 +287,15 @@ public class ConnectAndDiscoverService extends Service
         else {
             Log.d(TAG, "Connected as peer");
 
-                Thread.sleep(1000);
+            Thread.sleep(1000);
 
 
             handler = new ClientSocketHandler(
                     ChatActivity.handler,
                     p2pInfo.groupOwnerAddress);
             handler.start();
-        }}
-        catch (IOException e) {
+        }
+        }catch (IOException e) {
             Log.d(TAG,"Failed to create a server thread - " + e.getMessage());
             return;
         }
@@ -316,20 +318,17 @@ public class ConnectAndDiscoverService extends Service
      * to the user's username
      * @param username registered username
      */
-    public void changeDeviceName(String username){
+    public void changeDeviceName(final String username){
 
         try{
             Log.i(TAG,"Changing name!!");
 
-            Method m = manager.getClass().getMethod(
-                    "setDeviceName",
-                    new Class[] { WifiP2pManager.Channel.class, String.class,
+            Method m = manager.getClass().getMethod("setDeviceName",new Class[] { WifiP2pManager.Channel.class, String.class,
                             WifiP2pManager.ActionListener.class });
 
             m.invoke(manager,channel, username, new WifiP2pManager.ActionListener() {
                 public void onSuccess() {
-
-                    //Code for Success in changing name
+                    Log.i(TAG,"Device changed name to "+username);
                 }
 
                 public void onFailure(int reason) {

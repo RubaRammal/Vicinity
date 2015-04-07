@@ -13,6 +13,7 @@ import android.util.Log;
 import android.view.Window;
 
 import vicinity.ConnectionManager.ConnectAndDiscoverService;
+import vicinity.exceptionHandler.UnhandledExceptionHandler;
 
 /**
  * Implements the ActionBar to create a tabbed view.
@@ -27,6 +28,9 @@ public class Tabs extends FragmentActivity implements ActionBar.TabListener {
     public void onCreate(Bundle savedInstanceState) {
 
         super.onCreate(savedInstanceState);
+
+        //Handling unhandled exception
+        Thread.setDefaultUncaughtExceptionHandler(new UnhandledExceptionHandler(this));
         //Starting the service
         startService(new Intent(this, ConnectAndDiscoverService.class));
 

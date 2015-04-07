@@ -3,6 +3,8 @@ package vicinity.model;
 
 import android.database.sqlite.SQLiteDatabase;
 
+import vicinity.Controller.MainController;
+
 /**
  * This is a good java practice,
  * it's a class full of global variables and constants
@@ -22,5 +24,7 @@ public class Globals {
 
     public static DBHandler dbH;
     public static SQLiteDatabase database;
+    public static MainController controller = new MainController();
+
 
 }

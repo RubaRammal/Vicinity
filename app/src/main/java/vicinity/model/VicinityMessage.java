@@ -39,7 +39,7 @@ public class VicinityMessage {
     private boolean isMyMsg;
     private String messageBody;
 
-
+    public VicinityMessage(){}
     /**
      * Public constructor, initiates a message
      * attaches to it its timestamp and date

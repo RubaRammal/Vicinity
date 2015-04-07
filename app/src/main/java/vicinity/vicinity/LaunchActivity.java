@@ -29,11 +29,12 @@ public class LaunchActivity extends Activity {
 
             public void run() {
 
+
                 Intent intent = new Intent(context, MainActivity.class);
                 startActivity(intent);
             }
 
-        }, secondsDelay * 1000);
+        }, secondsDelay * 2000);
     }
 
 

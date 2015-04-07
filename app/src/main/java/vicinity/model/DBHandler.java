@@ -21,9 +21,7 @@ public class DBHandler extends SQLiteOpenHelper {
     private static final int DATABASE_VERSION = 3;
     private final Context myContext;
     private SQLiteDatabase vicinityDB;
-    //The following table must be created automatically whenever you add an external database
-    //private static final String CREATE_TABLE_ANDROID="CREATE TABLE \"android_metadata\" (\"locale\" TEXT DEFAULT 'en_US');";
-    //private static final String INSERT_ANDROID_VALUES="INSERT INTO \"android_metadata\" VALUES ('en_US');";
+
 
 
     /**
@@ -43,8 +41,7 @@ public class DBHandler extends SQLiteOpenHelper {
         catch (Exception e){
             Log.i(TAG,"Error in database creation");
         }
-        //db.execSQL(CREATE_TABLE_ANDROID);
-        //db.execSQL(INSERT_ANDROID_VALUES);
+
     }
 
     @Override
@@ -54,7 +51,6 @@ public class DBHandler extends SQLiteOpenHelper {
 
 
     /**
-     * createDatabase()
      * Creates a empty database on the system and rewrites it with your own database.
      */
     public void createDataBase() throws IOException{

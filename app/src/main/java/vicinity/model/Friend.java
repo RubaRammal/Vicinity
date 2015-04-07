@@ -8,7 +8,6 @@ import android.database.sqlite.SQLiteException;
 import android.util.Log;
 
 import vicinity.ConnectionManager.WiFiP2pService;
-import vicinity.Controller.MainController;
 
 /**
  * A structure class for holding friends information
@@ -19,8 +18,7 @@ public class Friend extends WiFiP2pService{
     private static final String TAG = "FriendClass";
 
 
-    private String _id;
-    private ArrayList<Message> _privateMessages;//I don't think we need this array here -AFNAN
+    private ArrayList<VicinityMessage> _privateMessages;
     private String _aliasName;
 
     /**
@@ -39,7 +37,7 @@ public class Friend extends WiFiP2pService{
     public Friend(Context context,String username,String _id) {
         //super(username);
         Globals.dbH = new DBHandler(context);
-        this._id=_id;
+
     }
 
 
@@ -47,15 +45,11 @@ public class Friend extends WiFiP2pService{
      *
      * Setters-getters
      */
-    public void setID(String id){this._id=id;}
-    public String getFriendID(){
-        return this._id;
-    }
     public String getAliasName(){
         return this._aliasName;
     }
     public void setAliasName(String newName){_aliasName=newName;}
-    public ArrayList<Message> getPrivateMessages(){
+    public ArrayList<VicinityMessage> getPrivateMessages(){
         return this._privateMessages;
     }
 
@@ -69,9 +63,10 @@ public class Friend extends WiFiP2pService{
      * @return isUpdated A boolean that is true if the name was changed, false otherwise
      */
     public boolean changeName(String aliasName, String friendID) throws SQLException{
-        MainController controller = new MainController();
         boolean isUpdated=false;
-        if(controller.nameValidation(aliasName))
+
+        //Validate the given Alias name first
+        if(Globals.controller.nameValidation(aliasName))
         {
             this._aliasName = aliasName;
             try{
@@ -92,7 +87,7 @@ public class Friend extends WiFiP2pService{
     }
 
 
-    public boolean sendMessage(Message newMessage){
+    public boolean sendMessage(VicinityMessage newMessage){
         return false;
     }
 

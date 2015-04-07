@@ -6,8 +6,6 @@ public class User {
 
     protected String _username;
     protected boolean status;
-    protected SQLiteDatabase database;
-    protected DBHandler dbH;
     /**
      * Public Constructor initializes username, and sets status to be true
      * assuming that when any user (either a neighbor or a friend) added to the
