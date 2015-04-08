@@ -4,6 +4,7 @@ import android.content.Context;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.BaseAdapter;
 
@@ -17,6 +18,8 @@ import vicinity.ConnectionManager.WiFiP2pService;
 public class NeighborListAdapter extends BaseAdapter {
     private LayoutInflater mInflater;
     ArrayList<WiFiP2pService> services;
+    public ProgressBar progressbar;
+
     public NeighborListAdapter(Context context, ArrayList<WiFiP2pService> services){
         this.services = services;
         mInflater = LayoutInflater.from(context);
@@ -27,6 +30,11 @@ public class NeighborListAdapter extends BaseAdapter {
         for (int i = 0; i < s.size(); i++) {
             services.add(s.get(i));
         }
+    }
+
+    public void setPB(ProgressBar pb){
+        progressbar = pb;
+
     }
 
     @Override
@@ -47,6 +55,7 @@ public class NeighborListAdapter extends BaseAdapter {
     @Override
     public View getView(int position, View convertView, ViewGroup parent) {
         ViewHolder holder;
+
         if(convertView == null){
             convertView = mInflater.inflate(R.layout.neighbor_row_view, null);
 

@@ -183,8 +183,5 @@ public class Tabs extends FragmentActivity implements ActionBar.TabListener {
         }
     }
 
-    public NeighborSectionFragment getNeighborFragment(){
-        return neighborFragment;
-    }
 
 }

@@ -2,11 +2,15 @@ package vicinity.vicinity;
 
 import android.content.Context;
 import android.database.DataSetObserver;
+import android.graphics.Color;
+import android.graphics.drawable.ColorDrawable;
 import android.os.Handler;
 import android.os.Message;
+import android.support.v7.app.ActionBar;
 import android.support.v7.app.ActionBarActivity;
 import android.os.Bundle;
 import android.util.Log;
+import android.view.Gravity;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -14,6 +18,7 @@ import android.widget.AbsListView;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ListView;
+import android.widget.TextView;
 
 import java.sql.SQLException;
 
@@ -39,6 +44,21 @@ public class ChatActivity extends ActionBarActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_chat);
 
+        final ActionBar abar = getSupportActionBar();
+        abar.setBackgroundDrawable(new ColorDrawable(Color.parseColor("#01aef0")));//line under the action bar
+        View viewActionBar = getLayoutInflater().inflate(R.layout.actionbar_layout, null);
+        ActionBar.LayoutParams params = new ActionBar.LayoutParams(//Center the textview in the ActionBar !
+                ActionBar.LayoutParams.WRAP_CONTENT,
+                ActionBar.LayoutParams.MATCH_PARENT,
+                Gravity.CENTER);
+        TextView textviewTitle = (TextView) viewActionBar.findViewById(R.id.actionbar_textview);
+        textviewTitle.setText("Friend's name");
+        abar.setCustomView(viewActionBar, params);
+        abar.setDisplayShowCustomEnabled(true);
+        abar.setDisplayShowTitleEnabled(false);
+        abar.setDisplayHomeAsUpEnabled(true);
+        abar.setHomeButtonEnabled(true);
+
         //Initializations
         ctx = this;
         chatListView = (ListView) findViewById(R.id.chatList);
@@ -61,7 +81,7 @@ public class ChatActivity extends ActionBarActivity {
                 new Button.OnClickListener() {
                     public void onClick(View v) {
 
-                    Log.i(TAG,"ChatManager= "+chatManager);
+                        Log.i(TAG,"ChatManager= "+chatManager);
 
                         if (chatManager != null) {
 
@@ -128,9 +148,9 @@ public class ChatActivity extends ActionBarActivity {
 
 
     /**
-    * Sends an object VicinityMessage to the Message adapter
-    * to be displayed in the ChatActivity
-    **/
+     * Sends an object VicinityMessage to the Message adapter
+     * to be displayed in the ChatActivity
+     **/
     public static void pushMessage(VicinityMessage readVicinityMessage) {
         adapter.add(readVicinityMessage);
         adapter.notifyDataSetChanged();

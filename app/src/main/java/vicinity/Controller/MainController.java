@@ -2,6 +2,7 @@ package vicinity.Controller;
 
 
 import vicinity.model.*;
+import vicinity.vicinity.TimelineSectionFragment;
 
 
 import android.content.ContentValues;
@@ -362,5 +363,35 @@ public class MainController {
 
     }
 
+
+    /**
+     * gets a post from the postList by ID
+     * @param postID The wanted post.
+     * @return returns the post.
+     */
+    public Post getPost(int postID)
+    {
+        //for now
+        TimelineSectionFragment tsf = new TimelineSectionFragment();
+        ArrayList<Post> posts= tsf.GetPosts();
+
+        Post post = new Post();
+
+
+
+        if(!posts.isEmpty())
+        {
+            for (int i = 0;  posts.size() >= i+1; i++) {
+                post = posts.get(i);
+
+                if (post.getPostID() == postID)
+                    return post;
+            }
+
+        }
+        return null;
+
+
+    }
 
 }

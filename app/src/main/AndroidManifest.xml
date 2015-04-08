@@ -53,10 +53,6 @@
             android:label="@string/app_name" >
         </activity>
         <activity
-            android:name=".addPost"
-            android:label="New post" >
-        </activity>
-        <activity
             android:name=".ChatActivity"
             android:label="@string/title_activity_chat" >
         </activity>
