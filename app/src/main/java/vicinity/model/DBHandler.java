@@ -6,6 +6,8 @@ import android.database.sqlite.SQLiteOpenHelper;
 import android.database.sqlite.SQLiteException;
 import android.content.Context;
 import android.util.Log;
+
+import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.FileOutputStream;
@@ -17,9 +19,9 @@ public class DBHandler extends SQLiteOpenHelper {
 
     private static final String TAG = "DBHandler";
     private static final String DB_PATH = "/data/data/vicinity.vicinity/databases/";
-    private static final String DB_NAME="VicinityDB.db";
+    private static final String DB_NAME="VicinityDatabase.db";
     private static final int DATABASE_VERSION = 3;
-    private final Context myContext;
+    private static Context myContext;
     private SQLiteDatabase vicinityDB;
 
 
@@ -30,7 +32,7 @@ public class DBHandler extends SQLiteOpenHelper {
      */
     public DBHandler(Context context){
         super(context, DB_NAME , null, DATABASE_VERSION);
-        this.myContext=context;
+        myContext=context;
 
     }
 
@@ -56,6 +58,7 @@ public class DBHandler extends SQLiteOpenHelper {
     public void createDataBase() throws IOException{
 
         boolean dbExist = checkDataBase();
+        Log.i(TAG,"Database exists? "+dbExist);
 
         if(dbExist){
             Log.i(TAG,"External DB exists.");
@@ -78,18 +81,8 @@ public class DBHandler extends SQLiteOpenHelper {
      * @return true if it exists, false if it doesn't
      */
     private boolean checkDataBase(){
-        SQLiteDatabase checkDB = null;
-        try{
-            String myPath = DB_PATH + DB_NAME;
-            checkDB = SQLiteDatabase.openDatabase(myPath, null, SQLiteDatabase.OPEN_READONLY);
-        }catch(SQLiteException e){
-            Log.i(TAG,"Database does NOT exist");
-        }
-        if(checkDB != null){
-
-            checkDB.close();//
-        }
-        return checkDB != null ? true : false;
+        File dbFile = myContext.getDatabasePath(DB_NAME);
+        return dbFile.exists();
     }
 
     /**
@@ -125,6 +118,18 @@ public class DBHandler extends SQLiteOpenHelper {
     public void openDataBase() throws SQLException{
         String myPath = DB_PATH + DB_NAME;
         vicinityDB = SQLiteDatabase.openDatabase(myPath, null, SQLiteDatabase.OPEN_READONLY);
+    }
+
+    /**
+     * Deletes a copied database from the system
+     * (Note: The one in the assets won't be affected)
+     * @return boolean equals true if database was
+     * deleted successfully, false otherwise.
+     */
+    public static boolean deleteDatabase(){
+        boolean deleted=myContext.deleteDatabase(DB_NAME);
+        Log.i(TAG,DB_NAME+" deleted? "+deleted);
+        return deleted;
     }
 
     @Override

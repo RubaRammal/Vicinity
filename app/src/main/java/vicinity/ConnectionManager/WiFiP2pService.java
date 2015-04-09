@@ -3,6 +3,8 @@ package vicinity.ConnectionManager;
 
 import android.net.wifi.p2p.WifiP2pDevice;
 
+import vicinity.Controller.MainController;
+
 /**
  * A structure to hold service information.
  */
@@ -15,7 +17,9 @@ public class WiFiP2pService {
     /**
      * Default constructor
      */
-    public WiFiP2pService(){}
+    public WiFiP2pService(){
+
+    }
     /**
      * Public constructor to initiate a full WiFiP2pService
      */

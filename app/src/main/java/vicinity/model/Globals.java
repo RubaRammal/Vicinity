@@ -24,7 +24,7 @@ public class Globals {
 
     public static DBHandler dbH;
     public static SQLiteDatabase database;
-    public static MainController controller = new MainController();
+    public static MainController controller;
 
 
 }

@@ -22,12 +22,15 @@ import java.io.IOException;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 
+import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
 
 
+import vicinity.Controller.MainController;
 import vicinity.model.CurrentUser;
+import vicinity.model.DBHandler;
 import vicinity.model.Globals;
 import vicinity.vicinity.ChatActivity;
 import vicinity.vicinity.NeighborListAdapter;
@@ -51,8 +54,8 @@ public class ConnectAndDiscoverService extends Service
     private BroadcastReceiver receiver = null;
     private WifiP2pDnsSdServiceRequest serviceRequest;
     public static ArrayList<WiFiP2pService> neighbors = new ArrayList<WiFiP2pService>();
-    static public NeighborListAdapter neighborListAdapter;
-
+    public static NeighborListAdapter neighborListAdapter;
+    public MainController controller;
 
 
 
@@ -64,7 +67,7 @@ public class ConnectAndDiscoverService extends Service
 
 
         ctx= ConnectAndDiscoverService.this;
-
+        controller = new MainController(ctx);
         intentFilter.addAction(WifiP2pManager.WIFI_P2P_STATE_CHANGED_ACTION);
         intentFilter.addAction(WifiP2pManager.WIFI_P2P_PEERS_CHANGED_ACTION);
         intentFilter.addAction(WifiP2pManager.WIFI_P2P_CONNECTION_CHANGED_ACTION);
@@ -76,9 +79,12 @@ public class ConnectAndDiscoverService extends Service
         //Attaching WiFiBroadcastReceiver
         receiver = new WiFiDirectBroadcastReceiver(manager,channel,ctx);
         registerReceiver(receiver,intentFilter);
-
-        //Later change this to changeDeviceName(CurrentUser.retrieveCurrentUsername());
-        changeDeviceName("Afnan");
+        //Changing the username depending on the one in the db
+        try {
+            changeDeviceName(controller.retrieveCurrentUsername());
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
         startRegistrationAndDiscovery();
     }
 
@@ -92,6 +98,8 @@ public class ConnectAndDiscoverService extends Service
         Log.i(TAG,"Service destroyed");
         unregisterReceiver(receiver);
         disconnectPeers();
+        /***TEST***/
+        DBHandler.deleteDatabase();
     }
 
     /************************************************************/
@@ -349,6 +357,10 @@ public class ConnectAndDiscoverService extends Service
 
 
     }
+
+    /**
+     * Disconnects peers
+     */
     public void disconnectPeers(){
         if (manager != null && channel != null) {
             manager.removeGroup(channel, new WifiP2pManager.ActionListener() {
