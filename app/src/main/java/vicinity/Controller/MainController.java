@@ -3,13 +3,13 @@ package vicinity.Controller;
 
 import vicinity.model.*;
 import vicinity.vicinity.TimelineSectionFragment;
-
-
 import android.content.ContentValues;
 import android.content.Context;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
+import android.database.sqlite.SQLiteException;
 import android.util.Log;
+import java.io.IOException;
 import java.sql.SQLException;
 import java.util.ArrayList;
 
@@ -20,17 +20,14 @@ public class MainController {
     private SQLiteDatabase database;
     private DBHandler dbH;
     private Context context;
-
-    private ArrayList<User> onlineUsers;
     private ArrayList<Friend> friendsList;
     private ArrayList<Request> requestsList;
     private ArrayList<Post> postList;
     private ArrayList<VicinityMessage> allMessages;
+    public String query;
+    public Cursor cursor;
 
-    /**
-     * Default constructor
-     */
-    public MainController(){}
+
 
 
     /**
@@ -39,9 +36,14 @@ public class MainController {
      */
     public MainController(Context context){
         dbH=new DBHandler(context);
+        try{dbH.createDataBase();}
+        catch (IOException e) {
+            e.printStackTrace();
+        }
         this.context=context;
 
     }
+/*****************************************User's methods**********************************************/
 
     /**
      * Creates a new user, this method shall be used once only
@@ -53,18 +55,59 @@ public class MainController {
         boolean isCreated=false;
         CurrentUser newUser=new CurrentUser(context,username);
         try{
+
             database = dbH.getReadableDatabase();
             dbH.openDataBase();
-            database.execSQL("INSERT INTO User (username) VALUES ('" + newUser.getUsername() + "');");
+            database.execSQL("INSERT INTO CurrentUser (Username) VALUES ('" + newUser.getUsername() + "');");
             isCreated=true;
             dbH.close();
         }
         catch (SQLException e){
-            Log.i(TAG,"SQLEXception IN createProfile > currentUser");
+            Log.i(TAG, "SQLEXception IN createProfile > currentUser");
         }
         return isCreated;
     }
 
+    /**
+     *
+     * Retrieves current user's username from database
+     * This method is called in the service each time the user opens the app
+     * to fetch the username and make it as the device name.
+     * @return a username String
+     * @throws java.sql.SQLException
+     *
+     */
+    public String retrieveCurrentUsername()throws SQLException{
+        String username2=null;
+
+        try {
+            database = dbH.getReadableDatabase();
+            dbH.openDataBase();
+            query="SELECT Username FROM CurrentUser";
+            cursor = database.rawQuery(query,null);
+            cursor.moveToFirst();
+            username2=cursor.getString(cursor.getColumnIndex("Username"));
+            cursor.close();
+            dbH.close();
+            return username2;
+        }
+        catch (SQLException e){
+            Log.i(TAG,"SQLException IN retrieveCurrentUser > currentUser");
+        }
+        return username2;
+    }
+
+    /**
+     * This method wipes out the user's account along with its data (friends, messages..etc)
+     * If the user wants to start a new account.
+     * @return boolean if the operation is successful
+     */
+    public boolean destroyUser(){
+        return false;
+    }
+
+
+/***************************************Friend's Methods********************************************************/
 
 
     /**
@@ -79,19 +122,6 @@ public class MainController {
 
 
     /**
-     * NOTE: //Should be implemented after integrating p2p code
-     * @return onlineUsers all online users (either friends or neighbors)
-     */
-    public ArrayList<User> viewOnlineUsers(){return null;}
-
-
-    public boolean muteUser(User user){
-
-        return true;}
-
-
-    //works but we need to edit _id column in database -AFNAN
-    /**
      * Adds a new Friend to the database.
      * @param newFriend An object of class Friend
      * @return isAdded true if the friend was added successfully, false otherwise.
@@ -103,8 +133,8 @@ public class MainController {
             database = dbH.getReadableDatabase();
             dbH.openDataBase();
             ContentValues values = new ContentValues();
-            values.put("username", newFriend.getInstanceName());
-            //values.put("id", newFriend.getFriendID());
+            values.put("Username", newFriend.getInstanceName());
+            values.put("deviceID", newFriend.getDeviceAddress());
             isAdded=database.insert("Friend", null, values)>0;
             dbH.close();
         }
@@ -116,7 +146,6 @@ public class MainController {
     }
 
 
-    //NEEDS TO BE TESTED AGAIN AFTER EDITING THE DATABASE -AFNAN
     /**
      * Deletes a friend from the database given an ID
      * @param friendID A to-be deleted friend's ID.
@@ -127,7 +156,7 @@ public class MainController {
         try{
             database=dbH.getReadableDatabase();
             dbH.openDataBase();
-            isDeleted=database.delete("Friend","_id="+"'"+friendID+"'",null)==1;
+            isDeleted=database.delete("Friend","deviceID"+"'"+friendID+"'",null)==1;
             Log.i(TAG,"Is friend deleted? "+isDeleted);
             dbH.close();
         }
@@ -138,7 +167,6 @@ public class MainController {
         return isDeleted;
     }
 
-    //UNTESTED: DB needs editing
     /**
      * Fetches user's friends from the database
      * In order to be displayed.
@@ -152,21 +180,22 @@ public class MainController {
             database=dbH.getReadableDatabase();
             dbH.openDataBase();
             String query="SELECT * FROM Friend";
-            Cursor c = database.rawQuery(query,null);
-            if (c.moveToFirst()) {
+            cursor = database.rawQuery(query,null);
+            if (cursor.moveToFirst()) {
                 do {
 
                     Friend myFriend = new Friend();
-                    myFriend.setInstanceName(c.getString(1)); //getting username from database column #: 1
+                    myFriend.setInstanceName(cursor.getString(1)); //getting username from database column #: 1
                     //myFriend.setStatus(myFriend.isOnline());
-                    myFriend.setAliasName(c.getString(3));
+                    myFriend.setAliasName(cursor.getString(3));
                     friendsList.add(myFriend);
 
-                } while (c.moveToNext());
+                } while (cursor.moveToNext());
             }
             else{
                 Log.i(TAG, "There are no friends in the DB.");
             }
+            cursor.close();
             dbH.close();
         }
         catch(SQLException e){
@@ -176,6 +205,62 @@ public class MainController {
 
         return friendsList;}//end of viewFriendsList
 
+    /**
+     * This method calls nameValidation from MainController to validate the new username
+     * then adds it to the database as an alias name
+     * @param aliasName A string that contains a new alias name for a certain friend
+     * @param friendID A string that contains the id of the friend with the alias name
+     * @return isUpdated A boolean that is true if the name was changed, false otherwise
+     */
+    public boolean changeName(String aliasName, String friendID) throws SQLException{
+        boolean isUpdated=false;
+
+        //Validate the given Alias name first
+        if(nameValidation(aliasName))
+        {
+
+            try{
+                database = dbH.getReadableDatabase();
+                dbH.openDataBase();
+                ContentValues args = new ContentValues();
+                args.put("aliasname", aliasName);
+                isUpdated= database.update("Friend", args, "deviceID=" + friendID, null)>0;
+                dbH.close();
+            }
+            catch(SQLiteException e){
+                Log.i(TAG,"SQLiteException > Friend > ChangeName");
+                e.printStackTrace();
+            }
+        }
+        Log.i(TAG,"Is Updated? "+isUpdated);
+        return isUpdated;
+    }
+
+    /**
+     * Checks if a peer is one of the user's friends
+     * @param deviceAddress of a peer
+     * @return true if this peer is a friend, false otherwise.
+     */
+    public boolean isThisMyFriend(String deviceAddress){
+        boolean isFriend=true;
+        try{
+            database=dbH.getReadableDatabase();
+            dbH.openDataBase();
+            query="SELECT * FROM Friend WHERE deviceID='"+deviceAddress+"'";
+            cursor = database.rawQuery(query,null);
+            cursor.moveToFirst();
+            if(cursor.getCount()==0)
+                isFriend=false;
+        }
+        catch(SQLException e){
+            e.printStackTrace();
+        }
+        Log.i(TAG,"Is "+deviceAddress+" your friend? "+isFriend);
+        return isFriend;
+
+    }
+
+/***************************************Request's Methods********************************************************/
 
     /**
      * Fetches user's Requests from the database

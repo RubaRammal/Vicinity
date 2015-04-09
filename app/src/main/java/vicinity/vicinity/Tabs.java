@@ -12,7 +12,10 @@ import android.support.v4.view.ViewPager;
 import android.util.Log;
 import android.view.Window;
 
+import java.sql.SQLException;
+
 import vicinity.ConnectionManager.ConnectAndDiscoverService;
+import vicinity.Controller.MainController;
 import vicinity.exceptionHandler.UnhandledExceptionHandler;
 
 /**
@@ -29,6 +32,15 @@ public class Tabs extends FragmentActivity implements ActionBar.TabListener {
 
         super.onCreate(savedInstanceState);
 
+        /****TEST****/
+        try{
+        MainController c = new MainController(Tabs.this);
+        Log.i(TAG,"There is a user in the database: "+ c.retrieveCurrentUsername());
+        c.isThisMyFriend("12312312");
+        c.isThisMyFriend("12302312");}
+        catch(SQLException e){
+            e.printStackTrace();
+        }
         //Handling unhandled exception
         Thread.setDefaultUncaughtExceptionHandler(new UnhandledExceptionHandler(this));
         //Starting the service
