@@ -38,11 +38,11 @@ public class DBHandler extends SQLiteOpenHelper {
 
     @Override
     public void onCreate(SQLiteDatabase db) {
-        try{
+        /*try{
             createDataBase();}
         catch (Exception e){
             Log.i(TAG,"Error in database creation");
-        }
+        }*/
 
     }
 
@@ -58,7 +58,6 @@ public class DBHandler extends SQLiteOpenHelper {
     public void createDataBase() throws IOException{
 
         boolean dbExist = checkDataBase();
-        Log.i(TAG,"Database exists? "+dbExist);
 
         if(dbExist){
             Log.i(TAG,"External DB exists.");
@@ -82,6 +81,8 @@ public class DBHandler extends SQLiteOpenHelper {
      */
     private boolean checkDataBase(){
         File dbFile = myContext.getDatabasePath(DB_NAME);
+        Log.i(TAG,"Database exists? "+dbFile.exists());
+
         return dbFile.exists();
     }
 
@@ -122,7 +123,7 @@ public class DBHandler extends SQLiteOpenHelper {
 
     /**
      * Deletes a copied database from the system
-     * (Note: The one in the assets won't be affected)
+     * (NOT THE ASSETS' ONE)
      * @return boolean equals true if database was
      * deleted successfully, false otherwise.
      */

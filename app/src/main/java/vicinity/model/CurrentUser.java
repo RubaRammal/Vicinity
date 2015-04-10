@@ -1,9 +1,6 @@
 package vicinity.model;
 
 import android.content.Context;
-import java.sql.SQLException;
-import android.util.Log;
-import android.database.Cursor;
 
 
 /**

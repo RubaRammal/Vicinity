@@ -1,6 +1,7 @@
 package vicinity.Controller;
 
 
+import vicinity.ConnectionManager.WiFiP2pService;
 import vicinity.model.*;
 import vicinity.vicinity.TimelineSectionFragment;
 import android.content.ContentValues;
@@ -36,10 +37,10 @@ public class MainController {
      */
     public MainController(Context context){
         dbH=new DBHandler(context);
-        try{dbH.createDataBase();}
+        /*try{dbH.createDataBase();}
         catch (IOException e) {
             e.printStackTrace();
-        }
+        }*/
         this.context=context;
 
     }
@@ -285,7 +286,7 @@ public class MainController {
                 do
                 {
                     Request requestObj= new Request();
-                    requestObj.setReqBy(new User (c.getString(1)));
+                 //   requestObj.setReqBy(new User (c.getString(1)));
                     requestObj.setRequestStatus(c.getString(2));
                     requestsList.add(requestObj);
                 } while (c.moveToNext());
@@ -308,7 +309,7 @@ public class MainController {
 
     public boolean denyRequest(int num){return true;}
 
-    public boolean sendRequest(User user){return true;}
+    public boolean sendRequest(WiFiP2pService user){return true;}
 
     /**
      * Fetches posts from the database
@@ -331,7 +332,7 @@ public class MainController {
                 {
                     Post post = new Post();
                     post.setPostBody(c.getString(1));
-                    post.setPostedBy(new User(c.getString(2)));
+                    //post.setPostedBy(new User(c.getString(2)));
                     //contact.setPicture(c.getBlob(3));
 
                     // Adding post to postList

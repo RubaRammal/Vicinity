@@ -6,9 +6,11 @@ import android.os.Bundle;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.content.Context;
-
+import java.io.IOException;
 import java.util.Timer;
 import java.util.TimerTask;
+
+import vicinity.model.DBHandler;
 
 /**
  * Launch activity displays the app's logo
@@ -22,6 +24,14 @@ public class LaunchActivity extends Activity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_launch);
+
+        DBHandler dbH=new DBHandler(context);
+        try{
+            dbH.createDataBase();}
+        catch (Exception e){
+        // Log.i(TAG,"Error in database creation");
+            }
+
 
         int secondsDelay = 3;
         Timer timer = new Timer();
