@@ -6,6 +6,7 @@ import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentTransaction;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -14,6 +15,7 @@ import android.widget.ListView;
 
 import java.util.ArrayList;
 
+import vicinity.Controller.MainController;
 import vicinity.model.VicinityMessage;
 
 /**
@@ -23,7 +25,8 @@ import vicinity.model.VicinityMessage;
 public class MessagesSectionFragment extends Fragment {
 
     private Context ctx;
-
+    private String TAG = "MessagesSectionFragment";
+    private MainController controller;
     public MessagesSectionFragment(){}
 
     @Override
@@ -33,7 +36,10 @@ public class MessagesSectionFragment extends Fragment {
 
         ctx = this.getActivity();
 
+        controller = new MainController(ctx);
         ArrayList<VicinityMessage> vicinityMessages = GetMessages();
+
+        //Log.i(TAG, controller.viewAllMessages().get(0).getMessageBody());
 
         //Get the fragment_messages layout ListView
         final ListView lv = (ListView) rootView.findViewById(R.id.messagesList);

@@ -14,6 +14,8 @@ import android.widget.ListView;
 
 import java.util.ArrayList;
 
+import vicinity.Controller.MainController;
+import vicinity.model.Globals;
 import vicinity.model.Post;
 import vicinity.model.User;
 
@@ -28,6 +30,7 @@ public class TimelineSectionFragment extends Fragment {
     private PostListAdapter adapter;
     private Context ctx;
     private String TAG = "Timeline";
+    private MainController controller;
 
 
     public TimelineSectionFragment(){}
@@ -44,6 +47,7 @@ public class TimelineSectionFragment extends Fragment {
 
 
         ctx = this.getActivity();
+        controller = new MainController(ctx);
         ArrayList<Post> posts = GetPosts();
         Button addPost = (Button) rootView.findViewById(R.id.add_post);
 

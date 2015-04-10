@@ -80,11 +80,11 @@ public class ConnectAndDiscoverService extends Service
         receiver = new WiFiDirectBroadcastReceiver(manager,channel,ctx);
         registerReceiver(receiver,intentFilter);
         //Changing the username depending on the one in the db
-        try {
+        /*try {
             changeDeviceName(controller.retrieveCurrentUsername());
         } catch (SQLException e) {
             e.printStackTrace();
-        }
+        }*/
         startRegistrationAndDiscovery();
     }
 

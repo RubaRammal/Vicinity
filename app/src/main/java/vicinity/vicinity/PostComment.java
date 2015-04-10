@@ -18,6 +18,7 @@ import android.widget.TextView;
 
 import java.util.ArrayList;
 
+import vicinity.Controller.MainController;
 import vicinity.model.Comment;
 import vicinity.model.Globals;
 import vicinity.model.Post;
@@ -38,6 +39,7 @@ public class PostComment extends ActionBarActivity {
     private Post commentedOn;
     private int postId;
     private String TAG = "PostComment";
+    private MainController controller;
 
 
     @Override
@@ -73,10 +75,14 @@ public class PostComment extends ActionBarActivity {
             postId = (int) savedInstanceState.getSerializable("POST_ID");
         }
 
-        commentedOn = Globals.controller.getPost(postId);
+        ctx = this;
+        controller = new MainController(ctx);
+
+        commentedOn = controller.getPost(postId);
         //Initializations
         Log.i(TAG, commentedOn.getPostBody());
         Log.i(TAG, commentedOn.getPostedBy().getUsername());
+
 
         Comment c = new Comment(commentedOn.getPostBody(), commentedOn.getPostedBy().getUsername());
         commentsList.add(c);
@@ -91,7 +97,8 @@ public class PostComment extends ActionBarActivity {
 
         commentsList.add(new Comment("Cool", "Ruba")); //Dummy
 
-        ctx = this;
+
+
         commentListView = (ListView) findViewById(android.R.id.list);
         adapter = new CommentListAdapter(ctx, commentsList);
         commentText = (EditText) findViewById(R.id.comment);
