@@ -1,14 +1,22 @@
 package vicinity.vicinity;
 
+import android.content.ContentResolver;
 import android.content.Context;
+import android.content.Intent;
+import android.database.Cursor;
 import android.database.DataSetObserver;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.graphics.Color;
 import android.graphics.drawable.ColorDrawable;
+import android.net.Uri;
+import android.os.Bundle;
+import android.os.Environment;
 import android.os.Handler;
 import android.os.Message;
+import android.provider.MediaStore;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.ActionBarActivity;
-import android.os.Bundle;
 import android.util.Log;
 import android.view.Gravity;
 import android.view.Menu;
@@ -20,10 +28,14 @@ import android.widget.EditText;
 import android.widget.ListView;
 import android.widget.TextView;
 
+import java.io.File;
+import java.io.IOException;
 import java.sql.SQLException;
 
 import vicinity.ConnectionManager.ChatManager;
+import vicinity.model.CapturePhotoUtils;
 import vicinity.model.Globals;
+import vicinity.model.Photo;
 import vicinity.model.VicinityMessage;
 
 
@@ -33,11 +45,18 @@ public class ChatActivity extends ActionBarActivity {
     private ListView chatListView;
     private EditText chatText;
     private Button send;
+    private Button sendPhoto;
+
     private Boolean position;
     private VicinityMessage vicinityMessage;
+    private Photo VicinityPhoto;
+    private static File file;
     private static ChatManager chatManager;
     private static ChatAdapter adapter;
     private static Context ctx;
+    ContentResolver contentResolver;
+    private int SELECT_PICTURE = 1;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -65,6 +84,9 @@ public class ChatActivity extends ActionBarActivity {
         adapter = new ChatAdapter(ctx, R.layout.chat_box_layout);
         chatText = (EditText) findViewById(R.id.chatText);
         send = (Button) findViewById(R.id.sendButton);
+        sendPhoto = (Button) findViewById(R.id.addphoto);
+        contentResolver = ctx.getContentResolver();
+
 
         chatListView.setAdapter(adapter);
         chatListView.setTranscriptMode(AbsListView.TRANSCRIPT_MODE_ALWAYS_SCROLL);
@@ -110,11 +132,85 @@ public class ChatActivity extends ActionBarActivity {
                 }
         );
 
+
+        //When button (+)  is clicked
+
+        sendPhoto.setOnClickListener(
+                new Button.OnClickListener(){
+
+
+
+                    @Override
+                    public void onClick(View v) {
+                        Globals.msgFlag = false;
+
+                        Intent i = new Intent(
+                                Intent.ACTION_PICK,
+                                android.provider.MediaStore.Images.Media.EXTERNAL_CONTENT_URI);
+
+                        startActivityForResult(i, SELECT_PICTURE);
+
+
+                    }
+                }
+
+
+        );
+
     }
 
 
-    public static final String TAG = "ChatActivity";
+
+    @Override
+    public  void onActivityResult(int requestCode, int resultCode, Intent data){
+        super.onActivityResult(requestCode, resultCode, data);
+
+        if (requestCode == SELECT_PICTURE && resultCode == RESULT_OK && null != data) {
+            Uri selectedImage = data.getData();
+            String[] filePathColumn = { MediaStore.Images.Media.DATA };
+
+            Cursor cursor = getContentResolver().query(selectedImage,
+                    filePathColumn, null, null, null);
+            cursor.moveToFirst();
+
+            int columnIndex = cursor.getColumnIndex(filePathColumn[0]);
+            String picturePath = cursor.getString(columnIndex);
+            Log.i(TAG, picturePath);
+            cursor.close();
+            sendPhotoObj(picturePath);
+
+
+        }
+
+    }
+
+
+    public void sendPhotoObj( String photoPath){
+
+        Log.i(TAG,"ChatManager= "+chatManager);
+
+        if(chatManager != null) {
+            VicinityPhoto = new Photo(ctx, "1", true, "", file);
+            VicinityPhoto.setPhotoPath(photoPath);
+
+            pushPhoto(VicinityPhoto);
+
+            //File code (at the receiver side)
+            file = new File(Environment.getExternalStorageDirectory() + "/"
+                    + ctx.getPackageName() + "/Vicinity-" + System.currentTimeMillis()
+                    + ".jpg");
+
+            chatManager.write(photoPath.getBytes());
+            Log.i(TAG, "Writing photo stream successful");
+
+        }
+
+    }
+
+
+public static final String TAG = "ChatActivity";
     private static VicinityMessage message;
+    private static Photo photo;
 
     public static Handler handler = new Handler(){
         /**
@@ -131,10 +227,33 @@ public class ChatActivity extends ActionBarActivity {
                     // construct a string from the valid bytes in the buffer
                     String readMessage = new String(readBuf, 0, msg.arg1);
                     Log.d(TAG, readMessage);
-                    message = new VicinityMessage(ctx, "2", false, readMessage);
-                    Log.i(TAG,"message"+message.getMessageBody());
-                    pushMessage(message);
-                    break;
+                    if(Globals.msgFlag ) {
+                        message = new VicinityMessage(ctx, "2", false, readMessage);
+                        Log.i(TAG, "message" + message.getMessageBody());
+                        pushMessage(message);
+                        break;
+                    }
+                    else       {
+
+                        photo = new Photo(ctx, "1", true, readMessage, file);
+                        Log.i(TAG, "photo" + photo.getphotoFile());
+                        file = new File(Environment.getExternalStorageDirectory() + "/"
+                                + ctx.getPackageName() + "/Vicinity-" + System.currentTimeMillis()
+                                + ".jpg");
+                        File dirs = new File(file.getParent());
+                        if (!dirs.exists())
+                            dirs.mkdirs();
+                        try {
+                            file.createNewFile();
+                        } catch (IOException e) {
+                            e.printStackTrace();
+                        }
+                        Bitmap bitmap = BitmapFactory.decodeFile(photo.getPhotoPath());
+                        ContentResolver contentResolver = ctx.getContentResolver();
+                        CapturePhotoUtils capturePhotoUtils = new CapturePhotoUtils();
+                        capturePhotoUtils.insertImage(contentResolver , bitmap ,"Received Photo" ," Photo saved to receiver media gallery" );
+                        Log.i(TAG,"Save photo to gallery");
+                    }
 
                 case Globals.MY_HANDLE:
                     Object obj = msg.obj;
@@ -157,7 +276,11 @@ public class ChatActivity extends ActionBarActivity {
     }
 
 
+    public  static void pushPhoto(Photo photo){
+        adapter.addPhoto(photo);
+        adapter.notifyDataSetChanged();
 
+    }
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
