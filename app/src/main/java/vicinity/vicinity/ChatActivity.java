@@ -102,6 +102,7 @@ public class ChatActivity extends ActionBarActivity {
         send.setOnClickListener(
                 new Button.OnClickListener() {
                     public void onClick(View v) {
+                        Globals.msgFlag = true;
 
                         Log.i(TAG,"ChatManager= "+chatManager);
 
@@ -137,9 +138,6 @@ public class ChatActivity extends ActionBarActivity {
 
         sendPhoto.setOnClickListener(
                 new Button.OnClickListener(){
-
-
-
                     @Override
                     public void onClick(View v) {
                         Globals.msgFlag = false;
