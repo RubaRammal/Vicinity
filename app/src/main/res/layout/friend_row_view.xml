@@ -11,17 +11,17 @@
     <TextView
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:id="@+id/neighbor_row"
+        android:id="@+id/friend_row"
         android:textSize="18sp"
-        android:text="hijhj"/>
+/>
 
     <TextView
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:id="@+id/request"
         android:textSize="10sp"
-        android:text="Tab to send a request..."
-        android:layout_below="@+id/neighbor_row"
+        android:text="Tab to connect..."
+        android:layout_below="@+id/friend_row"
         android:layout_alignParentLeft="true"
         android:layout_alignParentStart="true"
         android:textColor="#81020202"/>
@@ -29,10 +29,18 @@
     <ImageButton
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:src="@drawable/muteicon2"
+        android:src="@drawable/deleteicon"
         android:layout_alignParentRight="true"
-        android:id="@+id/muteButton"
-        android:onClick="muteUser" />
+        android:id="@+id/deleteButton" />
+
+    <ImageButton
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:src="@drawable/editicon"
+        android:id="@+id/changeName"
+        android:layout_alignParentTop="true"
+        android:layout_toLeftOf="@+id/deleteButton"
+        android:layout_toStartOf="@+id/deleteButton" />
 
 
 </RelativeLayout>

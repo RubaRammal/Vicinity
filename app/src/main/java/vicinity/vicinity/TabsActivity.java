@@ -10,31 +10,34 @@ import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentPagerAdapter;
 import android.support.v4.view.ViewPager;
 import android.util.Log;
+import android.view.View;
 import android.view.Window;
-
-import java.sql.SQLException;
+import android.widget.ImageButton;
 
 import vicinity.ConnectionManager.ConnectAndDiscoverService;
-import vicinity.Controller.MainController;
-import vicinity.exceptionHandler.UnhandledExceptionHandler;
 
 /**
  * Implements the ActionBar to create a tabbed view.
  */
-public class Tabs extends FragmentActivity implements ActionBar.TabListener {
+public class TabsActivity extends FragmentActivity implements ActionBar.TabListener {
 
-    private final String TAG ="Tabs";
+    private final String TAG ="TabsActivity";
     AppSectionsPagerAdapter mAppSectionsPagerAdapter;
     ViewPager mViewPager;
+    private ImageButton muteButton;
+
+
     static NeighborSectionFragment neighborFragment;
 
     public void onCreate(Bundle savedInstanceState) {
 
         super.onCreate(savedInstanceState);
 
+
+
         /****TEST****/
        /* try{
-        MainController c = new MainController(Tabs.this);
+        MainController c = new MainController(TabsActivity.this);
         Log.i(TAG,"There is a user in the database: "+ c.retrieveCurrentUsername());
         c.isThisMyFriend("12312312");
         c.isThisMyFriend("12302312");}
@@ -42,7 +45,7 @@ public class Tabs extends FragmentActivity implements ActionBar.TabListener {
             e.printStackTrace();
         }*/
         //Handling unhandled exception
-        Thread.setDefaultUncaughtExceptionHandler(new UnhandledExceptionHandler(this));
+       // Thread.setDefaultUncaughtExceptionHandler(new UnhandledExceptionHandler(this));
         //Starting the service
         startService(new Intent(this, ConnectAndDiscoverService.class));
 
@@ -64,6 +67,7 @@ public class Tabs extends FragmentActivity implements ActionBar.TabListener {
 
         // Set up the ViewPager, attaching the adapter and setting up a listener for when the
         // user swipes between sections.
+        muteButton = (ImageButton) findViewById(R.id.muteButton);
         mViewPager = (ViewPager) findViewById(R.id.pager);
         mViewPager.setAdapter(mAppSectionsPagerAdapter);
         mViewPager.setOnPageChangeListener(new ViewPager.SimpleOnPageChangeListener() {
@@ -76,12 +80,12 @@ public class Tabs extends FragmentActivity implements ActionBar.TabListener {
             }
         });
 
-        //Tabs layout (icons + text)
+        //TabsActivity layout (icons + text)
         final int[] LAYOUTS = new int[] {
                 R.layout.tab_timeline_layout,
                 R.layout.tab_neighbor_layout,
                 R.layout.tab_chat_layout,
-                R.layout.tab_request_layout
+                R.layout.tab_settings_layout
         };
 
 
@@ -120,7 +124,7 @@ public class Tabs extends FragmentActivity implements ActionBar.TabListener {
 
     @Override
     protected void onStop() {
-        Log.i(TAG,"Tabs are stopped");
+        Log.i(TAG,"TabsActivity are stopped");
         super.onStop();
 
 
@@ -128,7 +132,7 @@ public class Tabs extends FragmentActivity implements ActionBar.TabListener {
     }
     @Override
     protected void onDestroy(){
-        Log.i(TAG,"Tabs are destroyed");
+        Log.i(TAG,"TabsActivity are destroyed");
         //Destroying ConnectAndDiscover service
         //This means the service is only stopped when the user shuts down the app completely
         stopService(new Intent(this, ConnectAndDiscoverService.class));
@@ -138,7 +142,7 @@ public class Tabs extends FragmentActivity implements ActionBar.TabListener {
     /************************************************/
 
 
-    /********************Tabs Methods****************************/
+    /********************TabsActivity Methods****************************/
     @Override
     public void onTabUnselected(ActionBar.Tab tab, FragmentTransaction fragmentTransaction) {
     }
@@ -176,7 +180,7 @@ public class Tabs extends FragmentActivity implements ActionBar.TabListener {
                     return new MessagesSectionFragment();
 
                 case 3:
-                    return new RequestsSectionFragment();
+                    return new SettingsSectionFragment();
 
                 default:
                     // The other sections of the app are dummy placeholders.
@@ -193,6 +197,11 @@ public class Tabs extends FragmentActivity implements ActionBar.TabListener {
         public CharSequence getPageTitle(int position) {
             return "section "+ (position + 1);
         }
+    }
+
+    public void muteUser(View v){
+        muteButton.setImageResource(R.drawable.muteicon);
+
     }
 
 

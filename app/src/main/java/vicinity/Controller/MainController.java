@@ -12,6 +12,7 @@ import android.database.sqlite.SQLiteException;
 import android.util.Log;
 import java.io.IOException;
 import java.sql.SQLException;
+import java.sql.Timestamp;
 import java.util.ArrayList;
 
 
@@ -41,6 +42,12 @@ public class MainController {
         catch (IOException e) {
             e.printStackTrace();
         }*/
+
+        try{
+            dbH.createDataBase();}
+        catch (Exception e){
+            Log.i(TAG,"Error in database creation");
+        }
         this.context=context;
 
     }
@@ -382,7 +389,7 @@ public class MainController {
      * Fetches user's Chats from the database
      * @return allMessages
      */
-    public ArrayList<VicinityMessage> viewAllMessages()
+    public ArrayList<VicinityMessage> viewAllMessages(int chatId)
 
     {
 
@@ -391,14 +398,14 @@ public class MainController {
         {
             database=dbH.getReadableDatabase();
             dbH.openDataBase();
-            String query="SELECT * FROM Message";
+            String query="SELECT * FROM Message WHERE chatId = \""+chatId+"\"";
             Cursor c = database.rawQuery(query,null);
             if (c.moveToFirst())
             {
                 do
                 {
                     VicinityMessage msg = new VicinityMessage();
-                    msg.setMessageBody(c.getString(2));
+                    msg.setMessageBody(c.getString(4));
                     msg.setFriendID(c.getString(1));
                     //msg.setTime(c.getString(4));
                     //contact.setPicture(c.getBlob(3));
@@ -479,6 +486,39 @@ public class MainController {
 
 
     }
+
+    /**
+     * Adds a new Meesage to the database.
+     * @param message An object of class VicinityMessage
+     * @return isAdded true if the message was added successfully, false otherwise.
+     * @throws SQLException
+     */
+    public boolean addMessage(VicinityMessage message) throws SQLException
+    {
+        boolean isAdded=false;
+        try
+        {
+            java.util.Date date= new java.util.Date();
+            database = dbH.getReadableDatabase();
+            dbH.openDataBase();
+            ContentValues values = new ContentValues();
+            values.put("messageBody", message.getMessageBody());
+            values.put("isMyMsg", message.isMyMsg());
+            //values.put("msgTimestamp", new Timestamp(date.getTime()).getTime());
+
+
+            isAdded=database.insert("Message", null, values)>0;
+            Log.i(TAG, "ADD SUCCESSFUL");
+
+            dbH.close();
+        }
+        catch(SQLException e)
+        {
+            e.printStackTrace();
+        }
+        return isAdded;}
+
+
 
 
 }

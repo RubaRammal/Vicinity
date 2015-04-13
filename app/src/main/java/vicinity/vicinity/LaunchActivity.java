@@ -6,7 +6,7 @@ import android.os.Bundle;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.content.Context;
-import java.io.IOException;
+
 import java.util.Timer;
 import java.util.TimerTask;
 
@@ -40,7 +40,7 @@ public class LaunchActivity extends Activity {
             public void run() {
 
 
-                Intent intent = new Intent(context, MainActivity.class);
+                Intent intent = new Intent(context, NameActivity.class);
                 startActivity(intent);
             }
 

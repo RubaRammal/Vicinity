@@ -9,6 +9,8 @@ import android.database.DatabaseUtils;
 import android.database.sqlite.SQLiteDatabase;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+import android.net.wifi.p2p.WifiP2pDevice;
+import android.net.wifi.p2p.WifiP2pManager;
 import android.util.Log;
 import android.widget.ImageView;
 
@@ -21,6 +23,8 @@ import java.sql.SQLException;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.Date;
+
+import vicinity.ConnectionManager.WiFiP2pService;
 
 
 public class VicinityMessage {
@@ -38,22 +42,24 @@ public class VicinityMessage {
     private String friendID;
     private boolean isMyMsg;
     private String messageBody;
+    private int chatId;
 
     public VicinityMessage(){}
     /**
      * Public constructor, initiates a message
      * attaches to it its timestamp and date
      * @param context activity context
-     * @param friendID string
+     * @param friend Friend
      * @param isMyMsg boolean
      * @param messageBody string
      */
-    public VicinityMessage(Context context, String friendID, boolean isMyMsg, String messageBody){
+    public VicinityMessage(Context context, String friendId, int ChatId , boolean isMyMsg, String messageBody){
 
         getApplicationContext = context;
-        this.friendID = friendID;
+        this.friendID = friendId;
         this.messageBody = messageBody;
         this.isMyMsg = isMyMsg;
+        this.chatId = chatId;
         //The following lines will create a string of the time & date the message was sent at
         //in order to be displayed with the message
         Date msgSentAt = new Date();
@@ -93,6 +99,10 @@ public class VicinityMessage {
     }
     public String getMessageBody() {
         return this.messageBody;
+    }
+
+    public int getChatId(){
+        return chatId;
     }
 
 

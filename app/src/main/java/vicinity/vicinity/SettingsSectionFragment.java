@@ -11,12 +11,12 @@ import android.view.ViewGroup;
  * Still blank
  * May be deleted
  */
-public class RequestsSectionFragment extends Fragment {
+public class SettingsSectionFragment extends Fragment {
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
-        View rootView = inflater.inflate(R.layout.fragment_requests, container, false);
+        View rootView = inflater.inflate(R.layout.fragment_settings, container, false);
         return rootView;
     }
 }

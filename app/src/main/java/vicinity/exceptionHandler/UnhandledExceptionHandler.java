@@ -5,7 +5,8 @@ import java.io.StringWriter;
 import android.app.Activity;
 import android.content.Intent;
 import android.os.Build;
-import vicinity.vicinity.Tabs;
+import vicinity.vicinity.TabsActivity;
+
 /**
  * This class must handle the uncaught exceptions to avoid sudden crash
  *
@@ -62,7 +63,7 @@ public class UnhandledExceptionHandler implements java.lang.Thread.UncaughtExcep
         errorReport.append(Build.VERSION.INCREMENTAL);
         errorReport.append(LINE_SEPARATOR);
 
-        Intent intent = new Intent(activityContext, Tabs.class);
+        Intent intent = new Intent(activityContext, TabsActivity.class);
         intent.putExtra("error", errorReport.toString());
         activityContext.startActivity(intent);
 

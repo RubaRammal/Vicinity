@@ -2,6 +2,8 @@ package vicinity.vicinity;
 
 import android.app.ProgressDialog;
 import android.content.Context;
+import android.content.Intent;
+import android.net.wifi.p2p.WifiP2pDevice;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -9,9 +11,12 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.view.Window;
 import android.widget.AdapterView;
+import android.widget.Button;
+import android.widget.ImageButton;
 import android.widget.ListView;
 import android.support.v4.app.Fragment;
 import android.widget.ProgressBar;
+import android.widget.TextView;
 
 
 import java.util.ArrayList;
@@ -26,9 +31,14 @@ public class NeighborSectionFragment extends Fragment {
 
     private Context ctx;
     private ArrayList<WiFiP2pService> listOfServices;
-    private ListView lv;
+    private ArrayList<WiFiP2pService> friendServices;
+
+    private ListView lvn;
+    private ListView lvf;
     private NeighborListAdapter neighborListAdapter;
+    private FriendListAdapter friendListAdapter;
     private ProgressBar progress;
+    private TextView header;
 
 
     public interface DeviceClickListener {
@@ -47,25 +57,39 @@ public class NeighborSectionFragment extends Fragment {
 
 
         listOfServices = new ArrayList<WiFiP2pService>();
+        friendServices = new ArrayList<WiFiP2pService>();
+        friendServices.add(new WiFiP2pService(new WifiP2pDevice(), "ghjgjh", "jgjkgk"));
+
+
         ctx = this.getActivity();
 
         //progress = (ProgressBar) rootView.findViewById(R.id.temp);
-        lv = (ListView) rootView.findViewById(android.R.id.list);
+        lvn = (ListView) rootView.findViewById(R.id.listNeighbors);
+        lvf = (ListView) rootView.findViewById(R.id.listFriends);
+
         neighborListAdapter = new NeighborListAdapter(ctx, listOfServices);
-        neighborListAdapter.setPB(progress);
+        friendListAdapter = new FriendListAdapter(ctx, friendServices);
 
         //progress.setVisibility(View.VISIBLE);
         //mRelativeLayout.setVisibility(View.GONE);
 
         ConnectAndDiscoverService.setNAdapter(neighborListAdapter);
 
+        View nHeader = inflater.inflate(R.layout.neighbor_header, null);
+        View fHeader = inflater.inflate(R.layout.friend_header, null);
 
-        lv.setAdapter(neighborListAdapter);
+        lvn.addHeaderView(nHeader);
+        lvf.addHeaderView(fHeader);
+
+        lvn.setAdapter(neighborListAdapter);
+        lvf.setAdapter(friendListAdapter);
+
+        //Utility.setListViewHeightBasedOnChildren(lvn);
+        //Utility.setListViewHeightBasedOnChildren(lvf);
         //neighborListAdapter.notifyDataSetChanged();
 
 
-
-        lv.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+        lvn.setOnItemClickListener(new AdapterView.OnItemClickListener() {
 
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
@@ -77,9 +101,9 @@ public class NeighborSectionFragment extends Fragment {
 
 
 
-
         return rootView;
     }
+
 
 
 }
