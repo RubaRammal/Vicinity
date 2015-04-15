@@ -12,7 +12,7 @@ import android.widget.BaseAdapter;
 import java.util.ArrayList;
 
 import vicinity.ConnectionManager.WiFiP2pService;
-
+import vicinity.model.Friend;
 
 
 public class FriendListAdapter extends BaseAdapter {
@@ -53,12 +53,8 @@ public class FriendListAdapter extends BaseAdapter {
 
         if(convertView == null){
             convertView = mInflater.inflate(R.layout.friend_row_view, null);
-
-
             holder = new ViewHolder();
             holder.textName = (TextView) convertView.findViewById(R.id.friend_row);
-
-
             convertView.setTag(holder);
         } else {
             holder = (ViewHolder) convertView.getTag();

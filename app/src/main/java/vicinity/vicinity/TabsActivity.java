@@ -27,6 +27,7 @@ public class TabsActivity extends FragmentActivity implements ActionBar.TabListe
     private ImageButton muteButton;
 
 
+
     static NeighborSectionFragment neighborFragment;
 
     public void onCreate(Bundle savedInstanceState) {
@@ -199,6 +200,9 @@ public class TabsActivity extends FragmentActivity implements ActionBar.TabListe
         }
     }
 
+    /**
+     * Mute button
+     */
     public void muteUser(View v){
         muteButton.setImageResource(R.drawable.muteicon);
 

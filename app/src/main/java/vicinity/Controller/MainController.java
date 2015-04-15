@@ -38,16 +38,6 @@ public class MainController {
      */
     public MainController(Context context){
         dbH=new DBHandler(context);
-        /*try{dbH.createDataBase();}
-        catch (IOException e) {
-            e.printStackTrace();
-        }*/
-
-        try{
-            dbH.createDataBase();}
-        catch (Exception e){
-            Log.i(TAG,"Error in database creation");
-        }
         this.context=context;
 
     }
@@ -106,12 +96,16 @@ public class MainController {
     }
 
     /**
-     * This method wipes out the user's account along with its data (friends, messages..etc)
-     * If the user wants to start a new account.
-     * @return boolean if the operation is successful
+     * This method mutes user by searching for a peer with the given
+     * device address in the neighbours list and deleting the user
+     * It also deletes posts & comments by this specific user as well
+     * @param userAddress Device address of the to-be muted user
+     * @return isMuted true if the user was muted, false otherwise
      */
-    public boolean destroyUser(){
-        return false;
+    public boolean muteUser(String userAddress){
+        boolean isMuted = false;
+
+        return isMuted;
     }
 
 
@@ -131,18 +125,20 @@ public class MainController {
 
     /**
      * Adds a new Friend to the database.
-     * @param newFriend An object of class Friend
+     * @param username a friend's instance name.
+     * @param deviceAddress a friend's device address
      * @return isAdded true if the friend was added successfully, false otherwise.
      * @throws SQLException
      */
-    public boolean addFriend(Friend newFriend)throws SQLException{
+    public boolean addFriend(String username, String deviceAddress)throws SQLException{
         boolean isAdded=false;
         try{
             database = dbH.getReadableDatabase();
             dbH.openDataBase();
             ContentValues values = new ContentValues();
-            values.put("Username", newFriend.getInstanceName());
-            values.put("deviceID", newFriend.getDeviceAddress());
+            values.put("Username", username);
+            values.put("deviceID", deviceAddress);
+            Log.i(TAG,"Adding.. "+deviceAddress);
             isAdded=database.insert("Friend", null, values)>0;
             dbH.close();
         }
@@ -155,7 +151,7 @@ public class MainController {
 
 
     /**
-     * Deletes a friend from the database given an ID
+     * Deletes a friend from the database given a device address
      * @param friendID A to-be deleted friend's ID.
      * @return isDeleted A boolean that equals true if operation is successful, false otherwise.
      */
@@ -179,7 +175,7 @@ public class MainController {
      * Fetches user's friends from the database
      * In order to be displayed.
      * @return friendsList
-     */
+
     public ArrayList<Friend> viewFriendsList(){
 
         friendsList=new ArrayList<>();
@@ -212,7 +208,7 @@ public class MainController {
         }
 
         return friendsList;}//end of viewFriendsList
-
+     */
     /**
      * This method calls nameValidation from MainController to validate the new username
      * then adds it to the database as an alias name
@@ -223,7 +219,6 @@ public class MainController {
     public boolean changeName(String aliasName, String friendID) throws SQLException{
         boolean isUpdated=false;
 
-        //Validate the given Alias name first
         if(nameValidation(aliasName))
         {
 
@@ -240,7 +235,7 @@ public class MainController {
                 e.printStackTrace();
             }
         }
-        Log.i(TAG,"Is Updated? "+isUpdated);
+        Log.i(TAG,"Is alias updated? "+isUpdated);
         return isUpdated;
     }
 
@@ -312,11 +307,6 @@ public class MainController {
         return requestsList;
     }
 
-    public boolean acceptRequest(int num){return true;}
-
-    public boolean denyRequest(int num){return true;}
-
-    public boolean sendRequest(WiFiP2pService user){return true;}
 
     /**
      * Fetches posts from the database
@@ -498,7 +488,6 @@ public class MainController {
         boolean isAdded=false;
         try
         {
-            java.util.Date date= new java.util.Date();
             database = dbH.getReadableDatabase();
             dbH.openDataBase();
             ContentValues values = new ContentValues();
