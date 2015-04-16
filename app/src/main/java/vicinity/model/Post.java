@@ -8,7 +8,6 @@ import java.util.Date;
 public class Post {
 
     private static final String TAG = "PostClass";
-    //Post Atts
     private int postID;
     private String postedAt;
     private User postedBy;
@@ -59,9 +58,7 @@ public class Post {
         return this.postComments;
     }
 
-//Methods
 
-    //I wrote this -Sarah
     public String toString()
     {
         return "Posted by: "+postedBy.getUsername()+ " Post Content: "+ postBody+" Date: "+ postedAt;

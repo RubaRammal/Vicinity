@@ -3,8 +3,6 @@ package vicinity.ConnectionManager;
 
 import android.net.wifi.p2p.WifiP2pDevice;
 
-import vicinity.Controller.MainController;
-
 /**
  * A structure to hold service information.
  */
@@ -13,6 +11,8 @@ public class WiFiP2pService {
     protected String instanceName;
     protected String serviceRegistrationType;
     protected String deviceAddress;
+    private String _aliasName;//for friends only
+
 
     /**
      * Default constructor
@@ -23,8 +23,10 @@ public class WiFiP2pService {
     /**
      * Public constructor to initiate a full WiFiP2pService
      */
-    public WiFiP2pService(WifiP2pDevice device, String instanceName, String serviceRegistrationType){
-        this.device=device; this.instanceName=instanceName; this.serviceRegistrationType=serviceRegistrationType;
+    public WiFiP2pService(WifiP2pDevice device){
+        this.device=device;
+        instanceName = device.deviceName;
+        deviceAddress=device.deviceAddress;
     }
 
 
@@ -42,6 +44,10 @@ public class WiFiP2pService {
         this.serviceRegistrationType=serviceRegistrationType;
     }
     public String getServiceRegistrationType(){return this.serviceRegistrationType;}
+    public String getAliasName(){
+        return this._aliasName;
+    }
+    public void setAliasName(String newName){_aliasName=newName;}
 
     @Override
     public String toString(){

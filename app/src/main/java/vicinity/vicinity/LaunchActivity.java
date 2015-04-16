@@ -6,10 +6,14 @@ import android.os.Bundle;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.content.Context;
-
+import java.io.IOException;
+import java.sql.SQLException;
 import java.util.Timer;
 import java.util.TimerTask;
 
+import javax.net.ssl.SSLException;
+
+import vicinity.Controller.MainController;
 import vicinity.model.DBHandler;
 
 /**
@@ -19,7 +23,7 @@ import vicinity.model.DBHandler;
 public class LaunchActivity extends Activity {
 
     Context context = this;
-
+    MainController controller = new MainController(context);
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -29,7 +33,7 @@ public class LaunchActivity extends Activity {
         try{
             dbH.createDataBase();}
         catch (Exception e){
-        // Log.i(TAG,"Error in database creation");
+            e.printStackTrace();
             }
 
 
@@ -39,10 +43,22 @@ public class LaunchActivity extends Activity {
 
             public void run() {
 
+                try {
+                    if (controller.retrieveCurrentUsername().equals(null)) {
+                        Intent intent = new Intent(context, NameActivity.class);
+                        startActivity(intent);
+                    } else {
+                        Intent intent = new Intent(context, TabsActivity.class);
+                        startActivity(intent);
+                    }
 
-                Intent intent = new Intent(context, NameActivity.class);
-                startActivity(intent);
-            }
+
+                }
+                catch(SQLException e){
+                    e.printStackTrace();
+                }
+       }
+
 
         }, secondsDelay * 2000);
     }

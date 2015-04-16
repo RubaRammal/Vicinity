@@ -24,7 +24,6 @@ public class NameActivity extends Activity {
     private static final String TAG = "Username Activity";
     EditText username_input;
     Button submit_button;
-    TextView launchScreen;
     final Context context = this;
     public String username;
     MainController controller;

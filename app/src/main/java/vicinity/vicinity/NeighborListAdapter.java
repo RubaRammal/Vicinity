@@ -44,7 +44,7 @@ public class NeighborListAdapter extends BaseAdapter {
 
     @Override
     public Object getItem(int position) {
-        return services.get(position);
+        return services.get(position-1);
     }
 
     @Override
