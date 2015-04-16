@@ -7,6 +7,9 @@ import android.graphics.drawable.ColorDrawable;
 import android.os.Bundle;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.ActionBarActivity;
+import android.text.Editable;
+import android.text.TextUtils;
+import android.text.TextWatcher;
 import android.util.Log;
 import android.view.Gravity;
 import android.view.View;
@@ -15,29 +18,24 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ListView;
 import android.widget.TextView;
-
+import java.sql.SQLException;
 import java.util.ArrayList;
-
 import vicinity.Controller.MainController;
 import vicinity.model.Comment;
 import vicinity.model.Globals;
 import vicinity.model.Post;
 
-/**
- * Post comment activity
- * Still blank
- */
 public class PostComment extends ActionBarActivity {
 
     private ListView commentListView;
-    private EditText commentText;
-    private Button sendComment;
+    private EditText commentTextField;
+    private Button sendCommentButton;
     private Comment comment;
     private static CommentListAdapter adapter;
     public static Context ctx;
     private static ArrayList<Comment> commentsList;
     private Post commentedOn;
-    private int postId;
+    private int postID;
     private String TAG = "PostComment";
     private MainController controller;
 
@@ -46,7 +44,6 @@ public class PostComment extends ActionBarActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_post_comment);
-        commentsList = new ArrayList<Comment>();
 
         final ActionBar abar = getSupportActionBar();
         abar.setBackgroundDrawable(new ColorDrawable(Color.parseColor("#01aef0")));//line under the action bar
@@ -55,55 +52,40 @@ public class PostComment extends ActionBarActivity {
                 ActionBar.LayoutParams.WRAP_CONTENT,
                 ActionBar.LayoutParams.MATCH_PARENT,
                 Gravity.CENTER);
+
         TextView textviewTitle = (TextView) viewActionBar.findViewById(R.id.actionbar_textview);
-        textviewTitle.setText("Comment");
+        textviewTitle.setText("Comments");
         abar.setCustomView(viewActionBar, params);
         abar.setDisplayShowCustomEnabled(true);
         abar.setDisplayShowTitleEnabled(false);
-        abar.setDisplayHomeAsUpEnabled(true);
+        abar.setDisplayHomeAsUpEnabled(false);
         abar.setHomeButtonEnabled(true);
 
+        ctx = this;
+        controller = new MainController(this);
+        Bundle extras = getIntent().getExtras();
+        postID = extras.getInt("POST_ID");
 
-        if (savedInstanceState == null) {
+     /*if (savedInstanceState == null) {
             Bundle extras = getIntent().getExtras();
             if (extras == null) {
-                postId = 0;
+                postID = 0;
             } else {
-                postId = extras.getInt("POST_ID");
+                postID = extras.getInt("POST_ID");
             }
         } else {
-            postId = (int) savedInstanceState.getSerializable("POST_ID");
+            postID = (int) savedInstanceState.getSerializable("POST_ID");
         }
 
-        ctx = this;
-        controller = new MainController(ctx);
-
-        commentedOn = controller.getPost(postId);
-        //Initializations
-        Log.i(TAG, commentedOn.getPostBody());
-        Log.i(TAG, commentedOn.getPostedBy().getUsername());
-
-
-        Comment c = new Comment(commentedOn.getPostBody(), commentedOn.getPostedBy().getUsername());
-        commentsList.add(c);
-
+        commentedOn = controller.getPost(postID);
+        comment = new Comment(commentedOn.getPostBody(), commentedOn.getPostedBy().getUsername());
+        commentsList.add(comment);
         commentsList.add(new Comment("", "Comments"));
-
-
-        //To get comments of a post
-        /*for (int i = 0; i < controller.getPostComments(postID).size(); i++) {
-            commentsList.add(s.get(i));
-        }*/
-
-        commentsList.add(new Comment("Cool", "Ruba")); //Dummy
-
-
-
+        commentsList.addAll(controller.getPostComments(postID));
+        */
+        commentsList = controller.getPostComments(postID);
         commentListView = (ListView) findViewById(android.R.id.list);
         adapter = new CommentListAdapter(ctx, commentsList);
-        commentText = (EditText) findViewById(R.id.comment);
-        sendComment = (Button) findViewById(R.id.sendComment);
-
         commentListView.setAdapter(adapter);
         commentListView.setTranscriptMode(AbsListView.TRANSCRIPT_MODE_ALWAYS_SCROLL);
         commentListView.getAdapter().registerDataSetObserver(new DataSetObserver() {
@@ -114,9 +96,48 @@ public class PostComment extends ActionBarActivity {
             }
         });
 
+        commentTextField = (EditText) findViewById(R.id.commentTextField);
+        sendCommentButton = (Button) findViewById(R.id.sendCommentButton);
+        sendCommentButton.setEnabled(false);
+        commentTextField.addTextChangedListener(new TextWatcher() {
+            @Override
+            public void beforeTextChanged(CharSequence s, int start, int count, int after) {
 
-    }
+            }
 
+            @Override
+            public void onTextChanged(CharSequence s, int start, int before, int count) {
 
+            }
+
+            @Override
+            public void afterTextChanged(Editable s) {
+                sendCommentButton.setEnabled(!TextUtils.isEmpty(commentTextField.getText().toString().trim()));
+            }
+        });
+
+        sendCommentButton.setOnClickListener(
+                new Button.OnClickListener() {
+                    public void onClick(View view) {
+                        String commentText = commentTextField.getText().toString();
+                        Comment aComment = null;
+                        try {
+                            String username = controller.retrieveCurrentUsername();
+                            aComment = new Comment (postID, commentText, username);
+                            if (controller.addAcomment(aComment))
+                                Log.i(TAG, "Comment is added to DB");
+                            else
+                                Log.i(TAG, "Comment is NOT added to DB");
+
+                        } catch (SQLException e) {
+                            Log.i(TAG, "A problem in adding comment to DB");
+                        }
+                        commentsList.add(aComment);
+                        adapter.notifyDataSetChanged();
+                        commentTextField.setText("");
+                    }
+                }
+        );
+    }//End onCreate
 }
 

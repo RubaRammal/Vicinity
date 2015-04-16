@@ -11,11 +11,9 @@ import android.widget.TextView;
 import java.lang.Override;import java.util.ArrayList;
 import java.util.List;
 
-import vicinity.model.Comment;import vicinity.vicinity.R;
+import vicinity.model.Comment;
+import vicinity.vicinity.R;
 
-/**
- * Created by macproretina on 4/2/15.
- */
 public class CommentListAdapter extends BaseAdapter {
 
     private List<Comment> commentsList;
@@ -82,7 +80,7 @@ public class CommentListAdapter extends BaseAdapter {
             holder = (ViewHolder) convertView.getTag();
         }
 
-        View row = convertView.findViewById(R.id.commentRow);
+       /* View row = convertView.findViewById(R.id.commentRow);
 
         //The post row
         if(position==0){
@@ -102,10 +100,9 @@ public class CommentListAdapter extends BaseAdapter {
             holder.name_text.setPadding(5,5,5,5);
 
         }
+        */
 
-
-
-        holder.name_text.setText(commentsList.get(position).getCommentBy());
+        holder.name_text.setText(commentsList.get(position).getCommentedBy());
 
         holder.body_text.setText(commentsList.get(position).getCommentBody());
 
