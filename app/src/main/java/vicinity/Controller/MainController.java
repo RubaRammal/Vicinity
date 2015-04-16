@@ -419,7 +419,7 @@ public class MainController {
 
     /**
      * Fetches the comments on a specified post
-     * @param postID the id of the selected post
+     * @param postID
      * @return an ArrayList containing all comments on the specified post
      */
     public ArrayList<Comment> getPostComments(int postID) {

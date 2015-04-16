@@ -5,34 +5,12 @@
     android:paddingBottom="13dip"
     android:paddingLeft="13dip"
     android:paddingTop="10dip"
-    android:paddingRight="13dip"
-    android:descendantFocusability="blocksDescendants">
+    android:paddingRight="13dip">
 
     <TextView
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
+        android:layout_width="fill_parent"
+        android:layout_height="fill_parent"
         android:id="@+id/neighbor_row"
-        android:textSize="18sp"
-        android:text="hijhj"/>
-
-    <TextView
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:id="@+id/request"
-        android:textSize="10sp"
-        android:text="Tab to send a request..."
-        android:layout_below="@+id/neighbor_row"
-        android:layout_alignParentLeft="true"
-        android:layout_alignParentStart="true"
-        android:textColor="#81020202"/>
-
-    <ImageButton
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:src="@drawable/muteicon2"
-        android:layout_alignParentRight="true"
-        android:id="@+id/muteButton"
-        android:onClick="muteUser" />
-
+        android:textSize="18sp"/>
 
 </RelativeLayout>

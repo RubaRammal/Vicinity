@@ -25,6 +25,16 @@ public class Post {
 
     }
 
+    public Post(User postedBy, String postBody){
+        Date currentDate= new Date();
+        DateFormat dF=  new SimpleDateFormat("yyyy/MM/dd HH:mm:ss");
+        postedAt= dF.format(currentDate);
+        this.postBody=postBody;
+        this.postedBy=postedBy;
+        postComments = new ArrayList<Comment>();
+
+    }
+
     public Post(User postedBy, String postBody, int postID){
         Date currentDate= new Date();
         DateFormat dF=  new SimpleDateFormat("yyyy/MM/dd HH:mm:ss");
@@ -32,14 +42,23 @@ public class Post {
         this.postBody=postBody;
         this.postedBy=postedBy;
         this.postID = postID;
+        postComments = new ArrayList<Comment>();
     }
 
     //Setters and getters
     public int getPostID(){
         return this.postID;
     }
+
+    public void setPostID (int postID) {
+        this.postID = postID;
+    }
     public String getPostedAt(){
         return this.postedAt;
+    }
+
+    public void setPostedAt(String postedAt) {
+        this.postedAt=postedAt;
     }
     public boolean setPostedBy(User postedBy){
         this.postedBy=postedBy;
@@ -57,6 +76,14 @@ public class Post {
     }
     public ArrayList<Comment> getComments(){
         return this.postComments;
+    }
+
+    /**
+     * adds a comment to the ArrayList postComments
+     * @param comment
+     */
+    public void addAcomment (Comment comment) {
+        postComments.add(comment);
     }
 
 //Methods

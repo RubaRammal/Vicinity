@@ -4,7 +4,6 @@ import android.content.Context;
 import android.database.DataSetObserver;
 import android.graphics.Color;
 import android.graphics.drawable.ColorDrawable;
-import android.net.wifi.p2p.WifiP2pDevice;
 import android.os.Handler;
 import android.os.Message;
 import android.support.v7.app.ActionBar;
@@ -16,19 +15,14 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.AbsListView;
-import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ListView;
 import android.widget.TextView;
 
 import java.sql.SQLException;
-import java.util.ArrayList;
 
 import vicinity.ConnectionManager.ChatManager;
-import vicinity.ConnectionManager.WiFiP2pService;
-import vicinity.Controller.MainController;
-import vicinity.model.Friend;
 import vicinity.model.Globals;
 import vicinity.model.VicinityMessage;
 
@@ -44,7 +38,6 @@ public class ChatActivity extends ActionBarActivity {
     private static ChatManager chatManager;
     private static ChatAdapter adapter;
     private static Context ctx;
-    private static MainController controller;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -72,32 +65,9 @@ public class ChatActivity extends ActionBarActivity {
         adapter = new ChatAdapter(ctx, R.layout.chat_box_layout);
         chatText = (EditText) findViewById(R.id.chatText);
         send = (Button) findViewById(R.id.sendButton);
-        controller = new MainController(ctx);
 
         chatListView.setAdapter(adapter);
         chatListView.setTranscriptMode(AbsListView.TRANSCRIPT_MODE_ALWAYS_SCROLL);
-
-        int msgId;
-        if (savedInstanceState == null) {
-            Bundle extras = getIntent().getExtras();
-            if (extras == null) {
-                msgId = 0;
-            } else {
-                msgId = extras.getInt("MSG_ID");
-            }
-        } else {
-            msgId = (int) savedInstanceState.getSerializable("MSG_ID");
-        }
-
-        MessagesSectionFragment m = new MessagesSectionFragment();
-        Log.i(TAG, m.GetMessages().get(0).getChatId()+"");
-
-       for(int i=0; i<m.GetMessages().size(); i++){
-            if(m.GetMessages().get(i).getChatId() == msgId){
-                pushMessage(m.GetMessages().get(i));
-            }
-        }
-
         chatListView.getAdapter().registerDataSetObserver(new DataSetObserver() {
             @Override
             public void onChanged() {
@@ -116,7 +86,7 @@ public class ChatActivity extends ActionBarActivity {
                         if (chatManager != null) {
 
                             //Message
-                            vicinityMessage = new VicinityMessage(ctx,  "40-123943",5, true, chatText.getText().toString());
+                            vicinityMessage = new VicinityMessage(ctx, "1", true, chatText.getText().toString());
 
                             //Display Message to user
                             pushMessage(vicinityMessage);
@@ -128,9 +98,7 @@ public class ChatActivity extends ActionBarActivity {
 
                             //To add vicinityMessage to db
                             try {
-                                boolean added = controller.addMessage(vicinityMessage);
-                                if(added)
-                                Log.i(TAG, "Message added");
+                                vicinityMessage.addMessage(vicinityMessage);
                             } catch (SQLException e) {
                                 e.printStackTrace();
                             }
@@ -163,15 +131,9 @@ public class ChatActivity extends ActionBarActivity {
                     // construct a string from the valid bytes in the buffer
                     String readMessage = new String(readBuf, 0, msg.arg1);
                     Log.d(TAG, readMessage);
-                    message = new VicinityMessage(ctx, "30-123943", 5, false, readMessage); // WiFiP2pService should be a variable
-                    Log.i(TAG,"message "+message.getMessageBody());
+                    message = new VicinityMessage(ctx, "2", false, readMessage);
+                    Log.i(TAG,"message"+message.getMessageBody());
                     pushMessage(message);
-                    try {
-                        controller.addMessage(message);
-                    } catch (SQLException e) {
-                        e.printStackTrace();
-                    }
-
                     break;
 
                 case Globals.MY_HANDLE:

@@ -20,7 +20,6 @@ public class MessageListAdapter  extends BaseAdapter {
     private LayoutInflater mInflater;
 
 
-
     public MessageListAdapter(Context context, ArrayList<VicinityMessage> vicinityMessages){
         this.vicinityMessages = vicinityMessages;
         mInflater = LayoutInflater.from(context);
@@ -44,7 +43,7 @@ public class MessageListAdapter  extends BaseAdapter {
     @Override
     public View getView(int position, View convertView, ViewGroup parent) {
         ViewHolder holder;
-        if(convertView == null ){
+        if(convertView == null){
             convertView = mInflater.inflate(R.layout.messages_row_view, null);
 
 
@@ -59,11 +58,9 @@ public class MessageListAdapter  extends BaseAdapter {
             holder = (ViewHolder) convertView.getTag();
         }
 
-
-            holder.textDate.setText(vicinityMessages.get(position).getDate());
-            holder.textName.setText(vicinityMessages.get(position).getFriendID());
-            holder.textMessage.setText(vicinityMessages.get(position).getMessageBody());
-
+        holder.textDate.setText(vicinityMessages.get(position).getDate());
+        holder.textName.setText(vicinityMessages.get(position).getFriendID());
+        holder.textMessage.setText(vicinityMessages.get(position).getMessageBody());
 
 
         return convertView;
