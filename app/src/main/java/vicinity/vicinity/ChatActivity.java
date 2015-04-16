@@ -49,7 +49,7 @@ public class ChatActivity extends ActionBarActivity {
 
     private Boolean position;
     private VicinityMessage vicinityMessage;
-    private Photo VicinityPhoto;
+    private Photo vicinityPhoto;
     private static File file;
     private static ChatManager chatManager;
     private static ChatAdapter adapter;
@@ -102,7 +102,7 @@ public class ChatActivity extends ActionBarActivity {
         send.setOnClickListener(
                 new Button.OnClickListener() {
                     public void onClick(View v) {
-                        Globals.msgFlag = true;
+                        Globals.msgFlag = true; // assigning a value for the flag to be used in handleMessage method
 
                         Log.i(TAG,"ChatManager= "+chatManager);
 
@@ -133,14 +133,15 @@ public class ChatActivity extends ActionBarActivity {
                 }
         );
 
-
+         /*---------TESTED(Successful)---------*/
         //When button (+)  is clicked
+
 
         sendPhoto.setOnClickListener(
                 new Button.OnClickListener(){
                     @Override
                     public void onClick(View v) {
-                        Globals.msgFlag = false;
+                        Globals.msgFlag = false;  // again assigning a value for the flag to be used in handleMessage method
 
                         Intent i = new Intent(
                                 Intent.ACTION_PICK,
@@ -158,6 +159,7 @@ public class ChatActivity extends ActionBarActivity {
     }
 
 
+   /*---------TESTED(Successful)---------*/
 
     @Override
     public  void onActivityResult(int requestCode, int resultCode, Intent data){
@@ -182,33 +184,37 @@ public class ChatActivity extends ActionBarActivity {
 
     }
 
-
+    /*---------TESTED(Successful)---------*/
     public void sendPhotoObj( String photoPath){
 
         Log.i(TAG,"ChatManager= "+chatManager);
 
         if(chatManager != null) {
-            VicinityPhoto = new Photo(ctx, "1", true, "", file);
-            VicinityPhoto.setPhotoPath(photoPath);
+            vicinityPhoto = new Photo(ctx , "1" , true , "No text");
+            vicinityMessage = new VicinityMessage(ctx , "1", true , "No text" );
+            vicinityMessage.setPhotoPath(photoPath);
+            vicinityPhoto.setPhotoPath(photoPath);
 
-            pushPhoto(VicinityPhoto);
+            pushMessage(vicinityMessage); // pushing the photo to the Vicinity Messages List
 
             //File code (at the receiver side)
             file = new File(Environment.getExternalStorageDirectory() + "/"
                     + ctx.getPackageName() + "/Vicinity-" + System.currentTimeMillis()
                     + ".jpg");
+            String photopath = "file://" + photoPath+ "image/*";
 
-            chatManager.write(photoPath.getBytes());
+            chatManager.write(photopath.getBytes());
             Log.i(TAG, "Writing photo stream successful");
 
         }
 
     }
 
-
+/* ------- PHOTO PART UNTESTED NOTE SURE HOW IT PERFORMS DUE TO THE VIEW CRASHING ----- */
 public static final String TAG = "ChatActivity";
     private static VicinityMessage message;
     private static Photo photo;
+
 
     public static Handler handler = new Handler(){
         /**
@@ -223,17 +229,25 @@ public static final String TAG = "ChatActivity";
                 case Globals.MESSAGE_READ:
                     byte[] readBuf = (byte[]) msg.obj;
                     // construct a string from the valid bytes in the buffer
-                    String readMessage = new String(readBuf, 0, msg.arg1);
-                    Log.d(TAG, readMessage);
                     if(Globals.msgFlag ) {
-                        message = new VicinityMessage(ctx, "2", false, readMessage);
+                        String readMessage = new String(readBuf, 0, msg.arg1);
+                        Log.d(TAG, readMessage);
+                        message = new VicinityMessage(ctx, "2", false, readMessage );
                         Log.i(TAG, "message" + message.getMessageBody());
                         pushMessage(message);
                         break;
                     }
-                    else       {
+                    else       {/* --There might be a problem here at the receiving side!
+                                      I saved the photopath twice once in as VicinityMessage and once as Photo which is totally wrong! */
 
-                        photo = new Photo(ctx, "1", true, readMessage, file);
+                        BitmapFactory.Options options = new BitmapFactory.Options();
+                       Bitmap bitmap = BitmapFactory.decodeByteArray(readBuf, 0, readBuf.length, options);//This bitmap will be used to call method capturePhotoUtils.insertImage
+                        String readPhotoPath = new String(readBuf, 0, msg.arg1);
+                        message = new VicinityMessage(ctx , "2" , false , "No text" );
+                        message.setPhotoPath(readPhotoPath);//I did this twice because I wanted to try all the possible solutions
+                        photo = new Photo(ctx , "2" , false , "No text");
+                        photo.setPhotoPath(readPhotoPath);
+                        //photo.setphotoFile(bitmap.compress(Bitmap.CompressFormat.PNG, quality, outStream));
                         Log.i(TAG, "photo" + photo.getphotoFile());
                         file = new File(Environment.getExternalStorageDirectory() + "/"
                                 + ctx.getPackageName() + "/Vicinity-" + System.currentTimeMillis()
@@ -246,7 +260,9 @@ public static final String TAG = "ChatActivity";
                         } catch (IOException e) {
                             e.printStackTrace();
                         }
-                        Bitmap bitmap = BitmapFactory.decodeFile(photo.getPhotoPath());
+                        // bitmap = BitmapFactory.decodeFile(photo.getPhotoPath());
+                        message.setPhotoPath(photo.getPhotoPath());//saving the photopath again (but this time from the photo object)
+
                         ContentResolver contentResolver = ctx.getContentResolver();
                         CapturePhotoUtils capturePhotoUtils = new CapturePhotoUtils();
                         capturePhotoUtils.insertImage(contentResolver , bitmap ,"Received Photo" ," Photo saved to receiver media gallery" );
@@ -274,11 +290,13 @@ public static final String TAG = "ChatActivity";
     }
 
 
+
     public  static void pushPhoto(Photo photo){
         adapter.addPhoto(photo);
         adapter.notifyDataSetChanged();
 
     }
+
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
