@@ -141,5 +141,12 @@ public class NeighborSectionFragment extends Fragment {
     }
 
 
+    @Override
+    public void onStart() {
+        super.onStart();
+        friendListAdapter.notifyDataSetChanged();
+        neighborListAdapter.notifyDataSetChanged();
+
+    }
 
 }

@@ -94,7 +94,7 @@ public class ConnectAndDiscoverService extends Service
 
         /***TEST***/
         disconnectPeers();
-        DBHandler.deleteDatabase();
+       DBHandler.deleteDatabase();
 
     }
 

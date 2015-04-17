@@ -81,8 +81,13 @@ public class VicinityMessage {
         this.friendID = friendID;
     }
     public String getFriendID(){return friendID;}
+
     public String getDate() {
         return this.sentAt;
+    }
+
+    public void setDate(String d) {
+        sentAt = d;
     }
     public long getMsgTimestamp(){
         return msgTimestamp;
@@ -105,34 +110,11 @@ public class VicinityMessage {
         return chatId;
     }
 
-
-
-    /**
-     * Adds a single message to the database.
-     * @param newVicinityMessage a new VicinityMessage object to be added in the db
-     * @return isAdded a boolean that is true if the operation is successful, false otherwise
-     * @throws SQLException
-     */
-    public boolean addMessage(VicinityMessage newVicinityMessage) throws SQLException {
-
-        boolean isAdded = false;
-
-        try {
-            db = dbh.getWritableDatabase();
-            dbh.openDataBase();
-            ContentValues values = new ContentValues();
-            values.put("message", newVicinityMessage.getMessageBody());
-            //values.put("time", newVicinityMessage.getMsgTimestamp()); // I think we need generate time automatically in the db -AFNAN
-            values.put("isMyMsg", newVicinityMessage.isMyMsg());
-            values.put("friend_id", newVicinityMessage.getFriendID());
-            isAdded=db.insert("VicinityMessage", null, values)>0;
-
-            dbh.close();
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-        return isAdded;
+    public void setChatId( int cid){
+        chatId = cid;
     }
+
+
 
     /** UNTESTED METHODS
      *  WILL BE TESTED AFTER CONNECTING

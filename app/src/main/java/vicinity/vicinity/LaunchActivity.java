@@ -47,9 +47,11 @@ public class LaunchActivity extends Activity {
                     if (controller.retrieveCurrentUsername().equals(null)) {
                         Intent intent = new Intent(context, NameActivity.class);
                         startActivity(intent);
+                        finish();
                     } else {
                         Intent intent = new Intent(context, TabsActivity.class);
                         startActivity(intent);
+                        finish();
                     }
 
 

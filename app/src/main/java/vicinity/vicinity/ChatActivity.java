@@ -89,14 +89,22 @@ public class ChatActivity extends ActionBarActivity {
             msgId = (int) savedInstanceState.getSerializable("MSG_ID");
         }
 
-        MessagesSectionFragment m = new MessagesSectionFragment();
-        Log.i(TAG, m.GetMessages().get(0).getChatId()+"");
+        Log.i(TAG,msgId+"");
 
-       for(int i=0; i<m.GetMessages().size(); i++){
-            if(m.GetMessages().get(i).getChatId() == msgId){
-                pushMessage(m.GetMessages().get(i));
-            }
+
+/*
+        ArrayList<VicinityMessage> m = new ArrayList<VicinityMessage>();
+
+        for (int i = 0; i < controller.getChatMessages(msgId).size(); i++) {
+            m.add(controller.getChatMessages(msgId).get(i));
         }
+
+       for(int i=0; i<m.size(); i++){
+                pushMessage(m.get(i));
+           Log.i(TAG, m.get(i).getMessageBody());
+
+
+       }*/
 
         chatListView.getAdapter().registerDataSetObserver(new DataSetObserver() {
             @Override

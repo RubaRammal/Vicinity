@@ -38,12 +38,29 @@ public class MessagesSectionFragment extends Fragment {
         View rootView = inflater.inflate(R.layout.fragment_messages, container, false);
 
         ctx = this.getActivity();
-        ArrayList<VicinityMessage> vicinityMessages = GetMessages();
-        adapter = new MessageListAdapter(this.getActivity(), vicinityMessages);
 
         controller = new MainController(ctx);
 
-        // Log.i(TAG, controller.viewAllMessages().get(0).getMessageBody());
+        ArrayList<VicinityMessage> vicinityMessages = controller.viewAllMessages();
+        ArrayList<VicinityMessage> chatMsgs = new ArrayList<>();
+
+        //Returns the chat IDs of all messages
+        int[] ids = controller.viewChatIds();
+
+
+        //Fills an ArrayList with the last message of every chat to send it to the adapter for display
+        for (int i=0; i<ids.length; i++){
+            ArrayList<VicinityMessage> temp = controller.getChatMessages(ids[i]);
+            chatMsgs.add(temp.get(temp.size()-1));
+            if(ids[i]==0)
+                break;
+        }
+
+        for (int i=0; i<chatMsgs.size() ;i++){
+        Log.i(TAG, "last msg: "+chatMsgs.get(i).getMessageBody());}
+
+        adapter = new MessageListAdapter(this.getActivity(), chatMsgs);
+
 
         //Get the fragment_messages layout ListView
         final ListView lv = (ListView) rootView.findViewById(R.id.messagesList);
@@ -71,20 +88,11 @@ public class MessagesSectionFragment extends Fragment {
     }
 
 
-    //The PRIVATE METHOD SHOULD BE DELETED AND THE METHOD THAT
-    // RETURNS THE MESSAGES ARRAY LIST SHOULD BE CALLED IN THIS CLASS
-    public ArrayList<VicinityMessage> GetMessages(){
-        ArrayList<VicinityMessage> vicinityMessages = new ArrayList<VicinityMessage>();
 
-        VicinityMessage vicinityMessage = new VicinityMessage(this.getActivity(),  "30-123943", 1, true, "Hey");
-        vicinityMessages.add(vicinityMessage);
+    @Override
+    public void onStart() {
+        super.onStart();
+        adapter.notifyDataSetChanged();
 
-        vicinityMessage = new VicinityMessage(this.getActivity(),  "30-123943", 1, true, "Wassap");
-        vicinityMessages.add(vicinityMessage);
-
-        vicinityMessage = new VicinityMessage(this.getActivity(), "50-123943", 1, false, "Hola");
-        vicinityMessages.add(vicinityMessage);
-
-        return vicinityMessages;
     }
 }

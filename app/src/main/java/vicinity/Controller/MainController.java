@@ -23,7 +23,6 @@ public class MainController {
     private DBHandler dbH;
     private Context context;
     private ArrayList<Friend> friendsList;
-    private ArrayList<Request> requestsList;
     private ArrayList<Post> postList;
     private ArrayList<VicinityMessage> allMessages;
     public String query;
@@ -39,10 +38,12 @@ public class MainController {
     public MainController(Context context){
         dbH=new DBHandler(context);
         this.context=context;
+        allMessages = new ArrayList<VicinityMessage>();
 
     }
 /*****************************************User's methods**********************************************/
 
+    /*------------------------------Works------------------------------*/
     /**
      * Creates a new user, this method shall be used once only
      * when the user launches the app for the first time
@@ -66,6 +67,7 @@ public class MainController {
         return isCreated;
     }
 
+    /*------------------------------Works------------------------------*/
     /**
      *
      * Retrieves current user's username from database
@@ -111,7 +113,7 @@ public class MainController {
 
 /***************************************Friend's Methods********************************************************/
 
-
+    /*------------------------------Works------------------------------*/
     /**
      * Validates an input string (username) that shall contain letters, numbers, "-" and "_" ONLY
      * @param username A string
@@ -122,7 +124,7 @@ public class MainController {
     }
 
 
-
+    /*------------------------------Works------------------------------*/
     /**
      * Adds a new Friend to the database.
      * @param username a friend's instance name.
@@ -239,6 +241,7 @@ public class MainController {
         return isUpdated;
     }
 
+    /*------------------------------Works------------------------------*/
     /**
      * Checks if a peer is one of the user's friends
      * @param deviceAddress of a peer
@@ -261,50 +264,6 @@ public class MainController {
         Log.i(TAG,"Is "+deviceAddress+" your friend? "+isFriend);
         return isFriend;
 
-    }
-
-/***************************************Request's Methods********************************************************/
-
-    /**
-     * Fetches user's Requests from the database
-     * @return requestsList
-     */
-    public ArrayList<Request> viewAllRequests()
-    {
-
-        requestsList=new ArrayList<Request>();
-        Log.i("Sarah's message", "entered the view all requests method");
-
-
-
-        try
-        {
-            database=dbH.getReadableDatabase();
-            dbH.openDataBase();
-            String query="SELECT * FROM Request";
-            Cursor c = database.rawQuery(query,null);
-            if (c.moveToFirst())
-            {
-                do
-                {
-                    Request requestObj= new Request();
-                 //   requestObj.setReqBy(new User (c.getString(1)));
-                    requestObj.setRequestStatus(c.getString(2));
-                    requestsList.add(requestObj);
-                } while (c.moveToNext());
-            }
-            else
-            {
-                Log.i(TAG, "There are no requests in the DB.");
-            }
-            dbH.close();
-        }
-        catch(SQLException e)
-        {
-            e.printStackTrace();
-        }
-
-        return requestsList;
     }
 
 
@@ -375,40 +334,41 @@ public class MainController {
         }
         return isAdded;}
 
+    /*------------------------------Works------------------------------*/
     /**
      * Fetches user's Chats from the database
      * @return allMessages
      */
-    public ArrayList<VicinityMessage> viewAllMessages(int chatId)
+    public ArrayList<VicinityMessage> viewAllMessages()
 
     {
-
 
         try
         {
             database=dbH.getReadableDatabase();
             dbH.openDataBase();
-            String query="SELECT * FROM Message WHERE chatId = \""+chatId+"\"";
+            String query="SELECT * FROM Message";
             Cursor c = database.rawQuery(query,null);
-            if (c.moveToFirst())
-            {
-                do
-                {
-                    VicinityMessage msg = new VicinityMessage();
-                    msg.setMessageBody(c.getString(4));
-                    msg.setFriendID(c.getString(1));
-                    //msg.setTime(c.getString(4));
+
+            VicinityMessage msg = null;
+            if (c.moveToFirst()) {
+
+                do {
+
+                    msg = new VicinityMessage();
+                    msg.setMessageBody(c.getString(3));
+                    msg.setFriendID(c.getString(2));
+                    msg.setChatId(c.getInt(c.getColumnIndex("chatId")));
+
+                    msg.setDate(c.getString(1));
                     //contact.setPicture(c.getBlob(3));
 
                     // Adding message to allMessages
                     allMessages.add(msg);
                 } while (c.moveToNext());
-            }
-            else
-            {
+            }else{
                 Log.i(TAG, "There are no messages in the DB.");
             }
-
             dbH.close();
         }
         catch(SQLException e)
@@ -419,6 +379,46 @@ public class MainController {
 
         return allMessages;
     }
+
+    /*------------------------------Works------------------------------*/
+    /**
+     * Fetches all the chat IDs from the db
+     * @return chatIds int array
+     */
+    public int[] viewChatIds()
+
+    {
+        int[] chatIds = new int[30];
+
+        try
+        {
+            database=dbH.getReadableDatabase();
+            dbH.openDataBase();
+            String query="SELECT DISTINCT chatId FROM Message";
+            Cursor c = database.rawQuery(query,null);
+            int count = 0;
+            if (c.moveToFirst()) {
+
+                do {
+
+                    chatIds[count++] = c.getInt(c.getColumnIndex("chatId"));
+
+                } while (c.moveToNext());
+            }else{
+                Log.i(TAG, "There are no chat ids in the DB.");
+            }
+            dbH.close();
+        }
+        catch(SQLException e)
+        {
+            e.printStackTrace();
+        }
+
+        Log.i(TAG, "Successfully returned ids");
+
+        return chatIds;
+    }
+
 
     /**
      * Deletes a message from the database given an ID
@@ -477,6 +477,7 @@ public class MainController {
 
     }
 
+    /*------------------------------Works------------------------------*/
     /**
      * Adds a new Meesage to the database.
      * @param message An object of class VicinityMessage
@@ -493,7 +494,9 @@ public class MainController {
             ContentValues values = new ContentValues();
             values.put("messageBody", message.getMessageBody());
             values.put("isMyMsg", message.isMyMsg());
-            //values.put("msgTimestamp", new Timestamp(date.getTime()).getTime());
+            values.put("chatId", message.getChatId());
+            values.put("sentBy", message.getFriendID());
+            values.put("msgTimestamp", message.getDate());
 
 
             isAdded=database.insert("Message", null, values)>0;
@@ -506,6 +509,29 @@ public class MainController {
             e.printStackTrace();
         }
         return isAdded;}
+
+
+    /*------------------------------Works------------------------------*/
+    /**
+     * Returns an array of all messages for a chat id.
+     * @param chatId and int that is an id of a chat
+     * @return an ArrayLis of VicinityMessages of all the messages for the specified chat id.
+     */
+    public ArrayList<VicinityMessage> getChatMessages(int chatId){
+
+        ArrayList<VicinityMessage> chat = new ArrayList<VicinityMessage>();
+
+        for(int i=0; i<this.allMessages.size(); i++){
+            if(this.allMessages.get(i).getChatId()==chatId){
+                chat.add(allMessages.get(i));
+                Log.i(TAG, allMessages.get(i).getMessageBody());
+           }
+        }
+
+
+        return chat;
+    }
+
 
 
 
