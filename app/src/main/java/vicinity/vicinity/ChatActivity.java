@@ -4,7 +4,6 @@ import android.content.Context;
 import android.database.DataSetObserver;
 import android.graphics.Color;
 import android.graphics.drawable.ColorDrawable;
-import android.net.wifi.p2p.WifiP2pDevice;
 import android.os.Handler;
 import android.os.Message;
 import android.support.v7.app.ActionBar;
@@ -16,19 +15,14 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.AbsListView;
-import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ListView;
 import android.widget.TextView;
-
 import java.sql.SQLException;
-import java.util.ArrayList;
-
 import vicinity.ConnectionManager.ChatManager;
-import vicinity.ConnectionManager.WiFiP2pService;
 import vicinity.Controller.MainController;
-import vicinity.model.Friend;
+import vicinity.Controller.VicinityNotifications;
 import vicinity.model.Globals;
 import vicinity.model.VicinityMessage;
 
@@ -43,7 +37,7 @@ public class ChatActivity extends ActionBarActivity {
     private VicinityMessage vicinityMessage;
     private static ChatManager chatManager;
     private static ChatAdapter adapter;
-    private static Context ctx;
+    public static Context ctx;
     private static MainController controller;
 
     @Override
@@ -144,7 +138,6 @@ public class ChatActivity extends ActionBarActivity {
 
     }
 
-
     public static final String TAG = "ChatActivity";
     private static VicinityMessage message;
 
@@ -163,7 +156,9 @@ public class ChatActivity extends ActionBarActivity {
                     // construct a string from the valid bytes in the buffer
                     String readMessage = new String(readBuf, 0, msg.arg1);
                     Log.d(TAG, readMessage);
-                    message = new VicinityMessage(ctx, "30-123943", 5, false, readMessage); // WiFiP2pService should be a variable
+                    message = new VicinityMessage(ctx, "30-123943", 5, false, readMessage);
+                    if(Globals.Notification)
+                        VicinityNotifications.newMessageNotification(message);
                     Log.i(TAG,"message "+message.getMessageBody());
                     pushMessage(message);
                     try {

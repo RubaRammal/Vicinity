@@ -14,6 +14,7 @@ public class WiFiP2pService {
     private String _aliasName;//for friends only
 
 
+
     /**
      * Default constructor
      */
@@ -25,6 +26,7 @@ public class WiFiP2pService {
      */
     public WiFiP2pService(WifiP2pDevice device){
         this.device=device;
+
         instanceName = device.deviceName;
         deviceAddress=device.deviceAddress;
     }

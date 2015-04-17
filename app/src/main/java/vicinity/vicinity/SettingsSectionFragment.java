@@ -15,6 +15,7 @@ import android.widget.Toast;
 import java.util.Timer;
 import java.util.TimerTask;
 import vicinity.model.DBHandler;
+import vicinity.model.Globals;
 
 
 public class SettingsSectionFragment extends Fragment {
@@ -84,9 +85,11 @@ public class SettingsSectionFragment extends Fragment {
             public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
                if(isChecked){
                    Log.i(TAG,"Switch is on");
+                   Globals.Notification=true;
                }
                 else{
                    Log.i(TAG,"Switch is off");
+                   Globals.Notification=false;
 
                }
             }
@@ -99,13 +102,13 @@ public class SettingsSectionFragment extends Fragment {
         clearChat.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Log.i(TAG,"Clear chat history");
+                Log.i(TAG, "Clear chat history");
                 new AlertDialog.Builder(getActivity())
                         .setTitle("Clear Chat History")
                         .setMessage("Are you sure you want to delete all your chat history?")
                         .setPositiveButton(android.R.string.yes, new DialogInterface.OnClickListener() {
                             public void onClick(DialogInterface dialog, int which) {
-                                Log.i(TAG,"YES");
+                                Log.i(TAG, "YES");
                                 DBHandler.deleteDatabase();
                                 CharSequence text = "Deleted chat history";
                                 int duration = Toast.LENGTH_LONG;
@@ -133,13 +136,13 @@ public class SettingsSectionFragment extends Fragment {
         clearComments.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Log.i(TAG,"Clear all comments");
+                Log.i(TAG, "Clear all comments");
                 new AlertDialog.Builder(getActivity())
                         .setTitle("Clear Timeline Comments")
                         .setMessage("Are you sure you want to delete all Timeline comments?")
                         .setPositiveButton(android.R.string.yes, new DialogInterface.OnClickListener() {
                             public void onClick(DialogInterface dialog, int which) {
-                                Log.i(TAG,"YES");
+                                Log.i(TAG, "YES");
                                 DBHandler.deleteDatabase();
                                 CharSequence text = "Cleared Timeline comments";
                                 int duration = Toast.LENGTH_LONG;

@@ -1,5 +1,8 @@
 package vicinity.ConnectionManager;
 
+import android.app.Notification;
+import android.app.NotificationManager;
+import android.app.PendingIntent;
 import android.app.Service;
 import android.content.ComponentName;
 import android.content.Intent;
@@ -26,10 +29,13 @@ import java.util.Map;
 import vicinity.Controller.MainController;
 import vicinity.model.DBHandler;
 import vicinity.model.Globals;
+import vicinity.model.VicinityMessage;
 import vicinity.vicinity.ChatActivity;
 import vicinity.vicinity.FriendListAdapter;
 import vicinity.vicinity.NeighborListAdapter;
 import vicinity.vicinity.NeighborSectionFragment.DeviceClickListener;
+import vicinity.vicinity.R;
+import vicinity.vicinity.TabsActivity;
 
 
 /**
@@ -145,12 +151,11 @@ public class ConnectAndDiscoverService extends Service
                                 {
                                   friends.add(service);
                                   friendListAdapter.setServices(friends);
-                                  friendListAdapter.notifyDataSetChanged();
+
                                 }
                                 else{
                                  neighbors.add(service);
                                  neighborListAdapter.setServices(neighbors);
-                                 neighborListAdapter.notifyDataSetChanged();
 
                                 }
 
@@ -169,6 +174,9 @@ public class ConnectAndDiscoverService extends Service
                         Log.d(TAG,
                                 device.deviceName + " is "
                                         + record.get(Globals.TXTRECORD_PROP_AVAILABLE));
+                        friendListAdapter.notifyDataSetChanged();
+                        neighborListAdapter.notifyDataSetChanged();
+
 
                     }
                 });
@@ -217,6 +225,7 @@ public class ConnectAndDiscoverService extends Service
 
         //Wi-Fi P2p configuration for setting up a connection
         WifiP2pConfig config = new WifiP2pConfig();
+
         config.deviceAddress = service.getDevice().deviceAddress;//device unique MAC address
         final String name=service.getDevice().deviceName;//Device name
         config.wps.setup = WpsInfo.PBC;
