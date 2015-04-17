@@ -1,18 +1,24 @@
 package vicinity.Controller;
 
 
-import vicinity.ConnectionManager.WiFiP2pService;
-import vicinity.model.*;
-import vicinity.vicinity.TimelineSectionFragment;
 import android.content.ContentValues;
 import android.content.Context;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteException;
 import android.util.Log;
-import java.io.IOException;
+
 import java.sql.SQLException;
 import java.util.ArrayList;
+
+import vicinity.ConnectionManager.WiFiP2pService;
+import vicinity.model.CurrentUser;
+import vicinity.model.DBHandler;
+import vicinity.model.Friend;
+import vicinity.model.Post;
+import vicinity.model.Request;
+import vicinity.model.VicinityMessage;
+import vicinity.vicinity.TimelineSectionFragment;
 
 
 public class MainController {
@@ -397,11 +403,13 @@ public class MainController {
             {
                 do
                 {
+
                     VicinityMessage msg = new VicinityMessage();
                     msg.setMessageBody(c.getString(2));
                     msg.setFriendID(c.getString(1));
                     //msg.setTime(c.getString(4));
                     //contact.setPicture(c.getBlob(3));
+
 
                     // Adding message to allMessages
                     allMessages.add(msg);

@@ -23,8 +23,8 @@ public class Photo extends VicinityMessage{
          * @param isMyMsg     boolean
          * @param messageBody string
          */
-        public Photo(Context context, String friendID, boolean isMyMsg, String messageBody, File photoFile) {
-            super(context, friendID, isMyMsg, messageBody);
+        public Photo(Context context, String friendID, boolean isMyMsg, String messageBody) {
+            super(context, friendID, isMyMsg, messageBody );
             this.photoFile = photoFile;
 
         }

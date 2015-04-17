@@ -22,9 +22,14 @@ public class Globals {
     public static final int MESSAGE_READ = 0x400 + 1;
     public static final int MY_HANDLE = 0x400 + 2;
 
+
+
     public static DBHandler dbH;
     public static SQLiteDatabase database;
     public static MainController controller;
+    public static boolean msgFlag = true;//to check whether it's a photo obj or message
+                                         //true = message, false = photo
+
 
 
 }

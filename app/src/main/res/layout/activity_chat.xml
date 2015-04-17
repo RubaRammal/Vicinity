@@ -21,6 +21,14 @@
         android:layout_height="50dip"
         android:layout_gravity="bottom"
         >
+
+        <Button
+            style="?android:attr/buttonStyleSmall"
+            android:layout_width="48dp"
+            android:layout_height="wrap_content"
+            android:text="+"
+            android:id="@+id/addphoto" />
+
         <EditText
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
@@ -28,7 +36,7 @@
             android:ems="10"
             android:id="@+id/chatText"
             android:layout_gravity="bottom"
-            android:layout_weight="0.90"
+            android:layout_weight="0.16"
             android:focusableInTouchMode="true"
             android:visibility="visible"/>
 

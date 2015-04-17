@@ -3,10 +3,12 @@ package vicinity.ConnectionManager;
 
 import android.os.Handler;
 import android.util.Log;
+
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.net.Socket;
+
 import vicinity.model.Globals;
 
 
@@ -45,7 +47,7 @@ public class ChatManager implements Runnable {
                     // Read from the InputStream
                     // VicinityMessage is received from one user
                     bytes = iStream.read(buffer);
-                    if (bytes == -1) { // I don't know what -1 means
+                    if (bytes == -1) { // // It means keep looping (writing output stream) till inputStream == -1 - AMAL
                         break;
                     }
 

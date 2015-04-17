@@ -38,6 +38,9 @@ public class VicinityMessage {
     private String friendID;
     private boolean isMyMsg;
     private String messageBody;
+    private String photoPath;
+
+
 
     public VicinityMessage(){}
     /**
@@ -94,7 +97,13 @@ public class VicinityMessage {
     public String getMessageBody() {
         return this.messageBody;
     }
+    public String getPhotoPath() {
+        return photoPath;
+    }
 
+    public void setPhotoPath(String photoPath) {
+        this.photoPath = photoPath;
+    }
 
 
     /**
@@ -226,4 +235,6 @@ public class VicinityMessage {
         db.close();
 
     }
+
+
 }

@@ -119,6 +119,9 @@ public class ChatAdapter extends ArrayAdapter<VicinityMessage>  {
 
             }
             //getting the photo path from Vicinity Message instead of photo
+            /*Here i started thinking we might need to add one more attribute in VicinityMessage to
+             hold the photo bitmap instead instead on converting to bitmap here and at the receiver
+             side (in chat activity)*/
             Bitmap bitmap = BitmapFactory.decodeFile(vicinityMessages.get(position).getPhotoPath());
 
             holder.image_view.setImageBitmap(bitmap);
