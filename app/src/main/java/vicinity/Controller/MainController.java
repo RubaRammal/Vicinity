@@ -1,6 +1,5 @@
 package vicinity.Controller;
 
-
 import vicinity.ConnectionManager.WiFiP2pService;
 import vicinity.model.*;
 import vicinity.vicinity.TimelineSectionFragment;
@@ -25,6 +24,7 @@ public class MainController {
     private ArrayList<Friend> friendsList;
     private ArrayList<Request> requestsList;
     private ArrayList<Post> postList;
+    private ArrayList<Comment> commentsList;
     private ArrayList<VicinityMessage> allMessages;
     public String query;
     public Cursor cursor;
@@ -38,6 +38,10 @@ public class MainController {
      */
     public MainController(Context context){
         dbH=new DBHandler(context);
+        /*try{dbH.createDataBase();}
+        catch (IOException e) {
+            e.printStackTrace();
+        }*/
         this.context=context;
 
     }
@@ -308,28 +312,30 @@ public class MainController {
         return requestsList;
     }
 
+/*************************************Posts & Comments******************************************/
 
     /**
      * Fetches posts from the database
      * @return postList
      */
     public ArrayList<Post> viewAllPosts()
-
     {
         postList = new ArrayList<Post>();
-
         try
         {
             database = dbH.getReadableDatabase();
             dbH.openDataBase();
-            String query = "SELECT * FROM Post";
+            String query = "SELECT * FROM Post WHERE 1";
             Cursor c = database.rawQuery(query, null);
             if (c.moveToFirst())
             {
                 do
                 {
                     Post post = new Post();
-                    post.setPostBody(c.getString(1));
+                    post.setPostBody(c.getString(c.getColumnIndex("postBody")));
+                    post.setPostedBy(new User(c.getString(c.getColumnIndex("postedBy"))));
+                    post.setPostedAt(c.getString(c.getColumnIndex("postedAt")));
+                    post.setPostID(Integer.valueOf(c.getString(c.getColumnIndex("_id"))));
                     //post.setPostedBy(new User(c.getString(2)));
                     //contact.setPicture(c.getBlob(3));
 
@@ -337,7 +343,6 @@ public class MainController {
                     postList.add(post);
                 } while (c.moveToNext());
             }
-
             else
             {
                 Log.i(TAG, "There are no posts in the DB.");
@@ -347,10 +352,11 @@ public class MainController {
         catch (SQLException e)
         {
             e.printStackTrace();
+            Log.i(TAG, "Error in fetching all posts from DB.");
+
         }
         return postList;
-    }
-
+    } //END viewAllPosts
 
     /**
      * Adds a new Post to the database.
@@ -366,15 +372,134 @@ public class MainController {
             database = dbH.getReadableDatabase();
             dbH.openDataBase();
             ContentValues values = new ContentValues();
-            values.put("post", post.getPostBody());
+            values.put("postBody", post.getPostBody());
+            values.put("postedBy", post.getPostedBy().getUsername());
+            values.put("postedAt", post.getPostedAt());
             isAdded=database.insert("Post", null, values)>0;
             dbH.close();
         }
         catch(SQLException e)
         {
             e.printStackTrace();
+            Log.i(TAG, "Error in adding post to DB.");
+
         }
-        return isAdded;}
+        return isAdded;
+    } //END addPost
+
+    /**
+     * gets a post from the postList given its id
+     * @param postID The integer id of the selected post.
+     * @return returns the post.
+     */
+    public Post getPost(int postID)
+    {
+        Post post = null;
+        try
+        {
+            database = dbH.getReadableDatabase();
+            dbH.openDataBase();
+            String query = "SELECT * FORM Post WHERE postID="+"'"+postID+"'";
+            Cursor c = database.rawQuery(query, null);
+            if (c.moveToFirst()) {
+                post = new Post();
+                post.setPostID(c.getColumnIndex("_id"));
+                post.setPostBody(c.getString(c.getColumnIndex("postBody")));
+                post.setPostedBy(new User(c.getString(c.getColumnIndex("postedBy"))));
+                //contact.setPicture(c.getBlob(3));
+            }
+            else
+            {
+                Log.i(TAG, "This postID doesn't exist in the DB.");
+            }
+            dbH.close();
+        }
+        catch (SQLException e)
+        {
+            e.printStackTrace();
+            Log.i(TAG, "Error in getting post from DB.");
+
+        }
+        return post;
+    } //END getPost
+
+    /**
+     * Fetches the comments on a specified post
+     * @param postID the integer id of the selected post
+     * @return an ArrayList containing all comments on the specified post
+     */
+    public ArrayList<Comment> getPostComments(int postID)
+    {
+        commentsList = new ArrayList<Comment>();
+        try
+        {
+            database = dbH.getReadableDatabase();
+            dbH.openDataBase();
+            String query = "SELECT * FROM Comment WHERE postID="+"'"+postID+"'";
+            Cursor c = database.rawQuery(query, null);
+            if (c.moveToFirst())
+            {
+                do
+                {
+                    Comment comment = new Comment ();
+                    comment.setCommentBody(c.getString(c.getColumnIndex("commentBody")));
+                    comment.setCommentedBy(c.getString(c.getColumnIndex("commentedBy")));
+                    comment.setCommentID(c.getColumnIndex("commentID"));
+
+                    // Adding comment to commentsList
+                    commentsList.add(comment);
+                } while (c.moveToNext());
+            }
+            else
+            {
+                Log.i(TAG, "There are no comments on the specified post.");
+            }
+            dbH.close();
+        }
+        catch (SQLException e)
+        {
+            e.printStackTrace();
+            Log.i(TAG, "Error in getting comments from DB.");
+
+        }
+
+        return commentsList;
+    } //END getPostComments
+
+    public boolean addAcomment(Comment comment) {
+        boolean isAdded = false;
+        try
+        {
+            database = dbH.getReadableDatabase();
+            dbH.openDataBase();
+            ContentValues values = new ContentValues();
+            values.put("commentBody", comment.getCommentBody());
+            values.put("commentedBy", comment.getCommentedBy());
+            values.put("postID", comment.getCommentID());
+            isAdded=database.insert("Comment", null, values)>0;
+            dbH.close();
+        }
+        catch(SQLException e)
+        {
+            e.printStackTrace();
+            Log.i(TAG, "Error in adding comments to DB.");
+        }
+        return isAdded;
+    } //END addAcomment
+
+    //still working on these methods - amjad
+    public boolean deleteAcomment () {
+        return true;
+    }
+
+    public boolean deleteAllcomments () {
+        return true;
+    }
+    public boolean deleteAllPosts () {
+        return true;
+    }
+
+    /****************************************** Messages *****************************************/
 
     /**
      * Fetches user's Chats from the database
@@ -447,37 +572,6 @@ public class MainController {
 
     }
 
-
-    /**
-     * gets a post from the postList by ID
-     * @param postID The wanted post.
-     * @return returns the post.
-     */
-    public Post getPost(int postID)
-    {
-        //for now
-        TimelineSectionFragment tsf = new TimelineSectionFragment();
-        ArrayList<Post> posts= tsf.GetPosts();
-
-        Post post = new Post();
-
-
-
-        if(!posts.isEmpty())
-        {
-            for (int i = 0;  posts.size() >= i+1; i++) {
-                post = posts.get(i);
-
-                if (post.getPostID() == postID)
-                    return post;
-            }
-
-        }
-        return null;
-
-
-    }
-
     /**
      * Adds a new Meesage to the database.
      * @param message An object of class VicinityMessage
@@ -508,7 +602,5 @@ public class MainController {
         }
         return isAdded;}
 
-
-
-
 }
+
