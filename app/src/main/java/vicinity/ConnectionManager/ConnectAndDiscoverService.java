@@ -1,5 +1,8 @@
 package vicinity.ConnectionManager;
 
+import android.app.Notification;
+import android.app.NotificationManager;
+import android.app.PendingIntent;
 import android.app.Service;
 import android.content.ComponentName;
 import android.content.Intent;
@@ -26,10 +29,13 @@ import java.util.Map;
 import vicinity.Controller.MainController;
 import vicinity.model.DBHandler;
 import vicinity.model.Globals;
+import vicinity.model.VicinityMessage;
 import vicinity.vicinity.ChatActivity;
 import vicinity.vicinity.FriendListAdapter;
 import vicinity.vicinity.NeighborListAdapter;
 import vicinity.vicinity.NeighborSectionFragment.DeviceClickListener;
+import vicinity.vicinity.R;
+import vicinity.vicinity.TabsActivity;
 
 
 /**
