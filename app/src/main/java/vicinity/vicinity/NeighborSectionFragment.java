@@ -1,10 +1,7 @@
 package vicinity.vicinity;
 
-import android.app.AlertDialog;
 import android.app.ProgressDialog;
 import android.content.Context;
-import android.content.DialogInterface;
-import android.content.Intent;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -12,25 +9,15 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.view.Window;
 import android.widget.AdapterView;
-import android.widget.Button;
-import android.widget.ImageButton;
 import android.widget.ListView;
 import android.support.v4.app.Fragment;
 import android.widget.ProgressBar;
-import android.widget.TextView;
-import android.widget.Toast;
 
 
-import java.sql.SQLException;
 import java.util.ArrayList;
-import java.util.Timer;
-import java.util.TimerTask;
 
 import vicinity.ConnectionManager.ConnectAndDiscoverService;
 import vicinity.ConnectionManager.WiFiP2pService;
-import vicinity.Controller.MainController;
-import vicinity.model.DBHandler;
-import vicinity.model.Friend;
 
 
 public class NeighborSectionFragment extends Fragment {
@@ -39,14 +26,9 @@ public class NeighborSectionFragment extends Fragment {
 
     private Context ctx;
     private ArrayList<WiFiP2pService> listOfServices;
-    private ArrayList<WiFiP2pService> friendServices;
-    private MainController controller;
-    private ListView lvn;
-    private ListView lvf;
+    private ListView lv;
     private NeighborListAdapter neighborListAdapter;
-    private FriendListAdapter friendListAdapter;
     private ProgressBar progress;
-    private TextView header;
 
 
     public interface DeviceClickListener {
@@ -58,88 +40,46 @@ public class NeighborSectionFragment extends Fragment {
 
 
     @Override
-    public View onCreateView(LayoutInflater inflater, final ViewGroup container,
+    public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         View rootView = inflater.inflate(R.layout.fragment_neighbor, container, false);
 
 
-        controller = new MainController(getActivity());
+
         listOfServices = new ArrayList<WiFiP2pService>();
-        friendServices = new ArrayList<WiFiP2pService>();
         ctx = this.getActivity();
 
         //progress = (ProgressBar) rootView.findViewById(R.id.temp);
-        lvn = (ListView) rootView.findViewById(R.id.listNeighbors);
-        lvf = (ListView) rootView.findViewById(R.id.listFriends);
-
+        lv = (ListView) rootView.findViewById(android.R.id.list);
         neighborListAdapter = new NeighborListAdapter(ctx, listOfServices);
-        friendListAdapter = new FriendListAdapter(ctx, friendServices);
+        neighborListAdapter.setPB(progress);
 
         //progress.setVisibility(View.VISIBLE);
         //mRelativeLayout.setVisibility(View.GONE);
 
         ConnectAndDiscoverService.setNAdapter(neighborListAdapter);
-        ConnectAndDiscoverService.setFAdapter(friendListAdapter);
-        View nHeader = inflater.inflate(R.layout.neighbor_header, null);
-        View fHeader = inflater.inflate(R.layout.friend_header, null);
 
-        lvn.addHeaderView(nHeader);
-        lvf.addHeaderView(fHeader);
 
-        lvn.setAdapter(neighborListAdapter);
-        lvf.setAdapter(friendListAdapter);
-
-        //Utility.setListViewHeightBasedOnChildren(lvn);
-        //Utility.setListViewHeightBasedOnChildren(lvf);
+        lv.setAdapter(neighborListAdapter);
         //neighborListAdapter.notifyDataSetChanged();
 
 
-        lvn.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+
+        lv.setOnItemClickListener(new AdapterView.OnItemClickListener() {
 
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
                 Log.i(TAG,"Clicked: "+neighborListAdapter.getItem(position).toString()) ;
-                final WiFiP2pService neighbor = (WiFiP2pService) neighborListAdapter.getItem(position);
-                final int p = position;
-                new AlertDialog.Builder(getActivity())
-                        .setTitle("Friendship Request")
-                        .setMessage("Do you want to add "+neighbor.getInstanceName()+" as a friend?")
-                        .setPositiveButton(android.R.string.yes, new DialogInterface.OnClickListener() {
-                            public void onClick(DialogInterface dialog, int which) {
-                                try{
-                                boolean isAdded = controller.addFriend(neighbor.getInstanceName(),neighbor.getDeviceAddress());
-                                    if(isAdded){
-                                ((DeviceClickListener) ConnectAndDiscoverService.ctx).connectP2p((WiFiP2pService) neighborListAdapter
-                                        .getItem(p));
-                                    friendServices.add(neighbor);
-                                    friendListAdapter.notifyDataSetChanged();
-                                    listOfServices.remove(neighbor);
-                                    neighborListAdapter.notifyDataSetChanged();
-                                    }
-                                }
-                                catch(SQLException e){
-                                    e.printStackTrace();
-                                }
-
-                            }
-                        })
-                        .setNegativeButton(android.R.string.no, new DialogInterface.OnClickListener() {
-                            public void onClick(DialogInterface dialog, int which) {
-                                Log.i(TAG, "no");
-
-                            }
-                        })
-                        .setIcon(android.R.drawable.ic_dialog_alert)
-                        .show();
-
+                ((DeviceClickListener) ConnectAndDiscoverService.ctx).connectP2p((WiFiP2pService) neighborListAdapter
+                        .getItem(position));
             }
         });
 
 
 
+
         return rootView;
     }
-
 
 
 }

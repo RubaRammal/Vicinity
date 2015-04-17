@@ -16,18 +16,23 @@ import android.net.wifi.p2p.WifiP2pManager;
 import android.content.BroadcastReceiver;
 import android.util.Log;
 import android.net.wifi.p2p.WifiP2pManager.Channel;
+
+
 import java.io.IOException;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
+
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
+
+
 import vicinity.Controller.MainController;
+import vicinity.model.CurrentUser;
 import vicinity.model.DBHandler;
 import vicinity.model.Globals;
 import vicinity.vicinity.ChatActivity;
-import vicinity.vicinity.FriendListAdapter;
 import vicinity.vicinity.NeighborListAdapter;
 import vicinity.vicinity.NeighborSectionFragment.DeviceClickListener;
 
@@ -49,9 +54,7 @@ public class ConnectAndDiscoverService extends Service
     private BroadcastReceiver receiver = null;
     private WifiP2pDnsSdServiceRequest serviceRequest;
     public static ArrayList<WiFiP2pService> neighbors = new ArrayList<WiFiP2pService>();
-    public static ArrayList<WiFiP2pService> friends = new ArrayList<WiFiP2pService>();
     public static NeighborListAdapter neighborListAdapter;
-    public static FriendListAdapter friendListAdapter;
     public MainController controller;
 
 
@@ -62,23 +65,26 @@ public class ConnectAndDiscoverService extends Service
     public void onCreate(){
         Log.i(TAG,"Service started: "+ Globals.SERVICE_NAME);
 
+
+        ctx= ConnectAndDiscoverService.this;
+        controller = new MainController(ctx);
         intentFilter.addAction(WifiP2pManager.WIFI_P2P_STATE_CHANGED_ACTION);
         intentFilter.addAction(WifiP2pManager.WIFI_P2P_PEERS_CHANGED_ACTION);
         intentFilter.addAction(WifiP2pManager.WIFI_P2P_CONNECTION_CHANGED_ACTION);
         intentFilter.addAction(WifiP2pManager.WIFI_P2P_THIS_DEVICE_CHANGED_ACTION);
-        ctx= ConnectAndDiscoverService.this;
-        controller = new MainController(ctx);
+
         manager = (WifiP2pManager) getSystemService(Context.WIFI_P2P_SERVICE);
         channel = manager.initialize(this, getMainLooper(), null);
 
+        //Attaching WiFiBroadcastReceiver
         receiver = new WiFiDirectBroadcastReceiver(manager,channel,ctx);
         registerReceiver(receiver,intentFilter);
         //Changing the username depending on the one in the db
-        try {
+        /*try {
             changeDeviceName(controller.retrieveCurrentUsername());
         } catch (SQLException e) {
             e.printStackTrace();
-        }
+        }*/
         startRegistrationAndDiscovery();
     }
 
@@ -91,11 +97,9 @@ public class ConnectAndDiscoverService extends Service
     public void onDestroy(){
         Log.i(TAG,"Service destroyed");
         unregisterReceiver(receiver);
-
-        /***TEST***/
         disconnectPeers();
+        /***TEST***/
         DBHandler.deleteDatabase();
-
     }
 
     /************************************************************/
@@ -107,21 +111,30 @@ public class ConnectAndDiscoverService extends Service
      */
     private void startRegistrationAndDiscovery() {
         Log.i(TAG,"startRegistrationAndDiscovery");
+
         Map<String, String> record = new HashMap<String, String>();
         record.put(Globals.TXTRECORD_PROP_AVAILABLE, "visible");
+        //WifiP2pDnsSdServiceInfo is A class for storing Bonjour service information that is advertised over a Wi-Fi peer-to-peer setup.
         WifiP2pDnsSdServiceInfo service = WifiP2pDnsSdServiceInfo.newInstance(Globals.SERVICE_NAME, Globals.SERVICE_REG_TYPE, record);
+
+        //addLocalService Registers our service as a local service in order to be discovered.
         manager.addLocalService(channel, service, new WifiP2pManager.ActionListener() {
             @Override
             public void onSuccess() {
+                //What to do if our service got advertised in the local network
                 Log.i(TAG,"_vicinityapp Service registered");
                 discoverService();
             }
+
             @Override
             public void onFailure(int error) {
                 Log.i(TAG,"Failed to add a service");
             }
         });
-    }//end
+
+
+    }
+
 
     /**
      *First discoverService() registers listeners for DNS-SD services
@@ -129,32 +142,36 @@ public class ConnectAndDiscoverService extends Service
      */
     private void discoverService() {
         Log.i(TAG,"discoverService");
+        //setDnsSdResponseListeners() Registers a callback to be invoked on receiving Bonjour service discovery response.
         manager.setDnsSdResponseListeners(channel,
                 new WifiP2pManager.DnsSdServiceResponseListener() {
                     @Override
                     public void onDnsSdServiceAvailable(String instanceName,
                                                         String registrationType, WifiP2pDevice srcDevice) {
-                        Log.i(TAG,"Instance name "+instanceName+" Reg type: "+registrationType);
-                        if (instanceName.equals(Globals.SERVICE_NAME)) {
 
-                                WiFiP2pService service = new WiFiP2pService(srcDevice);
+                        // A service has been discovered here, we need to see if it's our app.
+                        if (instanceName.equalsIgnoreCase(Globals.SERVICE_NAME)) {
+                           // Log.i(TAG,instanceName+" =? "+ Globals.SERVICE_NAME);
+
+
+
+
+                            //Log.i(TAG,"Exists? "+alreadyExists(service.getDeviceAddress()));
+                                WiFiP2pService service = new WiFiP2pService();
+                                service.setDevice(srcDevice);
+                                service.setInstanceName(srcDevice.deviceName);
                                 service.setServiceRegistrationType(registrationType);
-                                Log.i(TAG, "Name: " + service.getInstanceName() + " Address: " + service.getDeviceAddress());
-                                Log.i(TAG, "is this my friend? "+controller.isThisMyFriend("3a:aa:3c:64:08:b0"));
-                                if(controller.isThisMyFriend(srcDevice.deviceAddress))
-                                {
-                                  friends.add(service);
-                                  friendListAdapter.setServices(friends);
-                                  friendListAdapter.notifyDataSetChanged();
-                                }
-                                else{
-                                 neighbors.add(service);
-                                 neighborListAdapter.setServices(neighbors);
-                                 neighborListAdapter.notifyDataSetChanged();
+                                service.setDeviceAddress(srcDevice.deviceAddress);
+                                Log.i(TAG,"Name: "+service.getInstanceName()+" Address: "+service.getDeviceAddress());
+                            neighbors.add(service);
+                            //Log.i(TAG,srcDevice.toString());
+                            neighborListAdapter.setServices(neighbors);
+                            neighborListAdapter.notifyDataSetChanged();
 
-                                }
+                            Log.d(TAG, "New Neighbor: "+neighbors.get(0).getInstanceName());}
 
-                        }
+
+
                     }
                 }, new WifiP2pManager.DnsSdTxtRecordListener() {
 
@@ -169,6 +186,7 @@ public class ConnectAndDiscoverService extends Service
                         Log.d(TAG,
                                 device.deviceName + " is "
                                         + record.get(Globals.TXTRECORD_PROP_AVAILABLE));
+
 
                     }
                 });
@@ -278,6 +296,8 @@ public class ConnectAndDiscoverService extends Service
             Log.d(TAG, "Connected as peer");
 
             Thread.sleep(1000);
+
+
             handler = new ClientSocketHandler(
                     ChatActivity.handler,
                     p2pInfo.groupOwnerAddress);
@@ -292,10 +312,6 @@ public class ConnectAndDiscoverService extends Service
         }
 
         //Starting a new chat activity with a connected peer.
-        startChatting();
-    }
-
-    public void startChatting(){
         Intent intent = new Intent();
         intent.setAction(Intent.ACTION_MAIN);
         intent.addCategory(Intent.CATEGORY_LAUNCHER);
@@ -303,8 +319,8 @@ public class ConnectAndDiscoverService extends Service
         ComponentName cn = new ComponentName(this, ChatActivity.class);
         intent.setComponent(cn);
         startActivity(intent);
-
     }
+
     /**
      * This method changes the original device name
      * to the user's username
@@ -368,10 +384,6 @@ public class ConnectAndDiscoverService extends Service
     static public void setNAdapter(NeighborListAdapter nAdapter){
         neighborListAdapter = nAdapter;
     }
-    static public void setFAdapter(FriendListAdapter fAdapter){
-        friendListAdapter = fAdapter;
-    }
-
 
 
 }

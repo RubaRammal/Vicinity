@@ -10,18 +10,32 @@ public class Comment {
     private static final String TAG = "CommentClass";
 
     //Comment Atts
-    private int commentID;
+    private int commentID; // postID in the database
     private String commentBody;
-    private String commentBy;
+    private String commentedBy;
     private String commentedAt; //returns the date as a string
 
-    //Constructor
+    //Constructors
+
+    public Comment () {
+
+    }
+
     public Comment(String commentBody, String commentBy){
         Date currentDate= new Date();
         DateFormat dF=  new SimpleDateFormat("yyyy/MM/dd HH:mm:ss");
         commentedAt= dF.format(currentDate);
         this.commentBody=commentBody;
-        this.commentBy=commentBy;
+        this.commentedBy=commentBy;
+    }
+
+    public Comment(int commentID, String commentBody, String commentBy){
+        this.commentID=commentID;
+        Date currentDate= new Date();
+        DateFormat dF=  new SimpleDateFormat("yyyy/MM/dd HH:mm:ss");
+        commentedAt= dF.format(currentDate);
+        this.commentBody=commentBody;
+        this.commentedBy=commentBy;
     }
 
     //Setters and Getters
@@ -32,19 +46,27 @@ public class Comment {
     public String getCommentBody(){
         return this.commentBody;
     }
-    public boolean setCommentBy(String commentBy){
-        this.commentBy=commentBy;
+    public boolean setCommentedBy(String commentBy){
+        this.commentedBy=commentBy;
         return true;
     }
-    public String getCommentBy(){
-        return this.commentBy;
+    public String getCommentedBy(){
+        return this.commentedBy;
     }
+    public void setCommentedAt(String commentedAt) {
+        this.commentedAt = commentedAt;
+    }
+
     public String getCommentedAt(){
         return this.commentedAt;
     }
 
     public int getCommentID(){
         return this.commentID;
+    }
+
+    public void setCommentID(int commentID) {
+        this.commentID = commentID;
     }
 
 

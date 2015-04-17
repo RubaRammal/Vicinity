@@ -12,7 +12,6 @@ import android.database.sqlite.SQLiteException;
 import android.util.Log;
 import java.io.IOException;
 import java.sql.SQLException;
-import java.sql.Timestamp;
 import java.util.ArrayList;
 
 
@@ -25,6 +24,7 @@ public class MainController {
     private ArrayList<Friend> friendsList;
     private ArrayList<Request> requestsList;
     private ArrayList<Post> postList;
+    private ArrayList<Comment> commentsList;
     private ArrayList<VicinityMessage> allMessages;
     public String query;
     public Cursor cursor;
@@ -38,6 +38,10 @@ public class MainController {
      */
     public MainController(Context context){
         dbH=new DBHandler(context);
+        try{dbH.createDataBase();}
+        catch (IOException e) {
+            e.printStackTrace();
+        }
         this.context=context;
 
     }
@@ -96,16 +100,12 @@ public class MainController {
     }
 
     /**
-     * This method mutes user by searching for a peer with the given
-     * device address in the neighbours list and deleting the user
-     * It also deletes posts & comments by this specific user as well
-     * @param userAddress Device address of the to-be muted user
-     * @return isMuted true if the user was muted, false otherwise
+     * This method wipes out the user's account along with its data (friends, messages..etc)
+     * If the user wants to start a new account.
+     * @return boolean if the operation is successful
      */
-    public boolean muteUser(String userAddress){
-        boolean isMuted = false;
-
-        return isMuted;
+    public boolean destroyUser(){
+        return false;
     }
 
 
@@ -125,20 +125,18 @@ public class MainController {
 
     /**
      * Adds a new Friend to the database.
-     * @param username a friend's instance name.
-     * @param deviceAddress a friend's device address
+     * @param newFriend An object of class Friend
      * @return isAdded true if the friend was added successfully, false otherwise.
      * @throws SQLException
      */
-    public boolean addFriend(String username, String deviceAddress)throws SQLException{
+    public boolean addFriend(Friend newFriend)throws SQLException{
         boolean isAdded=false;
         try{
             database = dbH.getReadableDatabase();
             dbH.openDataBase();
             ContentValues values = new ContentValues();
-            values.put("Username", username);
-            values.put("deviceID", deviceAddress);
-            Log.i(TAG,"Adding.. "+deviceAddress);
+            values.put("Username", newFriend.getInstanceName());
+            values.put("deviceID", newFriend.getDeviceAddress());
             isAdded=database.insert("Friend", null, values)>0;
             dbH.close();
         }
@@ -151,7 +149,7 @@ public class MainController {
 
 
     /**
-     * Deletes a friend from the database given a device address
+     * Deletes a friend from the database given an ID
      * @param friendID A to-be deleted friend's ID.
      * @return isDeleted A boolean that equals true if operation is successful, false otherwise.
      */
@@ -175,7 +173,7 @@ public class MainController {
      * Fetches user's friends from the database
      * In order to be displayed.
      * @return friendsList
-
+     */
     public ArrayList<Friend> viewFriendsList(){
 
         friendsList=new ArrayList<>();
@@ -208,7 +206,7 @@ public class MainController {
         }
 
         return friendsList;}//end of viewFriendsList
-     */
+
     /**
      * This method calls nameValidation from MainController to validate the new username
      * then adds it to the database as an alias name
@@ -219,6 +217,7 @@ public class MainController {
     public boolean changeName(String aliasName, String friendID) throws SQLException{
         boolean isUpdated=false;
 
+        //Validate the given Alias name first
         if(nameValidation(aliasName))
         {
 
@@ -235,7 +234,7 @@ public class MainController {
                 e.printStackTrace();
             }
         }
-        Log.i(TAG,"Is alias updated? "+isUpdated);
+        Log.i(TAG,"Is Updated? "+isUpdated);
         return isUpdated;
     }
 
@@ -307,36 +306,42 @@ public class MainController {
         return requestsList;
     }
 
+    public boolean acceptRequest(int num){return true;}
+
+    public boolean denyRequest(int num){return true;}
+
+    public boolean sendRequest(WiFiP2pService user){return true;}
+
+    /*************************************Posts & Comments******************************************/
 
     /**
      * Fetches posts from the database
      * @return postList
      */
     public ArrayList<Post> viewAllPosts()
-
     {
         postList = new ArrayList<Post>();
-
         try
         {
             database = dbH.getReadableDatabase();
             dbH.openDataBase();
-            String query = "SELECT * FROM Post";
+            String query = "SELECT * FROM Post WHERE 1";
             Cursor c = database.rawQuery(query, null);
             if (c.moveToFirst())
             {
                 do
                 {
                     Post post = new Post();
-                    post.setPostBody(c.getString(1));
-                    //post.setPostedBy(new User(c.getString(2)));
+                    post.setPostBody(c.getString(c.getColumnIndex("postBody")));
+                    post.setPostedBy(new User(c.getString(c.getColumnIndex("postedBy"))));
+                    post.setPostedAt(c.getString(c.getColumnIndex("postedAt")));
+                    post.setPostID(Integer.valueOf(c.getString(c.getColumnIndex("_id"))));
                     //contact.setPicture(c.getBlob(3));
 
                     // Adding post to postList
                     postList.add(post);
                 } while (c.moveToNext());
             }
-
             else
             {
                 Log.i(TAG, "There are no posts in the DB.");
@@ -365,7 +370,9 @@ public class MainController {
             database = dbH.getReadableDatabase();
             dbH.openDataBase();
             ContentValues values = new ContentValues();
-            values.put("post", post.getPostBody());
+            values.put("postBody", post.getPostBody());
+            values.put("postedBy", post.getPostedBy().getUsername());
+            values.put("postedAt", post.getPostedAt());
             isAdded=database.insert("Post", null, values)>0;
             dbH.close();
         }
@@ -373,29 +380,122 @@ public class MainController {
         {
             e.printStackTrace();
         }
-        return isAdded;}
+        return isAdded;
+    }
+
+    /**
+     * gets a post from the postList by ID
+     * @param postID The wanted post.
+     * @return returns the post.
+     */
+    public Post getPost(int postID)
+    {
+        Post post = null;
+        try
+        {
+            database = dbH.getReadableDatabase();
+            dbH.openDataBase();
+            String query = "SELECT * FORM Post WHERE postID="+"'"+postID+"'";
+            Cursor c = database.rawQuery(query, null);
+            if (c.moveToFirst()) {
+                post = new Post();
+                post.setPostID(c.getColumnIndex("_id"));
+                post.setPostBody(c.getString(c.getColumnIndex("postBody")));
+                post.setPostedBy(new User(c.getString(c.getColumnIndex("postedBy"))));
+                //contact.setPicture(c.getBlob(3));
+            }
+            else
+            {
+                Log.i(TAG, "This postID doesn't exist in the DB.");
+            }
+            dbH.close();
+        }
+        catch (SQLException e)
+        {
+            e.printStackTrace();
+        }
+        return post;
+    }
+
+    /**
+     * Fetches the comments on a specified post
+     * @param postID
+     * @return an ArrayList containing all comments on the specified post
+     */
+    public ArrayList<Comment> getPostComments(int postID) {
+        commentsList = new ArrayList<Comment>();
+        try
+        {
+            database = dbH.getReadableDatabase();
+            dbH.openDataBase();
+            String query = "SELECT * FROM Comment WHERE postID="+"'"+postID+"'";
+            Cursor c = database.rawQuery(query, null);
+            if (c.moveToFirst())
+            {
+                do
+                {
+                    Comment comment = new Comment ();
+                    comment.setCommentBody(c.getString(c.getColumnIndex("commentBody")));
+                    comment.setCommentedBy(c.getString(c.getColumnIndex("commentedBy")));
+                    comment.setCommentID(c.getColumnIndex("commentID"));
+
+                    // Adding comment to commentsList
+                    commentsList.add(comment);
+                } while (c.moveToNext());
+            }
+            else
+            {
+                Log.i(TAG, "There are no comments on the specified post.");
+            }
+            dbH.close();
+        }
+        catch (SQLException e)
+        {
+            e.printStackTrace();
+        }
+
+        return commentsList;
+    }
+
+    public boolean addAcomment(Comment comment) {
+        boolean isAdded = false;
+        try
+        {
+            database = dbH.getReadableDatabase();
+            dbH.openDataBase();
+            ContentValues values = new ContentValues();
+            values.put("commentBody", comment.getCommentBody());
+            values.put("commentedBy", comment.getCommentedBy());
+            values.put("postID", comment.getCommentID());
+            isAdded=database.insert("Comment", null, values)>0;
+            dbH.close();
+        }
+        catch(SQLException e)
+        {
+            e.printStackTrace();
+        }
+        return isAdded;
+    }
 
     /**
      * Fetches user's Chats from the database
      * @return allMessages
      */
-    public ArrayList<VicinityMessage> viewAllMessages(int chatId)
+    public ArrayList<VicinityMessage> viewAllMessages()
 
     {
-
-
         try
         {
             database=dbH.getReadableDatabase();
             dbH.openDataBase();
-            String query="SELECT * FROM Message WHERE chatId = \""+chatId+"\"";
+            String query="SELECT * FROM Message";
             Cursor c = database.rawQuery(query,null);
             if (c.moveToFirst())
             {
                 do
                 {
                     VicinityMessage msg = new VicinityMessage();
-                    msg.setMessageBody(c.getString(4));
+                    msg.setMessageBody(c.getString(2));
                     msg.setFriendID(c.getString(1));
                     //msg.setTime(c.getString(4));
                     //contact.setPicture(c.getBlob(3));
@@ -445,69 +545,4 @@ public class MainController {
         return isDeleted;
 
     }
-
-
-    /**
-     * gets a post from the postList by ID
-     * @param postID The wanted post.
-     * @return returns the post.
-     */
-    public Post getPost(int postID)
-    {
-        //for now
-        TimelineSectionFragment tsf = new TimelineSectionFragment();
-        ArrayList<Post> posts= tsf.GetPosts();
-
-        Post post = new Post();
-
-
-
-        if(!posts.isEmpty())
-        {
-            for (int i = 0;  posts.size() >= i+1; i++) {
-                post = posts.get(i);
-
-                if (post.getPostID() == postID)
-                    return post;
-            }
-
-        }
-        return null;
-
-
-    }
-
-    /**
-     * Adds a new Meesage to the database.
-     * @param message An object of class VicinityMessage
-     * @return isAdded true if the message was added successfully, false otherwise.
-     * @throws SQLException
-     */
-    public boolean addMessage(VicinityMessage message) throws SQLException
-    {
-        boolean isAdded=false;
-        try
-        {
-            database = dbH.getReadableDatabase();
-            dbH.openDataBase();
-            ContentValues values = new ContentValues();
-            values.put("messageBody", message.getMessageBody());
-            values.put("isMyMsg", message.isMyMsg());
-            //values.put("msgTimestamp", new Timestamp(date.getTime()).getTime());
-
-
-            isAdded=database.insert("Message", null, values)>0;
-            Log.i(TAG, "ADD SUCCESSFUL");
-
-            dbH.close();
-        }
-        catch(SQLException e)
-        {
-            e.printStackTrace();
-        }
-        return isAdded;}
-
-
-
-
 }

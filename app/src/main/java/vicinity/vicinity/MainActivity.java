@@ -19,20 +19,21 @@ import vicinity.Controller.MainController;
 
 
 
-public class NameActivity extends Activity {
+public class MainActivity extends Activity {
 
     private static final String TAG = "Username Activity";
     EditText username_input;
     Button submit_button;
+    TextView launchScreen;
     final Context context = this;
     public String username;
     MainController controller;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {//Lama
-        controller = new MainController(NameActivity.this);
+        controller = new MainController(MainActivity.this);
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_name);
+        setContentView(R.layout.activity_main);
         Log.i(TAG, "onCreate");
 
         username_input = (EditText) findViewById(R.id.username);
@@ -71,7 +72,7 @@ public class NameActivity extends Activity {
                                 int duration = Toast.LENGTH_SHORT;
                                 Toast toast = Toast.makeText(context, text, duration);//we can customize this Toast later -Afnan
                                 toast.show();
-                                Intent intent = new Intent(context, TabsActivity.class);
+                                Intent intent = new Intent(context, Tabs.class);
                                 startActivity(intent);
                             }
 
