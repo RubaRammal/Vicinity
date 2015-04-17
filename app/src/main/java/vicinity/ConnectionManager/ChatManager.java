@@ -10,6 +10,7 @@ import java.net.Socket;
 import vicinity.model.Globals;
 
 
+
 /**
  * This class handles reading and writing of vicinityMessages with socket buffers.
  * Uses a Handler to post vicinityMessages to UI thread for UI updates.
@@ -52,6 +53,7 @@ public class ChatManager implements Runnable {
                     // Send the obtained bytes to the UI Activity
                     // VicinityMessage is sent to WiFiServiceDiscovery to be sent to all users
                     Log.d(TAG, "Rec:" + String.valueOf(buffer));
+
                     handler.obtainMessage(Globals.MESSAGE_READ,
                             bytes, -1, buffer).sendToTarget();
                 } catch (IOException e) {
@@ -76,5 +78,6 @@ public class ChatManager implements Runnable {
             Log.e(TAG, "Exception during write", e);
         }
     }
+
 
 }
