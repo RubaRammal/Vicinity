@@ -514,7 +514,7 @@ public class MainController {
         {
             database=dbH.getReadableDatabase();
             dbH.openDataBase();
-            String query="SELECT * FROM Message WHERE chatId = \""+chatId+"\"";
+            String query="SELECT * FROM Message WHERE chatId = "+chatId;
             Cursor c = database.rawQuery(query,null);
             if (c.moveToFirst())
             {
@@ -588,6 +588,7 @@ public class MainController {
             ContentValues values = new ContentValues();
             values.put("messageBody", message.getMessageBody());
             values.put("isMyMsg", message.isMyMsg());
+            values.put("chatId", message.getChatId());
             //values.put("msgTimestamp", new Timestamp(date.getTime()).getTime());
 
 

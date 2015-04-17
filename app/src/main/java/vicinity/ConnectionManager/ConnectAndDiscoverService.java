@@ -151,12 +151,11 @@ public class ConnectAndDiscoverService extends Service
                                 {
                                   friends.add(service);
                                   friendListAdapter.setServices(friends);
-                                  friendListAdapter.notifyDataSetChanged();
+
                                 }
                                 else{
                                  neighbors.add(service);
                                  neighborListAdapter.setServices(neighbors);
-                                 neighborListAdapter.notifyDataSetChanged();
 
                                 }
 
@@ -175,6 +174,9 @@ public class ConnectAndDiscoverService extends Service
                         Log.d(TAG,
                                 device.deviceName + " is "
                                         + record.get(Globals.TXTRECORD_PROP_AVAILABLE));
+                        friendListAdapter.notifyDataSetChanged();
+                        neighborListAdapter.notifyDataSetChanged();
+
 
                     }
                 });
@@ -223,6 +225,7 @@ public class ConnectAndDiscoverService extends Service
 
         //Wi-Fi P2p configuration for setting up a connection
         WifiP2pConfig config = new WifiP2pConfig();
+
         config.deviceAddress = service.getDevice().deviceAddress;//device unique MAC address
         final String name=service.getDevice().deviceName;//Device name
         config.wps.setup = WpsInfo.PBC;
