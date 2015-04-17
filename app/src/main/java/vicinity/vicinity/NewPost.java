@@ -10,14 +10,32 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.TextView;
-
+import android.text.Editable;
+import android.text.TextUtils;
+import android.text.TextWatcher;
+import android.widget.EditText;
+import android.widget.Button;
+import android.util.Log;
+import android.content.Context;
+import java.sql.SQLException;
+import vicinity.Controller.MainController;
+import vicinity.model.Post;
+import vicinity.model.User;
+import static vicinity.vicinity.TimelineSectionFragment.*;
 
 public class NewPost extends ActionBarActivity {
+
+    private static final String TAG = "NewPost";
+    private EditText postTextField ;
+    private Button sendPostButton;
+    private MainController mc ;
+    private Context context = this;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_new_post);
+
 
 
         final ActionBar abar = getSupportActionBar();
@@ -27,14 +45,61 @@ public class NewPost extends ActionBarActivity {
                 ActionBar.LayoutParams.WRAP_CONTENT,
                 ActionBar.LayoutParams.MATCH_PARENT,
                 Gravity.CENTER);
+
         TextView textviewTitle = (TextView) viewActionBar.findViewById(R.id.actionbar_textview);
         textviewTitle.setText("New Post");
         abar.setCustomView(viewActionBar, params);
         abar.setDisplayShowCustomEnabled(true);
         abar.setDisplayShowTitleEnabled(false);
-        abar.setDisplayHomeAsUpEnabled(true);
+        // I disabled the back button in the action bar cuz it causes an error
+        abar.setDisplayHomeAsUpEnabled(false);
         abar.setHomeButtonEnabled(true);
-    }
+
+        mc = new MainController(this);
+        postTextField = (EditText) findViewById(R.id.postTextField);
+        sendPostButton = (Button) findViewById(R.id.sendPostButton);
+        sendPostButton.setEnabled(false);
+        postTextField.addTextChangedListener(new TextWatcher() {
+            @Override
+            public void beforeTextChanged(CharSequence s, int start, int count, int after) {
+
+            }
+
+            @Override
+            public void onTextChanged(CharSequence s, int start, int before, int count) {
+
+            }
+
+            @Override
+            public void afterTextChanged(Editable s) {
+                sendPostButton.setEnabled(!TextUtils.isEmpty(postTextField.getText().toString().trim()));
+            }
+        }); //END addTextChangedListener
+
+        // When the send button is clicked
+        sendPostButton.setOnClickListener(
+                new Button.OnClickListener() {
+                    public void onClick(View view) {
+                        String postText = postTextField.getText().toString();
+                        Post aPost = null;
+                        try {
+                            String username = mc.retrieveCurrentUsername();
+                            aPost = new Post(new User(username), postText);
+                            if (mc.addPost(aPost))
+                                Log.i(TAG, "post is saved to DB");
+                            else
+                                Log.i(TAG, "post is not saved to DB");
+
+                        } catch (Exception e) {
+                            e.printStackTrace();
+                            Log.i(TAG, "A problem in adding post to DB");
+                        }
+                        postToTimeline(aPost);
+                        finish();
+                    }
+                }
+        ); //END onClickListener
+    } //END onCreate
 
 
     @Override

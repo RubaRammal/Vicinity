@@ -10,18 +10,31 @@ public class Comment {
     private static final String TAG = "CommentClass";
 
     //Comment Atts
-    private int commentID;
+    private int commentID; // postID in the database
     private String commentBody;
-    private String commentBy;
+    private String commentedBy;
     private String commentedAt; //returns the date as a string
 
-    //Constructor
-    public Comment(String commentBody, String commentBy){
+    //Constructors
+    public Comment () {
+
+    }
+
+    public Comment(String commentBody, String commentedBy){
         Date currentDate= new Date();
         DateFormat dF=  new SimpleDateFormat("yyyy/MM/dd HH:mm:ss");
         commentedAt= dF.format(currentDate);
         this.commentBody=commentBody;
-        this.commentBy=commentBy;
+        this.commentedBy=commentedBy;
+    }
+
+    public Comment(int commentID, String commentBody, String commentedBy){
+        this.commentID=commentID;
+        Date currentDate= new Date();
+        DateFormat dF=  new SimpleDateFormat("yyyy/MM/dd HH:mm:ss");
+        commentedAt= dF.format(currentDate);
+        this.commentBody=commentBody;
+        this.commentedBy=commentedBy;
     }
 
     //Setters and Getters
@@ -32,21 +45,25 @@ public class Comment {
     public String getCommentBody(){
         return this.commentBody;
     }
-    public boolean setCommentBy(String commentBy){
-        this.commentBy=commentBy;
+    public boolean setCommentedBy(String commentedBy){
+        this.commentedBy=commentedBy;
         return true;
     }
-    public String getCommentBy(){
-        return this.commentBy;
+    public String getCommentedBy(){
+        return this.commentedBy;
+    }
+    public void setCommentedAt(String commentedAt) {
+        this.commentedAt = commentedAt;
     }
     public String getCommentedAt(){
         return this.commentedAt;
     }
-
+    public void setCommentID(int commentID) {
+        this.commentID = commentID;
+    }
     public int getCommentID(){
         return this.commentID;
     }
-
 
     //Methods
     public void viewComment(){//I don't think the view methods are necessary but we'll see later -Afnan
