@@ -487,11 +487,14 @@ public class MainController {
         return isAdded;
     } //END addAcomment
 
-    //still working on it-amjad
+    //still working on these methods - amjad
     public boolean deleteAcomment () {
         return true;
     }
-    //still working on it-amjad
+
+    public boolean deleteAllcomments () {
+        return true;
+    }
     public boolean deleteAllPosts () {
         return true;
     }
