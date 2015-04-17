@@ -40,7 +40,7 @@
         android:id="@+id/changeName"
         android:layout_alignParentTop="true"
         android:layout_toLeftOf="@+id/deleteButton"
-        android:layout_toStartOf="@+id/deleteButton" />
+        android:layout_toStartOf="@+id/changeName" />
 
 
 </RelativeLayout>

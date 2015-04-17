@@ -160,7 +160,7 @@ public class MainController {
         try{
             database=dbH.getReadableDatabase();
             dbH.openDataBase();
-            isDeleted=database.delete("Friend","deviceID"+"'"+friendID+"'",null)==1;
+            isDeleted=database.delete("Friend","deviceID="+"'"+friendID+"'",null)==1;
             Log.i(TAG,"Is friend deleted? "+isDeleted);
             dbH.close();
         }
@@ -227,8 +227,9 @@ public class MainController {
                 dbH.openDataBase();
                 ContentValues args = new ContentValues();
                 args.put("aliasname", aliasName);
-                isUpdated= database.update("Friend", args, "deviceID=" + friendID, null)>0;
+                isUpdated= database.update("Friend", args, "deviceID='" + friendID+"'", null)>0;
                 dbH.close();
+                database.close();
             }
             catch(SQLiteException e){
                 Log.i(TAG,"SQLiteException > Friend > ChangeName");
