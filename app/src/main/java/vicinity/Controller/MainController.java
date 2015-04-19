@@ -1,17 +1,15 @@
 package vicinity.Controller;
 
-import vicinity.ConnectionManager.WiFiP2pService;
 import vicinity.model.*;
-import vicinity.vicinity.TimelineSectionFragment;
+
 import android.content.ContentValues;
 import android.content.Context;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteException;
 import android.util.Log;
-import java.io.IOException;
+
 import java.sql.SQLException;
-import java.sql.Timestamp;
 import java.util.ArrayList;
 
 
@@ -38,10 +36,6 @@ public class MainController {
      */
     public MainController(Context context){
         dbH=new DBHandler(context);
-        /*try{dbH.createDataBase();}
-        catch (IOException e) {
-            e.printStackTrace();
-        }*/
         this.context=context;
 
     }
@@ -313,6 +307,8 @@ public class MainController {
     }
 
 /*************************************Posts & Comments******************************************/
+
+
 
     /**
      * Fetches posts from the database

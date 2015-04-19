@@ -151,11 +151,13 @@ public class ConnectAndDiscoverService extends Service
                                 {
                                   friends.add(service);
                                   friendListAdapter.setServices(friends);
+                                    friendListAdapter.notifyDataSetChanged();
 
                                 }
                                 else{
                                  neighbors.add(service);
                                  neighborListAdapter.setServices(neighbors);
+                                 neighborListAdapter.notifyDataSetChanged();
 
                                 }
 
@@ -174,8 +176,6 @@ public class ConnectAndDiscoverService extends Service
                         Log.d(TAG,
                                 device.deviceName + " is "
                                         + record.get(Globals.TXTRECORD_PROP_AVAILABLE));
-                        friendListAdapter.notifyDataSetChanged();
-                        neighborListAdapter.notifyDataSetChanged();
 
 
                     }

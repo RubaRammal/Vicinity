@@ -18,6 +18,8 @@ import android.widget.Button;
 import android.util.Log;
 import android.content.Context;
 import java.sql.SQLException;
+
+import vicinity.ConnectionManager.PostManager;
 import vicinity.Controller.MainController;
 import vicinity.model.Post;
 import vicinity.model.User;
@@ -29,8 +31,7 @@ public class NewPost extends ActionBarActivity {
     private EditText postTextField ;
     private Button sendPostButton;
     private MainController mc ;
-    private Context context = this;
-
+    PostManager postManager;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -56,6 +57,8 @@ public class NewPost extends ActionBarActivity {
         abar.setHomeButtonEnabled(true);
 
         mc = new MainController(this);
+        postManager = new PostManager(this);
+
         postTextField = (EditText) findViewById(R.id.postTextField);
         sendPostButton = (Button) findViewById(R.id.sendPostButton);
         sendPostButton.setEnabled(false);
@@ -83,14 +86,18 @@ public class NewPost extends ActionBarActivity {
                         String postText = postTextField.getText().toString();
                         Post aPost = null;
                         try {
+
                             String username = mc.retrieveCurrentUsername();
                             aPost = new Post(new User(username), postText);
+                            postManager.setPost(aPost.getPostBody());
+                            postManager.execute();
+
                             if (mc.addPost(aPost))
                                 Log.i(TAG, "post is saved to DB");
                             else
                                 Log.i(TAG, "post is not saved to DB");
 
-                        } catch (Exception e) {
+                        } catch (SQLException e) {
                             e.printStackTrace();
                             Log.i(TAG, "A problem in adding post to DB");
                         }
@@ -123,6 +130,7 @@ public class NewPost extends ActionBarActivity {
 
         return super.onOptionsItemSelected(item);
     }
+
 }
 
 
