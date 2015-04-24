@@ -29,7 +29,6 @@ import android.widget.ListView;
 import android.widget.TextView;
 
 import java.io.File;
-import java.io.IOException;
 import java.sql.SQLException;
 
 import vicinity.ConnectionManager.ChatManager;
@@ -115,7 +114,7 @@ public class ChatActivity extends ActionBarActivity {
                             pushMessage(vicinityMessage);
 
                             //Send vicinityMessage to ChatManager
-                            chatManager.write(chatText.getText().toString().getBytes());
+                            chatManager.write(vicinityMessage);
                             Log.i(TAG,"Writing vicinityMessage successful");
 
 
@@ -190,10 +189,10 @@ public class ChatActivity extends ActionBarActivity {
         Log.i(TAG,"ChatManager= "+chatManager);
 
         if(chatManager != null) {
-            vicinityPhoto = new Photo(ctx , "1" , true , "No text");
-            vicinityMessage = new VicinityMessage(ctx , "1", true , "No text" );
+
+            vicinityMessage = new VicinityMessage(ctx , "1", true , null );
             vicinityMessage.setPhotoPath(photoPath);
-            vicinityPhoto.setPhotoPath(photoPath);
+
 
             pushMessage(vicinityMessage); // pushing the photo to the Vicinity Messages List
 
@@ -203,17 +202,17 @@ public class ChatActivity extends ActionBarActivity {
                     + ".jpg");
             String photopath = "file://" + photoPath+ "image/*";
 
-            chatManager.write(photopath.getBytes());
+            chatManager.write(vicinityMessage);
             Log.i(TAG, "Writing photo stream successful");
 
         }
 
     }
 
-/* ------- PHOTO PART UNTESTED NOTE SURE HOW IT PERFORMS DUE TO THE VIEW CRASHING ----- */
-public static final String TAG = "ChatActivity";
+
+    public static final String TAG = "ChatActivity";
     private static VicinityMessage message;
-    private static Photo photo;
+
 
 
     public static Handler handler = new Handler(){
@@ -227,47 +226,51 @@ public static final String TAG = "ChatActivity";
             Log.i(TAG,"handleMessage");
             switch (msg.what) {
                 case Globals.MESSAGE_READ:
-                    byte[] readBuf = (byte[]) msg.obj;
+                   message = (VicinityMessage) msg.obj;
+                   // message = msg.obj;
                     // construct a string from the valid bytes in the buffer
-                    if(Globals.msgFlag ) {
-                        String readMessage = new String(readBuf, 0, msg.arg1);
-                        Log.d(TAG, readMessage);
-                        message = new VicinityMessage(ctx, "2", false, readMessage );
+                   if(message.getMessageBody() == null){
+
+                    String readPhotoPath = message.getPhotoPath();
+                       Log.i(TAG , readPhotoPath);
+                    Bitmap bitmap = BitmapFactory.decodeFile(readPhotoPath);
+                    /*message = new VicinityMessage(ctx , "2" , false , "No text" );
+                    message.setPhotoPath(readPhotoPath);//I did this twice because I wanted to try all the possible solutions
+
+                    file = new File(Environment.getExternalStorageDirectory() + "/"
+                            + ctx.getPackageName() + "/Vicinity-" + System.currentTimeMillis()
+                            + ".jpg");
+                    File dirs = new File(file.getParent());
+                    if (!dirs.exists())
+                        dirs.mkdirs();
+                    try {
+                        file.createNewFile();
+                    } catch (IOException e) {
+                        e.printStackTrace();
+                    }
+
+
+                    */
+                    ContentResolver contentResolver = ctx.getContentResolver();
+                    CapturePhotoUtils capturePhotoUtils = new CapturePhotoUtils();
+                    capturePhotoUtils.insertImage(contentResolver , bitmap ,"Received Photo" ," Photo saved to receiver media gallery" );
+                    Log.i(TAG,"Save photo to gallery");
+
+
+                       pushMessage(message);
+                       break;
+                    //Does not work
+
+                    //Log.i(TAG,readPhotoPath.substring(0,9)); //why do we need the substring of the photo path? - AMAL
+                    }
+
+                    else{//Temporarily
+
                         Log.i(TAG, "message" + message.getMessageBody());
                         pushMessage(message);
                         break;
                     }
-                    else       {/* --There might be a problem here at the receiving side!
-                                      I saved the photopath twice once in as VicinityMessage and once as Photo which is totally wrong! */
 
-                        BitmapFactory.Options options = new BitmapFactory.Options();
-                       Bitmap bitmap = BitmapFactory.decodeByteArray(readBuf, 0, readBuf.length, options);//This bitmap will be used to call method capturePhotoUtils.insertImage
-                        String readPhotoPath = new String(readBuf, 0, msg.arg1);
-                        message = new VicinityMessage(ctx , "2" , false , "No text" );
-                        message.setPhotoPath(readPhotoPath);//I did this twice because I wanted to try all the possible solutions
-                        photo = new Photo(ctx , "2" , false , "No text");
-                        photo.setPhotoPath(readPhotoPath);
-                        //photo.setphotoFile(bitmap.compress(Bitmap.CompressFormat.PNG, quality, outStream));
-                        Log.i(TAG, "photo" + photo.getphotoFile());
-                        file = new File(Environment.getExternalStorageDirectory() + "/"
-                                + ctx.getPackageName() + "/Vicinity-" + System.currentTimeMillis()
-                                + ".jpg");
-                        File dirs = new File(file.getParent());
-                        if (!dirs.exists())
-                            dirs.mkdirs();
-                        try {
-                            file.createNewFile();
-                        } catch (IOException e) {
-                            e.printStackTrace();
-                        }
-                        // bitmap = BitmapFactory.decodeFile(photo.getPhotoPath());
-                        message.setPhotoPath(photo.getPhotoPath());//saving the photopath again (but this time from the photo object)
-
-                        ContentResolver contentResolver = ctx.getContentResolver();
-                        CapturePhotoUtils capturePhotoUtils = new CapturePhotoUtils();
-                        capturePhotoUtils.insertImage(contentResolver , bitmap ,"Received Photo" ," Photo saved to receiver media gallery" );
-                        Log.i(TAG,"Save photo to gallery");
-                    }
 
                 case Globals.MY_HANDLE:
                     Object obj = msg.obj;
@@ -290,12 +293,6 @@ public static final String TAG = "ChatActivity";
     }
 
 
-
-    public  static void pushPhoto(Photo photo){
-        adapter.addPhoto(photo);
-        adapter.notifyDataSetChanged();
-
-    }
 
 
     @Override

@@ -5,11 +5,12 @@ import android.os.Handler;
 import android.util.Log;
 
 import java.io.IOException;
-import java.io.InputStream;
-import java.io.OutputStream;
+import java.io.ObjectOutputStream;
+import java.io.ObjectInputStream;
 import java.net.Socket;
 
 import vicinity.model.Globals;
+import vicinity.model.VicinityMessage;
 
 
 /**
@@ -26,40 +27,39 @@ public class ChatManager implements Runnable {
         this.handler = handler;
     }
 
-    private InputStream iStream;
-    private OutputStream oStream;
+    private ObjectInputStream iStream;
+    private ObjectOutputStream oStream;
     private static final String TAG = "ChatHandler";
+    VicinityMessage vicinityMessage = new VicinityMessage();
 
     @Override
     public void run() {
         try {
 
-            iStream = socket.getInputStream();
-            oStream = socket.getOutputStream();
-            byte[] buffer = new byte[1024];
-            int bytes;
+            iStream = new ObjectInputStream(socket.getInputStream());
+            oStream = new ObjectOutputStream(socket.getOutputStream());
+
 
             handler.obtainMessage(Globals.MY_HANDLE, this)
                     .sendToTarget();
 
-            while (true) {
+
                 try {
                     // Read from the InputStream
                     // VicinityMessage is received from one user
-                    bytes = iStream.read(buffer);
-                    if (bytes == -1) { // // It means keep looping (writing output stream) till inputStream == -1 - AMAL
-                        break;
-                    }
+                    vicinityMessage = (VicinityMessage) iStream.readObject(); // De-Serialization 
 
                     // Send the obtained bytes to the UI Activity
                     // VicinityMessage is sent to WiFiServiceDiscovery to be sent to all users
-                    Log.d(TAG, "Rec:" + String.valueOf(buffer));
+                    Log.d(TAG, vicinityMessage.getMessageBody());
                     handler.obtainMessage(Globals.MESSAGE_READ,
-                            bytes, -1, buffer).sendToTarget();
+                            1, -1, vicinityMessage).sendToTarget();// not sure about the arg1 and arg2 values!!! - AMAL
                 } catch (IOException e) {
                     Log.e(TAG, "disconnected", e);
+                } catch (ClassNotFoundException e) {
+                    e.printStackTrace();
                 }
-            }
+
         } catch (IOException e) {
             e.printStackTrace();
         } finally {
@@ -71,9 +71,9 @@ public class ChatManager implements Runnable {
         }
     }
 
-    public void write(byte[] buffer) {
+    public void write(VicinityMessage vicinityMessage) {
         try {
-            oStream.write(buffer);
+            oStream.writeObject(vicinityMessage); //Serialization
         } catch (IOException e) {
             Log.e(TAG, "Exception during write", e);
         }

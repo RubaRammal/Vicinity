@@ -3,6 +3,7 @@ package vicinity.vicinity;
 import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+import android.util.Log;
 import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -16,8 +17,6 @@ import android.widget.TextView;
 import java.util.ArrayList;
 import java.util.List;
 
-import vicinity.model.Globals;
-import vicinity.model.Photo;
 import vicinity.model.VicinityMessage;
 
 /**
@@ -27,16 +26,15 @@ import vicinity.model.VicinityMessage;
 public class ChatAdapter extends ArrayAdapter<VicinityMessage>  {
 
     private List<VicinityMessage > vicinityMessages;
-    //private List<Photo> photos;//I need it in order to call a method in Photo class
     private LayoutInflater mInflater;
     private Context ctx;
+    private String TAG = "ChatAdapter";
 
 
     //Constructor
     public ChatAdapter(Context context, int resource) {
         super(context, resource);
         vicinityMessages = new ArrayList<>();
-        //photos = new ArrayList<>();
         mInflater = LayoutInflater.from(context);
         ctx = context;
 
@@ -60,82 +58,67 @@ public class ChatAdapter extends ArrayAdapter<VicinityMessage>  {
         return vicinityMessages.get(position);
     }
 
- public void addPhoto(Photo photo){
-
-        vicinityMessages.add(photo);
-        super.add(photo);
-
-    }
-
-    /**
-     * Google this method if you wanna understand it. - Ruba
-     */
     @Override
     public View getView(int position, View convertView, ViewGroup parent) {
         ViewHolder holder;
-        if (Globals.msgFlag) {
-            if (convertView == null) {
+        if (convertView == null) {
 
 
-                convertView = mInflater.inflate(R.layout.chat_box_layout, null);
+            convertView = mInflater.inflate(R.layout.chat_box_layout, null);
 
-                holder = new ViewHolder();
-                holder.chat_text = (TextView) convertView.findViewById(R.id.chatBox);
-                holder.name_text = (TextView) convertView.findViewById(R.id.nameOfFriend);
+            holder = new ViewHolder();
+            holder.chat_text = (TextView) convertView.findViewById(R.id.chatBox);
+            holder.name_text = (TextView) convertView.findViewById(R.id.nameOfFriend);
+            holder.image_view = (ImageView) convertView.findViewById(R.id.imageBox);
 
-                convertView.setTag(holder);
-            } else {
-                holder = (ViewHolder) convertView.getTag();
-            }
+            convertView.setTag(holder);
+        } else {
+            holder = (ViewHolder) convertView.getTag();
+        }
 
-            holder.chat_text.setText(vicinityMessages.get(position).getMessageBody());
 
-            holder.chat_text.setBackgroundDrawable(vicinityMessages.get(position).isMyMsg() ?
+        Bitmap bitmap = BitmapFactory.decodeFile(vicinityMessages.get(position).getPhotoPath());
+        holder.image_view.setVisibility(View.GONE);
+        holder.chat_text.setVisibility(View.GONE);
+
+        String m = vicinityMessages.get(position).getPhotoPath().substring(0,9);
+        Log.i(TAG,m);
+
+
+        if(vicinityMessages.get(position).getMessageBody() == null){//Temporarily
+            holder.image_view.setVisibility(View.VISIBLE);
+            holder.image_view.setImageBitmap(bitmap);
+            holder.image_view.setBackgroundDrawable(vicinityMessages.get(position).isMyMsg() ?
                     ctx.getResources().getDrawable(R.drawable.chatboxright) : ctx.getResources().getDrawable(R.drawable.chatboxleft));
 
-            holder.name_text.setText(vicinityMessages.get(position).isMyMsg() ? "" : "Sarah");
-
-
-            LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(LayoutParams.WRAP_CONTENT, LayoutParams.WRAP_CONTENT);
-
-            if (!vicinityMessages.get(position).isMyMsg()) {
-                params.gravity = Gravity.LEFT;
-            } else {
-                params.gravity = Gravity.RIGHT;
-            }
-
-            holder.chat_text.setLayoutParams(params);
         }
-        else{
-            if (convertView == null) {
-                convertView = mInflater.inflate(R.layout.chat_box_layout, null);
-                holder = new ViewHolder();
-                holder.image_view = (ImageView) convertView.findViewById(R.id.imageBox);
-                convertView.setTag(holder);
+        else {
 
-            }
-            else{
-                holder = (ViewHolder) convertView.getTag();
+            holder.chat_text.setVisibility(View.VISIBLE);
+            holder.chat_text.setText(vicinityMessages.get(position).getMessageBody());
+            holder.chat_text.setBackgroundDrawable(vicinityMessages.get(position).isMyMsg() ?
+                    ctx.getResources().getDrawable(R.drawable.chatboxright) : ctx.getResources().getDrawable(R.drawable.chatboxleft));
+        }
 
-            }
-            //getting the photo path from Vicinity Message instead of photo
+
+
+        holder.name_text.setText(vicinityMessages.get(position).isMyMsg() ? "" : "Sarah");
+
+        //getting the photo path from Vicinity Message instead of photo
             /*Here i started thinking we might need to add one more attribute in VicinityMessage to
              hold the photo bitmap instead instead on converting to bitmap here and at the receiver
              side (in chat activity)*/
-            Bitmap bitmap = BitmapFactory.decodeFile(vicinityMessages.get(position).getPhotoPath());
 
-            holder.image_view.setImageBitmap(bitmap);
 
-            LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(LayoutParams.WRAP_CONTENT, LayoutParams.WRAP_CONTENT);
+        LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(LayoutParams.WRAP_CONTENT, LayoutParams.WRAP_CONTENT);
 
-            if (!vicinityMessages.get(position).isMyMsg()) {
-                params.gravity = Gravity.LEFT;
-            } else {
-                params.gravity = Gravity.RIGHT;
-            }
-
-            holder.image_view.setLayoutParams(params);
+        if (!vicinityMessages.get(position).isMyMsg()) {
+            params.gravity = Gravity.LEFT;
+        } else {
+            params.gravity = Gravity.RIGHT;
         }
+
+        holder.chat_text.setLayoutParams(params);
 
         return convertView;
 
