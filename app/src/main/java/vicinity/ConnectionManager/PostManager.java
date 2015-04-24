@@ -1,6 +1,5 @@
 package vicinity.ConnectionManager;
 import android.content.Context;
-import android.net.DhcpInfo;
 import android.net.wifi.WifiManager;
 import android.os.AsyncTask;
 import android.util.Log;
@@ -9,7 +8,8 @@ import java.io.IOException;
 import java.net.DatagramPacket;
 import java.net.DatagramSocket;
 import java.net.InetAddress;
-import java.net.SocketTimeoutException;
+import java.net.InetSocketAddress;
+import java.net.SocketAddress;
 
 import vicinity.model.Globals;
 
@@ -20,7 +20,8 @@ public class PostManager extends AsyncTask <Void, Void, Void> {
     private Context context;
     private String post;
     WifiManager wifiManager;
-    DatagramSocket datagramSocket;
+    private static final int TIMEOUT_MS = 500;
+    DatagramSocket socket;
 
     public PostManager(Context context){
         this.context=context;
@@ -37,21 +38,28 @@ public class PostManager extends AsyncTask <Void, Void, Void> {
 
 
     }
+
     @Override
     protected Void doInBackground(Void... param){
         Log.i(TAG,"doInBackground");
         Log.i(TAG,"Post: "+post);
-        sendPost(post);
 
-        //JUST TO CHECK IF IT IS WORKING
         try{
-        lsnToPostBroadcast();}
+
+            socket = new DatagramSocket(null);
+            SocketAddress socketAddr = new InetSocketAddress(Globals.SERVER_PORT);
+            socket.setReuseAddress(true);
+            socket.setBroadcast(true);
+            socket.bind(socketAddr);
+            socket.setSoTimeout(TIMEOUT_MS);
+            sendPost(post,socket);
+
+        }
         catch (IOException e){
             e.printStackTrace();
         }
-        Void s = null;
 
-        return s;
+        return null;
     }
 
     @Override
@@ -60,57 +68,28 @@ public class PostManager extends AsyncTask <Void, Void, Void> {
 
     }
 
-    public void sendPost(String post){
+    public void sendPost(String post, DatagramSocket socket){
         try{
-        Log.i(TAG,"Sending post: "+post);
-        datagramSocket = new DatagramSocket(Globals.SERVER_PORT);
-        datagramSocket.setBroadcast(true);
-        byte[] data = post.getBytes();
-        DatagramPacket datagramPacket = new DatagramPacket(data, data.length,
-                getBroadcastAddress(), Globals.SERVER_PORT);
-        datagramSocket.send(datagramPacket);}
+
+            Log.i(TAG,"Sending post: "+post);
+            socket.setBroadcast(true);
+            byte[] data = post.getBytes();
+            Log.i(TAG,"socket.getInetAddress();: "+socket.getInetAddress());
+            InetAddress broadcastIP = InetAddress.getByName("192.168.49.255");
+            DatagramPacket datagramPacket = new DatagramPacket(data, data.length,
+                    broadcastIP, Globals.SERVER_PORT);
+            socket.send(datagramPacket);
+            String senderIP = datagramPacket.getAddress().getHostAddress();
+            Log.d(TAG, " senderIP: "+senderIP);
+
+        }
         catch(IOException e){
             e.printStackTrace();
         }
     }
-    /**
-     * @return broadcast address
-     * @throws IOException
-     */
-    public InetAddress getBroadcastAddress() throws IOException {
-        DhcpInfo dhcp = wifiManager.getDhcpInfo();
-        if (dhcp == null) {
-            Log.d(TAG, "Could not get dhcp info");
-            return null;
-        }
-
-        int broadcast = (dhcp.ipAddress & dhcp.netmask) | ~dhcp.netmask;
-        byte[] quads = new byte[4];
-        for (int k = 0; k < 4; k++)
-            quads[k] = (byte) ((broadcast >> k * 8) & 0xFF);
-        InetAddress bcAddress= InetAddress.getByAddress(quads);
-        Log.i(TAG,"Broadcast Address: "+bcAddress);
-        return bcAddress;
-
-    }
-
-    public void lsnToPostBroadcast()throws IOException{
-
-            byte[] buf = new byte[1024];
-            try {
-                while (true) {
-                    DatagramPacket packet = new DatagramPacket(buf, buf.length);
-                    datagramSocket.receive(packet);
-                    String s = new String(packet.getData(), 0, packet.getLength());
-                    Log.d(TAG, "Received response " + s);
-                }
-            } catch (SocketTimeoutException e) {
-                Log.d(TAG, "Receive timed out");
-            }
-        }
 
 
-    }
+}
 
 
 

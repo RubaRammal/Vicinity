@@ -4,8 +4,6 @@ import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 
-import vicinity.ConnectionManager.WiFiP2pService;
-
 public class Comment {
     private static final String TAG = "CommentClass";
 

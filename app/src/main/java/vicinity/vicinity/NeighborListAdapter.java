@@ -11,25 +11,27 @@ import android.widget.BaseAdapter;
 
 import java.util.ArrayList;
 
-import vicinity.ConnectionManager.WiFiP2pService;
+import vicinity.model.WiFiP2pService;
 
 
 
 public class NeighborListAdapter extends BaseAdapter {
     private LayoutInflater mInflater;
-    ArrayList<WiFiP2pService> services;
+    public static ArrayList<WiFiP2pService> services;
     public ProgressBar progressbar;
 
-    public NeighborListAdapter(Context context, ArrayList<WiFiP2pService> services){
-        this.services = services;
+    public NeighborListAdapter(Context context, ArrayList<WiFiP2pService> services2){
+        services = services2;
         mInflater = LayoutInflater.from(context);
 
     }
 
     public void setServices(ArrayList<WiFiP2pService> s){
+
+        if(s.size()!=0){
         for (int i = 0; i < s.size(); i++) {
             services.add(s.get(i));
-        }
+        }}
     }
 
     public void setPB(ProgressBar pb){

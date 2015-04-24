@@ -9,8 +9,6 @@ import android.database.DatabaseUtils;
 import android.database.sqlite.SQLiteDatabase;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
-import android.net.wifi.p2p.WifiP2pDevice;
-import android.net.wifi.p2p.WifiP2pManager;
 import android.util.Log;
 import android.widget.ImageView;
 
@@ -23,8 +21,6 @@ import java.sql.SQLException;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.Date;
-
-import vicinity.ConnectionManager.WiFiP2pService;
 
 
 public class VicinityMessage {
@@ -49,7 +45,7 @@ public class VicinityMessage {
      * Public constructor, initiates a message
      * attaches to it its timestamp and date
      * @param context activity context
-     * @param friend Friend
+     * @param  Friend
      * @param isMyMsg boolean
      * @param messageBody string
      */

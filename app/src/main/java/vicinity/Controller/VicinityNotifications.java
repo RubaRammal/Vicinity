@@ -8,7 +8,9 @@ import vicinity.model.VicinityMessage;
 import vicinity.vicinity.ChatActivity;
 import vicinity.vicinity.R;
 
-
+/**
+ * A class to manage app's notifications
+ */
 public class VicinityNotifications {
 
 
@@ -32,7 +34,7 @@ public class VicinityNotifications {
 
         notification.setLatestEventInfo(ChatActivity.ctx, title, text, contentIntent);
         notificationManager.notify(1, notification);
-        Log.d(TAG, "Notification: " + newMsg.getMessageBody());
+        Log.d(TAG,newMsg.getMessageBody());
     }
 
 }

@@ -1,11 +1,9 @@
 package vicinity.ConnectionManager;
 
-import android.app.Notification;
-import android.app.NotificationManager;
-import android.app.PendingIntent;
 import android.app.Service;
 import android.content.ComponentName;
 import android.content.Intent;
+import android.net.wifi.p2p.WifiP2pGroup;
 import android.os.IBinder;
 import android.content.Context;
 import android.content.IntentFilter;
@@ -29,13 +27,11 @@ import java.util.Map;
 import vicinity.Controller.MainController;
 import vicinity.model.DBHandler;
 import vicinity.model.Globals;
-import vicinity.model.VicinityMessage;
+import vicinity.model.WiFiP2pService;
 import vicinity.vicinity.ChatActivity;
 import vicinity.vicinity.FriendListAdapter;
 import vicinity.vicinity.NeighborListAdapter;
 import vicinity.vicinity.NeighborSectionFragment.DeviceClickListener;
-import vicinity.vicinity.R;
-import vicinity.vicinity.TabsActivity;
 
 
 /**
@@ -112,14 +108,14 @@ public class ConnectAndDiscoverService extends Service
      * then calls discoverService()
      */
     private void startRegistrationAndDiscovery() {
-        Log.i(TAG,"startRegistrationAndDiscovery");
+        Log.i(TAG,"startRegistrationAndDiscovery()");
         Map<String, String> record = new HashMap<String, String>();
         record.put(Globals.TXTRECORD_PROP_AVAILABLE, "visible");
         WifiP2pDnsSdServiceInfo service = WifiP2pDnsSdServiceInfo.newInstance(Globals.SERVICE_NAME, Globals.SERVICE_REG_TYPE, record);
         manager.addLocalService(channel, service, new WifiP2pManager.ActionListener() {
             @Override
             public void onSuccess() {
-                Log.i(TAG,"_vicinityapp Service registered");
+                Log.i(TAG,"Vicinity's Service registered");
                 discoverService();
             }
             @Override
@@ -127,7 +123,7 @@ public class ConnectAndDiscoverService extends Service
                 Log.i(TAG,"Failed to add a service");
             }
         });
-    }//end
+    }
 
     /**
      *First discoverService() registers listeners for DNS-SD services
@@ -135,6 +131,7 @@ public class ConnectAndDiscoverService extends Service
      */
     private void discoverService() {
         Log.i(TAG,"discoverService");
+        //createPersistentGroup();
         manager.setDnsSdResponseListeners(channel,
                 new WifiP2pManager.DnsSdServiceResponseListener() {
                     @Override
@@ -146,18 +143,22 @@ public class ConnectAndDiscoverService extends Service
                                 WiFiP2pService service = new WiFiP2pService(srcDevice);
                                 service.setServiceRegistrationType(registrationType);
                                 Log.i(TAG, "Name: " + service.getInstanceName() + " Address: " + service.getDeviceAddress());
-                                Log.i(TAG, "is this my friend? "+controller.isThisMyFriend("3a:aa:3c:64:08:b0"));
                                 if(controller.isThisMyFriend(srcDevice.deviceAddress))
                                 {
                                   friends.add(service);
                                   friendListAdapter.setServices(friends);
-                                    friendListAdapter.notifyDataSetChanged();
+                                  friendListAdapter.notifyDataSetChanged();
 
                                 }
                                 else{
                                  neighbors.add(service);
                                  neighborListAdapter.setServices(neighbors);
                                  neighborListAdapter.notifyDataSetChanged();
+                                    //TEST
+                                  // NeighborListAdapter.services.add(service);
+                                   //neighborListAdapter.notifyDataSetChanged();
+
+
 
                                 }
 
@@ -301,7 +302,7 @@ public class ConnectAndDiscoverService extends Service
         }
 
         //Starting a new chat activity with a connected peer.
-        startChatting();
+       startChatting();
     }
 
     public void startChatting(){
@@ -314,6 +315,45 @@ public class ConnectAndDiscoverService extends Service
         startActivity(intent);
 
     }
+
+
+    //TEST
+    public void requestGroupInfo(){
+        manager.requestGroupInfo(channel, new WifiP2pManager.GroupInfoListener() {
+            @Override
+            public void onGroupInfoAvailable(WifiP2pGroup group) {
+                Log.i(TAG,"onGroupInfoAvailable");
+                //gets a list of clients participating in this group
+                /*Collection <WifiP2pDevice> clients;
+                if(group.getClientList().size()!=0)
+                    clients = group.getClientList();*/
+                //Who owns this group?
+//                WifiP2pDevice groupOwner = group.getOwner();
+              //  Log.i(TAG,"GO: "+groupOwner.deviceName);
+                //String network name
+                //String networkName = group.getNetworkName();
+               // Log.i(TAG,"Network name: "+networkName);
+            }
+        });
+
+    }
+    //TESST
+    public void createPersistentGroup(){
+        manager.createGroup(channel, new WifiP2pManager.ActionListener() {
+            @Override
+            public void onSuccess() {
+                requestGroupInfo();
+                Log.i(TAG,"Created a group");
+            }
+
+            @Override
+            public void onFailure(int reason) {
+                Log.i(TAG,"failed to create a group");
+            }
+
+        });
+    }
+
     /**
      * This method changes the original device name
      * to the user's username

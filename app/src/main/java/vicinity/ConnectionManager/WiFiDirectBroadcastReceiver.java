@@ -15,6 +15,8 @@ import android.util.Log;
 
 import java.util.ArrayList;
 
+import vicinity.model.WiFiP2pService;
+
 /**
  * this class is a WiFi BroadcastReceiver
  * Listens to wifi events and alerts the system
@@ -53,7 +55,7 @@ public class WiFiDirectBroadcastReceiver extends BroadcastReceiver {
 
         if (WifiP2pManager.WIFI_P2P_CONNECTION_CHANGED_ACTION.equals(action)) {
             //Broadcast intent action indicating that peer discovery has either started or stopped.
-            Log.i(TAG,"WIFI_P2P_CONNECTION_CHANGED_ACTION");
+            //Log.i(TAG,"WIFI_P2P_CONNECTION_CHANGED_ACTION");
             if (manager == null) {
                 return;
             }
@@ -74,7 +76,7 @@ public class WiFiDirectBroadcastReceiver extends BroadcastReceiver {
         }
         else if (WifiP2pManager.WIFI_P2P_THIS_DEVICE_CHANGED_ACTION
                 .equals(action)) {
-            Log.i(TAG,"WIFI_P2P_THIS_DEVICE_CHANGED_ACTION");
+            //Log.i(TAG,"WIFI_P2P_THIS_DEVICE_CHANGED_ACTION");
             WifiP2pDevice device = (WifiP2pDevice) intent
                     .getParcelableExtra(WifiP2pManager.EXTRA_WIFI_P2P_DEVICE);
             Log.d(TAG, "Device status -" + device.status);
@@ -83,13 +85,12 @@ public class WiFiDirectBroadcastReceiver extends BroadcastReceiver {
         else if (WifiP2pManager.WIFI_P2P_PEERS_CHANGED_ACTION.equals(action)) {
             Log.i(TAG,"WIFI_P2P_PEERS_CHANGED_ACTION");
             // The peer list has changed!
-            //should update the list here
+
 
         } else if (WifiP2pManager.WIFI_P2P_CONNECTION_CHANGED_ACTION.equals(action)) {
             Log.i(TAG,"WIFI_P2P_CONNECTION_CHANGED_ACTION");
             // Connection state changed!
-            ArrayList<WiFiP2pService> updated = (ArrayList<WiFiP2pService>) intent
-                    .getParcelableExtra(WifiP2pManager.EXTRA_P2P_DEVICE_LIST);
+
 
 
         }

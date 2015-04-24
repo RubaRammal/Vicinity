@@ -2,11 +2,8 @@ package vicinity.vicinity;
 
 import android.content.Context;
 import android.content.Intent;
-import android.net.wifi.p2p.WifiP2pDevice;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
-import android.support.v4.app.FragmentManager;
-import android.support.v4.app.FragmentTransaction;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -16,7 +13,6 @@ import android.widget.ListView;
 
 import java.util.ArrayList;
 
-import vicinity.ConnectionManager.WiFiP2pService;
 import vicinity.Controller.MainController;
 import vicinity.model.VicinityMessage;
 

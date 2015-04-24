@@ -1,5 +1,5 @@
 
-package vicinity.ConnectionManager;
+package vicinity.model;
 
 import android.net.wifi.p2p.WifiP2pDevice;
 

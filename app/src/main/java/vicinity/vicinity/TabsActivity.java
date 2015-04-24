@@ -16,6 +16,7 @@ import android.view.Window;
 import android.widget.ImageButton;
 
 import vicinity.ConnectionManager.ConnectAndDiscoverService;
+import vicinity.ConnectionManager.UDPpacketListner;
 import vicinity.Controller.MainController;
 
 /**
@@ -42,6 +43,7 @@ public class TabsActivity extends FragmentActivity implements ActionBar.TabListe
        // Thread.setDefaultUncaughtExceptionHandler(new UnhandledExceptionHandler(this));
         //Starting the service
         startService(new Intent(this, ConnectAndDiscoverService.class));
+        startService(new Intent(this, UDPpacketListner.class));
 
         requestWindowFeature(Window.FEATURE_ACTION_BAR);
         setContentView(R.layout.activity_tabs);

@@ -1,6 +1,9 @@
 package vicinity.model;
 
-
+/**
+ * This class contains constants and variables that are used more than once
+ * among other classes to reduce code redundancy
+ */
 public class Globals {
     public static final String TXTRECORD_PROP_AVAILABLE = "available";
     public static final String SERVICE_NAME = "_VicinityApp";

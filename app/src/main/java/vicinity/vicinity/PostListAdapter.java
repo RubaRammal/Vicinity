@@ -17,12 +17,12 @@ import vicinity.vicinity.R;
  * inside the TimelineSectionFragment
  */
 public class PostListAdapter  extends BaseAdapter {
-    ArrayList<Post> posts;
+    public static ArrayList<Post> posts;
     private LayoutInflater mInflater;
 
 
-    public PostListAdapter(Context context, ArrayList<Post> posts){
-        this.posts = posts;
+    public PostListAdapter(Context context, ArrayList<Post> posts2){
+        posts = new ArrayList<Post>();
         mInflater = LayoutInflater.from(context);
     }
 

@@ -1,5 +1,6 @@
 package vicinity.Controller;
 
+import vicinity.model.WiFiP2pService;
 import vicinity.model.*;
 
 import android.content.ContentValues;
@@ -19,7 +20,7 @@ public class MainController {
     private SQLiteDatabase database;
     private DBHandler dbH;
     private Context context;
-    private ArrayList<Friend> friendsList;
+    private ArrayList<WiFiP2pService> friendsList;
     private ArrayList<Request> requestsList;
     private ArrayList<Post> postList;
     private ArrayList<Comment> commentsList;
