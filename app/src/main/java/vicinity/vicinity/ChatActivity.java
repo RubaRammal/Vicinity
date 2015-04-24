@@ -4,7 +4,6 @@ import android.content.Context;
 import android.database.DataSetObserver;
 import android.graphics.Color;
 import android.graphics.drawable.ColorDrawable;
-import android.net.wifi.p2p.WifiP2pDevice;
 import android.os.Handler;
 import android.os.Message;
 import android.support.v7.app.ActionBar;
@@ -16,7 +15,6 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.AbsListView;
-import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ListView;
@@ -26,10 +24,8 @@ import java.sql.SQLException;
 import java.util.ArrayList;
 
 import vicinity.ConnectionManager.ChatManager;
-import vicinity.ConnectionManager.WiFiP2pService;
 import vicinity.Controller.MainController;
 import vicinity.Controller.VicinityNotifications;
-import vicinity.model.Friend;
 import vicinity.model.Globals;
 import vicinity.model.VicinityMessage;
 

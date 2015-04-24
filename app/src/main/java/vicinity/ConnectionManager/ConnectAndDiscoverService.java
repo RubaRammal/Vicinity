@@ -3,6 +3,7 @@ package vicinity.ConnectionManager;
 import android.app.Service;
 import android.content.ComponentName;
 import android.content.Intent;
+import android.net.wifi.p2p.WifiP2pGroup;
 import android.os.IBinder;
 import android.content.Context;
 import android.content.IntentFilter;
@@ -16,9 +17,7 @@ import android.net.wifi.p2p.WifiP2pManager;
 import android.content.BroadcastReceiver;
 import android.util.Log;
 import android.net.wifi.p2p.WifiP2pManager.Channel;
-import android.app.Notification;
-import android.app.NotificationManager;
-import android.app.PendingIntent;
+
 import java.io.IOException;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
@@ -29,14 +28,11 @@ import java.util.Map;
 import vicinity.Controller.MainController;
 import vicinity.model.DBHandler;
 import vicinity.model.Globals;
-import vicinity.model.VicinityMessage;
+import vicinity.model.WiFiP2pService;
 import vicinity.vicinity.ChatActivity;
 import vicinity.vicinity.FriendListAdapter;
 import vicinity.vicinity.NeighborListAdapter;
 import vicinity.vicinity.NeighborSectionFragment.DeviceClickListener;
-import vicinity.vicinity.R;
-import vicinity.vicinity.TabsActivity;
-
 
 
 /**
@@ -315,6 +311,45 @@ public class ConnectAndDiscoverService extends Service
         startActivity(intent);
 
     }
+
+
+    //TEST
+      public void requestGroupInfo(){
+           manager.requestGroupInfo(channel, new WifiP2pManager.GroupInfoListener() {
+                    @Override
+                    public void onGroupInfoAvailable(WifiP2pGroup group) {
+                              Log.i(TAG,"onGroupInfoAvailable");
+                              //gets a list of clients participating in this group
+                                       /*Collection <WifiP2pDevice> clients;
+               if(group.getClientList().size()!=0)
+                   clients = group.getClientList();*/
+                                              //Who owns this group?
+                                        //                WifiP2pDevice groupOwner = group.getOwner();
+                                                              //  Log.i(TAG,"GO: "+groupOwner.deviceName);
+                                                                       //String network name
+                                                                              //String networkName = group.getNetworkName();
+                                                                                      // Log.i(TAG,"Network name: "+networkName);
+                                                                                           }
+                    });
+
+                  }
+        //TESST
+               public void createPersistentGroup(){
+                manager.createGroup(channel, new WifiP2pManager.ActionListener() {
+                       @Override
+                        public void onSuccess() {
+                                requestGroupInfo();
+                                Log.i(TAG,"Created a group");
+                            }
+
+                                @Override
+                        public void onFailure(int reason) {
+                              Log.i(TAG,"failed to create a group");
+                           }
+
+                            });
+            }
+
     /**
      * This method changes the original device name
      * to the user's username

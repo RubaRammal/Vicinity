@@ -17,7 +17,7 @@ import vicinity.vicinity.R;
  * inside the TimelineSectionFragment
  */
 public class PostListAdapter  extends BaseAdapter {
-    ArrayList<Post> posts;
+    public static ArrayList<Post> posts;
     private LayoutInflater mInflater;
 
 

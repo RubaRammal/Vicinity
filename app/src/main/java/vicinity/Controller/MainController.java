@@ -1,18 +1,16 @@
 package vicinity.Controller;
 
 
-import vicinity.ConnectionManager.WiFiP2pService;
 import vicinity.model.*;
-import vicinity.vicinity.TimelineSectionFragment;
+
 import android.content.ContentValues;
 import android.content.Context;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteException;
 import android.util.Log;
-import java.io.IOException;
+
 import java.sql.SQLException;
-import java.sql.Timestamp;
 import java.util.ArrayList;
 
 
@@ -22,7 +20,7 @@ public class MainController {
     private SQLiteDatabase database;
     private DBHandler dbH;
     private Context context;
-    private ArrayList<Friend> friendsList;
+    private ArrayList<WiFiP2pService> friendsList;
     private ArrayList<Post> postList;
     private ArrayList<VicinityMessage> allMessages;
     private ArrayList<VicinityMessage> allChatMessages;

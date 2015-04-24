@@ -73,6 +73,12 @@
             android:exported="true" >
         </service>
 
+        <service
+                    android:name="vicinity.ConnectionManager.UDPpacketListner"
+                    android:enabled="true"
+                    android:exported="true" >
+        </service>
+
         <activity
             android:name=".NewPost"
             android:label="@string/title_activity_new_post"

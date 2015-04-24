@@ -15,6 +15,8 @@ import android.util.Log;
 
 import java.util.ArrayList;
 
+import vicinity.model.WiFiP2pService;
+
 /**
  * this class is a WiFi BroadcastReceiver
  * Listens to wifi events and alerts the system
@@ -88,8 +90,7 @@ public class WiFiDirectBroadcastReceiver extends BroadcastReceiver {
         } else if (WifiP2pManager.WIFI_P2P_CONNECTION_CHANGED_ACTION.equals(action)) {
             Log.i(TAG,"WIFI_P2P_CONNECTION_CHANGED_ACTION");
             // Connection state changed!
-            ArrayList<WiFiP2pService> updated = (ArrayList<WiFiP2pService>) intent
-                    .getParcelableExtra(WifiP2pManager.EXTRA_P2P_DEVICE_LIST);
+
 
 
         }

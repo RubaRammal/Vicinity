@@ -4,15 +4,12 @@ import android.app.AlertDialog;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.text.Editable;
-import android.text.Layout;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageButton;
-import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.BaseAdapter;
 import android.widget.Toast;
@@ -21,9 +18,7 @@ import android.widget.Toast;
 import java.sql.SQLException;
 import java.util.ArrayList;
 
-import vicinity.ConnectionManager.WiFiP2pService;
-import vicinity.model.DBHandler;
-import vicinity.model.Friend;
+import vicinity.model.WiFiP2pService;
 
 
 public class FriendListAdapter extends BaseAdapter {
@@ -39,8 +34,10 @@ public class FriendListAdapter extends BaseAdapter {
     }
 
     public void setServices(ArrayList<WiFiP2pService> s){
-        for (int i = 0; i < s.size(); i++) {
-            services.add(s.get(i));
+        if(s.size()!=0) {
+            for (int i = 0; i < s.size(); i++) {
+                services.add(s.get(i));
+            }
         }
     }
 
