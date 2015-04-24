@@ -16,6 +16,9 @@ import android.net.wifi.p2p.WifiP2pManager;
 import android.content.BroadcastReceiver;
 import android.util.Log;
 import android.net.wifi.p2p.WifiP2pManager.Channel;
+import android.app.Notification;
+import android.app.NotificationManager;
+import android.app.PendingIntent;
 import java.io.IOException;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
@@ -26,10 +29,14 @@ import java.util.Map;
 import vicinity.Controller.MainController;
 import vicinity.model.DBHandler;
 import vicinity.model.Globals;
+import vicinity.model.VicinityMessage;
 import vicinity.vicinity.ChatActivity;
 import vicinity.vicinity.FriendListAdapter;
 import vicinity.vicinity.NeighborListAdapter;
 import vicinity.vicinity.NeighborSectionFragment.DeviceClickListener;
+import vicinity.vicinity.R;
+import vicinity.vicinity.TabsActivity;
+
 
 
 /**
@@ -94,7 +101,9 @@ public class ConnectAndDiscoverService extends Service
 
         /***TEST***/
         disconnectPeers();
-       DBHandler.deleteDatabase();
+        neighborListAdapter.clear();
+        neighborListAdapter.notifyDataSetChanged();
+        DBHandler.deleteDatabase();
 
     }
 
@@ -297,6 +306,7 @@ public class ConnectAndDiscoverService extends Service
 
     public void startChatting(){
         Intent intent = new Intent();
+        intent.putExtra("MSG_ID", 5);
         intent.setAction(Intent.ACTION_MAIN);
         intent.addCategory(Intent.CATEGORY_LAUNCHER);
         intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);

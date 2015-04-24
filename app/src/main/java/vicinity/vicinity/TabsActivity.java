@@ -13,8 +13,10 @@ import android.util.Log;
 import android.view.View;
 import android.view.Window;
 import android.widget.ImageButton;
+import android.content.Context;
 
 import vicinity.ConnectionManager.ConnectAndDiscoverService;
+import vicinity.Controller.MainController;
 
 /**
  * Implements the ActionBar to create a tabbed view.
@@ -25,6 +27,8 @@ public class TabsActivity extends FragmentActivity implements ActionBar.TabListe
     AppSectionsPagerAdapter mAppSectionsPagerAdapter;
     ViewPager mViewPager;
     private ImageButton muteButton;
+    public static Context ctx;
+    public static MainController controller;
 
 
 
@@ -33,18 +37,8 @@ public class TabsActivity extends FragmentActivity implements ActionBar.TabListe
     public void onCreate(Bundle savedInstanceState) {
 
         super.onCreate(savedInstanceState);
-
-
-
-        /****TEST****/
-       /* try{
-        MainController c = new MainController(TabsActivity.this);
-        Log.i(TAG,"There is a user in the database: "+ c.retrieveCurrentUsername());
-        c.isThisMyFriend("12312312");
-        c.isThisMyFriend("12302312");}
-        catch(SQLException e){
-            e.printStackTrace();
-        }*/
+        ctx=TabsActivity.this;
+        controller = new MainController(ctx);
         //Handling unhandled exception
        // Thread.setDefaultUncaughtExceptionHandler(new UnhandledExceptionHandler(this));
         //Starting the service

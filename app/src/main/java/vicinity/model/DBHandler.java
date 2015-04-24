@@ -38,11 +38,6 @@ public class DBHandler extends SQLiteOpenHelper {
 
     @Override
     public void onCreate(SQLiteDatabase db) {
-        /*try{
-            createDataBase();}
-        catch (Exception e){
-            Log.i(TAG,"Error in database creation");
-        }*/
 
     }
 

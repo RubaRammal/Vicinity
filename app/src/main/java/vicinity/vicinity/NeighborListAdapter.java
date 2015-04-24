@@ -78,4 +78,8 @@ public class NeighborListAdapter extends BaseAdapter {
     static class ViewHolder{
         TextView textName;
     }
+
+    public void clear(){
+        services.clear();
+    }
 }

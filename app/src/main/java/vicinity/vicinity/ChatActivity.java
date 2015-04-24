@@ -28,6 +28,7 @@ import java.util.ArrayList;
 import vicinity.ConnectionManager.ChatManager;
 import vicinity.ConnectionManager.WiFiP2pService;
 import vicinity.Controller.MainController;
+import vicinity.Controller.VicinityNotifications;
 import vicinity.model.Friend;
 import vicinity.model.Globals;
 import vicinity.model.VicinityMessage;
@@ -43,8 +44,9 @@ public class ChatActivity extends ActionBarActivity {
     private VicinityMessage vicinityMessage;
     private static ChatManager chatManager;
     private static ChatAdapter adapter;
-    private static Context ctx;
+    public static Context ctx;
     private static MainController controller;
+    private int msgId;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -74,10 +76,10 @@ public class ChatActivity extends ActionBarActivity {
         send = (Button) findViewById(R.id.sendButton);
         controller = new MainController(ctx);
 
+
         chatListView.setAdapter(adapter);
         chatListView.setTranscriptMode(AbsListView.TRANSCRIPT_MODE_ALWAYS_SCROLL);
 
-        int msgId;
         if (savedInstanceState == null) {
             Bundle extras = getIntent().getExtras();
             if (extras == null) {
@@ -89,22 +91,9 @@ public class ChatActivity extends ActionBarActivity {
             msgId = (int) savedInstanceState.getSerializable("MSG_ID");
         }
 
-        Log.i(TAG,msgId+"");
+        Log.i(TAG, msgId+"");
 
-
-/*
-        ArrayList<VicinityMessage> m = new ArrayList<VicinityMessage>();
-
-        for (int i = 0; i < controller.getChatMessages(msgId).size(); i++) {
-            m.add(controller.getChatMessages(msgId).get(i));
-        }
-
-       for(int i=0; i<m.size(); i++){
-                pushMessage(m.get(i));
-           Log.i(TAG, m.get(i).getMessageBody());
-
-
-       }*/
+        //getHistory();
 
         chatListView.getAdapter().registerDataSetObserver(new DataSetObserver() {
             @Override
@@ -171,7 +160,9 @@ public class ChatActivity extends ActionBarActivity {
                     // construct a string from the valid bytes in the buffer
                     String readMessage = new String(readBuf, 0, msg.arg1);
                     Log.d(TAG, readMessage);
-                    message = new VicinityMessage(ctx, "30-123943", 5, false, readMessage); // WiFiP2pService should be a variable
+                    message = new VicinityMessage(ctx, "30-123943", 5, false, readMessage);
+                    if(Globals.Notification)
+                    VicinityNotifications.newMessageNotification(message);
                     Log.i(TAG,"message "+message.getMessageBody());
                     pushMessage(message);
                     try {
@@ -225,6 +216,26 @@ public class ChatActivity extends ActionBarActivity {
         }
 
         return super.onOptionsItemSelected(item);
+    }
+
+
+    private void getHistory() {
+        try {
+            Log.i(TAG, msgId + "");
+
+
+            ArrayList<VicinityMessage> m = new ArrayList<VicinityMessage>();
+            m = controller.getChatMessages(msgId);
+
+            for (int i = 0; i < m.size(); i++) {
+                pushMessage(m.get(i));
+                Log.i(TAG, m.get(i).getMessageBody());
+
+            }
+        } catch (IndexOutOfBoundsException e) {
+            e.printStackTrace();
+
+        }
     }
 
 

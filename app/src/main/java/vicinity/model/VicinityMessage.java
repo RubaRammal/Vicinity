@@ -53,7 +53,7 @@ public class VicinityMessage {
      * @param isMyMsg boolean
      * @param messageBody string
      */
-    public VicinityMessage(Context context, String friendId, int ChatId , boolean isMyMsg, String messageBody){
+    public VicinityMessage(Context context, String friendId, int chatId , boolean isMyMsg, String messageBody){
 
         getApplicationContext = context;
         this.friendID = friendId;

@@ -38,15 +38,16 @@ public class NeighborSectionFragment extends Fragment {
     public final String TAG = "Neighbors";
 
     private Context ctx;
-    private ArrayList<WiFiP2pService> listOfServices;
-    private ArrayList<WiFiP2pService> friendServices;
+    private static ArrayList<WiFiP2pService> listOfServices;
+    private static ArrayList<WiFiP2pService> friendServices;
     private MainController controller;
     private ListView lvn;
     private ListView lvf;
-    private NeighborListAdapter neighborListAdapter;
-    private FriendListAdapter friendListAdapter;
+    private static NeighborListAdapter neighborListAdapter;
+    private static FriendListAdapter friendListAdapter;
     private ProgressBar progress;
     private TextView header;
+    private Button deleteFriend;
 
 
     public interface DeviceClickListener {
@@ -140,13 +141,11 @@ public class NeighborSectionFragment extends Fragment {
         return rootView;
     }
 
-
-    @Override
-    public void onStart() {
-        super.onStart();
-        friendListAdapter.notifyDataSetChanged();
-        neighborListAdapter.notifyDataSetChanged();
-
-    }
+        public static void updateDeletedFriend(WiFiP2pService deletedFriend){
+                friendServices.remove(deletedFriend);
+                listOfServices.add(deletedFriend);
+                friendListAdapter.notifyDataSetChanged();
+                neighborListAdapter.notifyDataSetChanged();
+            }
 
 }

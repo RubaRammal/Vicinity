@@ -11,14 +11,10 @@ import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.Button;
 import android.widget.ListView;
-
 import java.util.ArrayList;
-
 import vicinity.Controller.MainController;
-import vicinity.model.Globals;
 import vicinity.model.Post;
-import vicinity.model.User;
-
+import android.app.Activity;
 
 
 /**
@@ -27,37 +23,50 @@ import vicinity.model.User;
 
 public class TimelineSectionFragment extends Fragment {
 
-    private PostListAdapter adapter;
+    private static PostListAdapter adapter;
     private Context ctx;
-    private String TAG = "Timeline";
+    private static String TAG = "Timeline";
     private MainController controller;
+    private static ArrayList<Post> posts ;
+    //private TimelineInterface tlCommander;
 
-
-    public TimelineSectionFragment(){}
-
-
-    public interface ClickedPost {
+    /* this is not tested - amjad
+    // Interface to communicate with PostComment activity
+    public interface TimelineInterface {
         public void sendClickedPost(Post post);
     }
+
+    @Override
+    public void onAttach(Activity activity) {
+        super.onAttach(activity);
+        try {
+            tlCommander = (TimelineInterface)  activity;
+        } catch (ClassCastException e) {
+            throw new ClassCastException(activity.toString()
+                    + " must implement TimelineInterface");
+        }
+    }
+
+    @Override
+    public void onDetach() {
+        super.onDetach();
+        tlCommander = null;
+    }*/
 
     @Override
     public View onCreateView(final LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         View rootView = inflater.inflate(R.layout.fragment_timeline, container, false);
 
-
         ctx = this.getActivity();
         controller = new MainController(ctx);
-        ArrayList<Post> posts = GetPosts();
+        posts = new ArrayList<Post>();
+        posts.addAll(controller.viewAllPosts());
         Button addPost = (Button) rootView.findViewById(R.id.add_post);
 
-
         final ListView lv = (ListView) rootView.findViewById(android.R.id.list);
-
         adapter = new PostListAdapter(this.getActivity(), posts);
-
         lv.setAdapter(adapter);
-
         lv.setOnItemClickListener(
                 new AdapterView.OnItemClickListener(){
                     @Override
@@ -66,15 +75,13 @@ public class TimelineSectionFragment extends Fragment {
                         //((ClickedPost) PostComment.ctx).sendClickedPost((Post) adapter.getItem(position));
                         int postID = ((Post) adapter.getItem(position)).getPostID();
                         Log.i(TAG, ((Post) adapter.getItem(position)).getPostBody());
-
                         Intent intent = new Intent(getActivity(), PostComment.class);
                         intent.putExtra("POST_ID", postID);
                         startActivity(intent);
                         Log.i(TAG, "ItemClicked");
                     }
                 }
-
-        );
+        ); //END setOnItemClickListener
 
         //When Post is clicked
         addPost.setOnClickListener(
@@ -87,33 +94,19 @@ public class TimelineSectionFragment extends Fragment {
         );
 
         return rootView;
-    }
+    } //END onCreateView
 
-    //The PRIVATE METHOD SHOULD BE DELETED AND THE METHOD THAT
-    // RETURNS THE POSTS ARRAY LIST SHOULD BE CALLED IN THIS CLASS
-    public ArrayList<Post> GetPosts(){
-        ArrayList<Post> posts = new ArrayList<Post>();
-
-        Post post = new Post(new User("Ruba"), "Vicinity is a great way to communicate with people around you!", 1);
-        posts.add(post);
-
-        post = new Post(new User("Afnan"), "\"The best way to predict your future is to create it.\"",2);
-        posts.add(post);
-
-        post = new Post(new User("Amal"), "Cool app!",3);
-        posts.add(post);
-
-        post = new Post(new User("Sarah"), "\"Be nice to nerds. Chances are you'll end up working for one.\" - Bill gates",4);
-        posts.add(post);
-
-        post = new Post(new User("Lama"), "On my way to KSU...",5);
-        posts.add(post);
-
-        post = new Post(new User("Amjad"), "\"My advice is to never do tomorrow what you can do today. Procrastination is the thief of time.\" - Charles Dickens",6);
-        posts.add(post);
-
-        return posts;
-    }
+    /**
+     * sends post form NewPost activity to TimelineSectionFragment
+     * @param aPost the post to be added to posts list
+     */
+    public static void postToTimeline (Post aPost) {
+        if (aPost != null) {
+            posts.add(aPost);
+            adapter.notifyDataSetChanged();
+        }
+        else
+            Log.i(TAG, "Post object is null");
+    } //END postToTimeline
 
 }
-

@@ -15,6 +15,7 @@ import android.widget.Toast;
 import java.util.Timer;
 import java.util.TimerTask;
 import vicinity.model.DBHandler;
+import vicinity.model.Globals;
 
 
 public class SettingsSectionFragment extends Fragment {
@@ -83,9 +84,11 @@ public class SettingsSectionFragment extends Fragment {
         notificationSwitch.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
             public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
                if(isChecked){
+                   Globals.Notification=true;
                    Log.i(TAG,"Switch is on");
                }
                 else{
+                   Globals.Notification=false;
                    Log.i(TAG,"Switch is off");
 
                }

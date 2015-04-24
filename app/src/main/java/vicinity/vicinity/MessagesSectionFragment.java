@@ -48,16 +48,26 @@ public class MessagesSectionFragment extends Fragment {
         int[] ids = controller.viewChatIds();
 
 
+        //Make a case for 1 later
+        try{
         //Fills an ArrayList with the last message of every chat to send it to the adapter for display
         for (int i=0; i<ids.length; i++){
             ArrayList<VicinityMessage> temp = controller.getChatMessages(ids[i]);
+            //Log.i(TAG, "From id: "+temp.get(i).getMessageBody());
+
             chatMsgs.add(temp.get(temp.size()-1));
             if(ids[i]==0)
                 break;
         }
+        }
+        catch (ArrayIndexOutOfBoundsException e){
+            e.printStackTrace();
+        }
 
         for (int i=0; i<chatMsgs.size() ;i++){
-        Log.i(TAG, "last msg: "+chatMsgs.get(i).getMessageBody());}
+        Log.i(TAG, "last msg: "+chatMsgs.get(i).getMessageBody());
+            Log.i(TAG, "last id: "+chatMsgs.get(i).getChatId());
+        }
 
         adapter = new MessageListAdapter(this.getActivity(), chatMsgs);
 
