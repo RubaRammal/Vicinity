@@ -22,10 +22,15 @@ public class PostListAdapter  extends BaseAdapter {
 
 
     public PostListAdapter(Context context, ArrayList<Post> posts2){
+        //posts = posts2;
         posts = new ArrayList<Post>();
         mInflater = LayoutInflater.from(context);
     }
-
+    public void addPost(Post p){
+        //TimelineSectionFragment.postToTimeline(p);
+        posts.add(p);
+        notifyDataSetChanged();
+    }
     @Override
     public int getCount() {
         return posts.size();
@@ -58,7 +63,7 @@ public class PostListAdapter  extends BaseAdapter {
             holder = (ViewHolder) convertView.getTag();
         }
 
-        holder.txtName.setText(posts.get(position).getPostedBy().getUsername());
+        holder.txtName.setText(posts.get(position).getPostedBy());
         holder.txtPost.setText(posts.get(position).getPostBody());
         holder.txtComments.setText("0 comments");
 

@@ -14,13 +14,6 @@ public class WiFiP2pService {
     private String _aliasName;//for friends only
 
 
-
-    /**
-     * Default constructor
-     */
-    public WiFiP2pService(){
-
-    }
     /**
      * Public constructor to initiate a full WiFiP2pService
      */

@@ -3,6 +3,7 @@ package vicinity.vicinity;
 import android.app.AlertDialog;
 import android.content.Context;
 import android.content.DialogInterface;
+import android.net.wifi.p2p.WifiP2pDevice;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -143,5 +144,13 @@ public class NeighborSectionFragment extends Fragment {
         neighborListAdapter.notifyDataSetChanged();
     }
 
+    public static void addToFriendsList(WiFiP2pService friend){
+        friendServices.add(friend);
+        friendListAdapter.notifyDataSetChanged();
+    }
+    public static void addToNeighborssList(WiFiP2pService neighbor){
+        listOfServices.add(neighbor);
+        neighborListAdapter.notifyDataSetChanged();
+    }
 
 }

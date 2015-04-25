@@ -16,13 +16,13 @@ import android.text.TextWatcher;
 import android.widget.EditText;
 import android.widget.Button;
 import android.util.Log;
-import android.content.Context;
+
 import java.sql.SQLException;
 
 import vicinity.ConnectionManager.PostManager;
 import vicinity.Controller.MainController;
 import vicinity.model.Post;
-import vicinity.model.User;
+
 import static vicinity.vicinity.TimelineSectionFragment.*;
 
 public class NewPost extends ActionBarActivity {
@@ -86,10 +86,9 @@ public class NewPost extends ActionBarActivity {
                         String postText = postTextField.getText().toString();
                         Post aPost = null;
                         try {
-
-                            String username = mc.retrieveCurrentUsername();
-                            aPost = new Post(new User(username), postText);
-                            postManager.setPost(aPost.getPostBody());
+                            aPost = new Post(mc.retrieveCurrentUsername(), postText, true);
+                            //flag is true for now, we'll put an if statement later to check if it is a photo or a text
+                            postManager.setPost(aPost);
                             postManager.execute();
 
                             if (mc.addPost(aPost))
