@@ -5,8 +5,6 @@ import android.content.Context;
 import android.content.Intent;
 import android.database.Cursor;
 import android.database.DataSetObserver;
-import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
 import android.graphics.Color;
 import android.graphics.drawable.ColorDrawable;
 import android.net.Uri;
@@ -32,7 +30,6 @@ import java.io.File;
 import java.sql.SQLException;
 
 import vicinity.ConnectionManager.ChatManager;
-import vicinity.model.CapturePhotoUtils;
 import vicinity.model.Globals;
 import vicinity.model.Photo;
 import vicinity.model.VicinityMessage;
@@ -216,16 +213,13 @@ public class ChatActivity extends ActionBarActivity {
 
 
     public static Handler handler = new Handler(){
-        /**
-         *
-         * @param msg
-         * @return
-         */
+
         @Override
         public void handleMessage(Message msg) {
             Log.i(TAG,"handleMessage");
             switch (msg.what) {
                 case Globals.MESSAGE_READ:
+
                    message = (VicinityMessage) msg.obj;
                    // message = msg.obj;
                     // construct a string from the valid bytes in the buffer
@@ -233,8 +227,9 @@ public class ChatActivity extends ActionBarActivity {
 
                     String readPhotoPath = message.getPhotoPath();
                        Log.i(TAG , readPhotoPath);
+                       /*
                     Bitmap bitmap = BitmapFactory.decodeFile(readPhotoPath);
-                    /*message = new VicinityMessage(ctx , "2" , false , "No text" );
+                    message = new VicinityMessage(ctx , "2" , false , "No text" );
                     message.setPhotoPath(readPhotoPath);//I did this twice because I wanted to try all the possible solutions
 
                     file = new File(Environment.getExternalStorageDirectory() + "/"
@@ -250,21 +245,20 @@ public class ChatActivity extends ActionBarActivity {
                     }
 
 
-                    */
+
                     ContentResolver contentResolver = ctx.getContentResolver();
                     CapturePhotoUtils capturePhotoUtils = new CapturePhotoUtils();
                     capturePhotoUtils.insertImage(contentResolver , bitmap ,"Received Photo" ," Photo saved to receiver media gallery" );
                     Log.i(TAG,"Save photo to gallery");
-
+*/
 
                        pushMessage(message);
                        break;
-                    //Does not work
 
                     //Log.i(TAG,readPhotoPath.substring(0,9)); //why do we need the substring of the photo path? - AMAL
                     }
 
-                    else{//Temporarily
+                    else{
 
                         Log.i(TAG, "message" + message.getMessageBody());
                         pushMessage(message);

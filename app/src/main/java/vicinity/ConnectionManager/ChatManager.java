@@ -47,13 +47,13 @@ public class ChatManager implements Runnable {
                 try {
                     // Read from the InputStream
                     // VicinityMessage is received from one user
-                    vicinityMessage = (VicinityMessage) iStream.readObject(); // De-Serialization 
+                    vicinityMessage = (VicinityMessage) iStream.readObject(); // De-Serialization
 
                     // Send the obtained bytes to the UI Activity
                     // VicinityMessage is sent to WiFiServiceDiscovery to be sent to all users
                     Log.d(TAG, vicinityMessage.getMessageBody());
                     handler.obtainMessage(Globals.MESSAGE_READ,
-                            1, -1, vicinityMessage).sendToTarget();// not sure about the arg1 and arg2 values!!! - AMAL
+                            1,-1, vicinityMessage).sendToTarget();// we can use none instead of 1 and -1 for arg1 and arg2 - AMAL
                 } catch (IOException e) {
                     Log.e(TAG, "disconnected", e);
                 } catch (ClassNotFoundException e) {

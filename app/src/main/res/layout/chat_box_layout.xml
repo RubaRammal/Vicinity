@@ -24,10 +24,17 @@
         android:layout_marginTop="0dip"
         android:layout_marginRight="5dip"
         android:layout_marginBottom="5dip" />
-    <imageView
+    <ImageView
         android:id="@+id/imageBox"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        />
+        android:layout_margin="5dip"
+        android:layout_marginLeft="5dip"
+        android:layout_marginTop="0dip"
+        android:layout_marginRight="5dip"
+        android:layout_marginBottom="5dip"
+        android:adjustViewBounds="true"
+        android:background="@drawable/chatboxright"
+        android:paddingLeft="10dip" />
 
 </LinearLayout>

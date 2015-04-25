@@ -11,7 +11,6 @@ import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.util.Log;
 import android.widget.ImageView;
-
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;

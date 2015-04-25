@@ -85,7 +85,7 @@ public class ChatAdapter extends ArrayAdapter<VicinityMessage>  {
         Log.i(TAG,m);
 
 
-        if(vicinityMessages.get(position).getMessageBody() == null){//Temporarily
+        if(vicinityMessages.get(position).getMessageBody() == null){
             holder.image_view.setVisibility(View.VISIBLE);
             holder.image_view.setImageBitmap(bitmap);
             holder.image_view.setBackgroundDrawable(vicinityMessages.get(position).isMyMsg() ?
