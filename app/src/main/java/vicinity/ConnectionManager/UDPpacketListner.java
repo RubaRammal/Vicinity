@@ -23,6 +23,7 @@ public class UDPpacketListner extends Service {
     private static final String TAG = "UDPpacketListner";
     DatagramSocket socket;
     Integer port = Globals.SERVER_PORT;
+    static PostListAdapter postAdapter;
 
     Thread UDPBroadcastThread;
     @Override
@@ -68,7 +69,7 @@ public class UDPpacketListner extends Service {
                 Log.i(TAG,"received object: "+p.getPostBody()+" from: "+senderIP+" "+p.getPostedBy()+" posted at: "+p.getPostedAt());
 
                 postListAdapter.addPost(p);
-
+                //postAdapter.notifyDataSetChanged();
                 //String s = new String(packet.getData(), 0, packet.getLength());
                 // String senderIP = packet.getAddress().getHostAddress();
                 // Log.d(TAG, "Received response: "+s+" senderIP: "+senderIP);
@@ -95,5 +96,10 @@ public class UDPpacketListner extends Service {
     @Override
     public IBinder onBind(Intent intent) {
         return null;
+    }
+
+    public static void setAdapter(PostListAdapter a){
+
+        postAdapter = a;
     }
 }

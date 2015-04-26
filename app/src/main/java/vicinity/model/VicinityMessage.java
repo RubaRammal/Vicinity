@@ -17,13 +17,14 @@ import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.Serializable;
 import java.sql.SQLException;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 
 
-public class VicinityMessage {
+public class VicinityMessage implements Serializable{
 
     private static final String TAG = "MessageClass";
     private static Context getApplicationContext;
@@ -45,7 +46,6 @@ public class VicinityMessage {
      * Public constructor, initiates a message
      * attaches to it its timestamp and date
      * @param context activity context
-     * @param  Friend
      * @param isMyMsg boolean
      * @param messageBody string
      */

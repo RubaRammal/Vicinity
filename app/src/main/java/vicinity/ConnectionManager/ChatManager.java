@@ -1,4 +1,3 @@
-
 package vicinity.ConnectionManager;
 
 import android.os.Handler;

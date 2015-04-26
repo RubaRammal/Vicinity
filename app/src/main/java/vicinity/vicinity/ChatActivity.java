@@ -86,7 +86,7 @@ public class ChatActivity extends ActionBarActivity {
         MessagesSectionFragment m = new MessagesSectionFragment();
         Log.i(TAG, m.GetMessages().get(0).getChatId()+"");
 
-       for(int i=0; i<m.GetMessages().size(); i++){
+        for(int i=0; i<m.GetMessages().size(); i++){
             if(m.GetMessages().get(i).getChatId() == msgId){
                 pushMessage(m.GetMessages().get(i));
             }
@@ -124,7 +124,7 @@ public class ChatActivity extends ActionBarActivity {
                             try {
                                 boolean added = controller.addMessage(vicinityMessage);
                                 if(added)
-                                Log.i(TAG, "Message added");
+                                    Log.i(TAG, "Message added");
                             } catch (SQLException e) {
                                 e.printStackTrace();
                             }

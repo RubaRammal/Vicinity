@@ -12,6 +12,8 @@ import android.widget.AdapterView;
 import android.widget.Button;
 import android.widget.ListView;
 import java.util.ArrayList;
+
+import vicinity.ConnectionManager.UDPpacketListner;
 import vicinity.Controller.MainController;
 import vicinity.model.Post;
 import android.app.Activity;
@@ -66,6 +68,7 @@ public class TimelineSectionFragment extends Fragment {
 
         final ListView lv = (ListView) rootView.findViewById(android.R.id.list);
         adapter = new PostListAdapter(this.getActivity(), posts);
+        UDPpacketListner.setAdapter(adapter);
         lv.setAdapter(adapter);
         lv.setOnItemClickListener(
                 new AdapterView.OnItemClickListener(){
