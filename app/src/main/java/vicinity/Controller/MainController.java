@@ -289,7 +289,7 @@ public class MainController {
                 {
                     Post post = new Post();
                     post.setPostBody(c.getString(c.getColumnIndex("postBody")));
-                    post.setPostedBy(new User(c.getString(c.getColumnIndex("postedBy"))));
+                    post.setPostedBy(c.getString(c.getColumnIndex("postedBy")));
                     post.setPostedAt(c.getString(c.getColumnIndex("postedAt")));
                     post.setPostID(Integer.valueOf(c.getString(c.getColumnIndex("_id"))));
                      //post.setPostedBy(new User(c.getString(2)));
@@ -330,7 +330,7 @@ public class MainController {
             dbH.openDataBase();
             ContentValues values = new ContentValues();
             values.put("postBody", post.getPostBody());
-            values.put("postedBy", post.getPostedBy().getUsername());
+            values.put("postedBy", post.getPostedBy());
             values.put("postedAt", post.getPostedAt());
             isAdded=database.insert("Post", null, values)>0;
             dbH.close();
@@ -361,8 +361,8 @@ public class MainController {
                             post = new Post();
                             post.setPostID(c.getColumnIndex("_id"));
                             post.setPostBody(c.getString(c.getColumnIndex("postBody")));
-                            post.setPostedBy(new User(c.getString(c.getColumnIndex("postedBy"))));
-                            //contact.setPicture(c.getBlob(3));
+                            post.setPostedBy(c.getString(c.getColumnIndex("postedBy")));
+                                                    //contact.setPicture(c.getBlob(3));
                                }
                     else
                     {
@@ -671,8 +671,6 @@ public class MainController {
 
         return chat;
     }
-
-
 
 
 

@@ -3,6 +3,7 @@ package vicinity.vicinity;
 import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
+import android.os.Handler;
 import android.support.v4.app.Fragment;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -12,6 +13,10 @@ import android.widget.AdapterView;
 import android.widget.Button;
 import android.widget.ListView;
 import java.util.ArrayList;
+import java.util.Timer;
+import java.util.TimerTask;
+
+import vicinity.ConnectionManager.UDPpacketListner;
 import vicinity.Controller.MainController;
 import vicinity.model.Post;
 import android.app.Activity;
@@ -53,6 +58,9 @@ public class TimelineSectionFragment extends Fragment {
         tlCommander = null;
     }*/
 
+
+
+
     @Override
     public View onCreateView(final LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
@@ -66,6 +74,8 @@ public class TimelineSectionFragment extends Fragment {
 
         final ListView lv = (ListView) rootView.findViewById(android.R.id.list);
         adapter = new PostListAdapter(this.getActivity(), posts);
+        UDPpacketListner.setPostListAdapter(adapter);
+        adapter.notifyDataSetChanged();
         lv.setAdapter(adapter);
         lv.setOnItemClickListener(
                 new AdapterView.OnItemClickListener(){
@@ -93,12 +103,39 @@ public class TimelineSectionFragment extends Fragment {
                 }
         );
 
+
+
+
+        Timer myTimer;
+        myTimer = new Timer();
+        myTimer.schedule(new TimerTask() {
+            @Override
+            public void run() {
+                TimerMethod();
+            }
+
+        }, 0, 10000);
+
+
         return rootView;
     } //END onCreateView
 
+
+
+    private void TimerMethod()
+    {
+        getActivity().runOnUiThread(Timer_Tick);
+    }
+
+    private Runnable Timer_Tick = new Runnable() {
+        public void run() {
+            adapter.notifyDataSetChanged();
+        }
+    };
+
     /**
      * sends post form NewPost activity to TimelineSectionFragment
-     * @param aPost the post to be added to posts list
+     * @param  aPost the post to be added to posts list
      */
     public static void postToTimeline (Post aPost) {
         if (aPost != null) {
@@ -108,5 +145,6 @@ public class TimelineSectionFragment extends Fragment {
         else
             Log.i(TAG, "Post object is null");
     } //END postToTimeline
+
 
 }

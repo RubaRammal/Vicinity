@@ -7,8 +7,10 @@ import android.view.ViewGroup;
 import android.widget.BaseAdapter;
 import android.widget.TextView;
 
+import java.sql.SQLException;
 import java.util.ArrayList;
 
+import vicinity.Controller.MainController;
 import vicinity.model.Post;
 import vicinity.vicinity.R;
 
@@ -19,11 +21,33 @@ import vicinity.vicinity.R;
 public class PostListAdapter  extends BaseAdapter {
     public static ArrayList<Post> posts;
     private LayoutInflater mInflater;
+    MainController controller;
 
 
-    public PostListAdapter(Context context, ArrayList<Post> posts){
-        this.posts = posts;
+    public PostListAdapter(Context context, ArrayList<Post> postsList){
+        posts = postsList;
         mInflater = LayoutInflater.from(context);
+        controller = new MainController(context);
+    }
+
+    public void updatePosts(ArrayList<Post> p) {
+        if(p.size()!=0) {
+            posts.clear();
+            for (int i = 0; i < p.size(); i++) {
+                posts.add(p.get(i));
+
+                try {
+                    controller.addPost(p.get(i));
+                } catch (SQLException e) {
+                    e.printStackTrace();
+                }
+
+            }
+        }
+    }
+
+    public void addPostToList(Post p){
+        posts.add(p);
     }
 
     @Override
@@ -58,7 +82,7 @@ public class PostListAdapter  extends BaseAdapter {
             holder = (ViewHolder) convertView.getTag();
         }
 
-        holder.txtName.setText(posts.get(position).getPostedBy().getUsername());
+        holder.txtName.setText(posts.get(position).getPostedBy());
         holder.txtPost.setText(posts.get(position).getPostBody());
         holder.txtComments.setText("0 comments");
 

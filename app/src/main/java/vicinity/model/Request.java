@@ -9,7 +9,7 @@ import java.util.Date;
 public class Request {
     private static final String TAG = "RequestClass";
     //Request Atts
-    private User requestedBy; //sender
+    private String requestedBy; //sender
     private String requestedAt;
     private boolean requestStatus; //is accepted?
     private String requestStatus1;
@@ -20,7 +20,7 @@ public class Request {
     {
 
     }
-    public Request(User requestedBy, User requestedTo){
+    public Request(String requestedBy, String requestedTo){
 
         Date currentDate= new Date();
         DateFormat dF=  new SimpleDateFormat("yyyy/MM/dd HH:mm:ss");
@@ -30,9 +30,9 @@ public class Request {
 
     }
 
-    public void setReqBy(User newFriend)
+    public void setReqBy(String newFriend)
     {
-        if(newFriend.getUsername().equals(null))
+        if(newFriend.equals(null))
             requestedBy=null;
         else
             requestedBy=newFriend;
@@ -40,13 +40,13 @@ public class Request {
 
     }
     //Setters - Getters
-    public boolean setRequestedBy(User newFriend){
+    public boolean setRequestedBy(String newFriend){
         if(newFriend.equals(null))
             return false;
         this.requestedBy=requestedBy;
         return true;
     }
-    public User getRequestedBy(){
+    public String getRequestedBy(){
         return requestedBy;
     }
 
@@ -70,7 +70,7 @@ public class Request {
 
     public String toString()
     {
-        return "Requested by: "+requestedBy.getUsername()+"  Request Status: "+requestStatus1;
+        return "Requested by: "+requestedBy+"  Request Status: "+requestStatus1;
 
     }
 

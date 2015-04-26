@@ -139,4 +139,13 @@ public class NeighborSectionFragment extends Fragment {
                 neighborListAdapter.notifyDataSetChanged();
             }
 
+    public static void addToFriendsList(WiFiP2pService friend){
+        friendServices.add(friend);
+        friendListAdapter.notifyDataSetChanged();
+    }
+    public static void addToNeighborssList(WiFiP2pService neighbor){
+        listOfServices.add(neighbor);
+        neighborListAdapter.notifyDataSetChanged();
+    }
+
 }

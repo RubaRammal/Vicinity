@@ -27,6 +27,7 @@ public class MessagesSectionFragment extends Fragment {
     private String TAG = "MessagesSectionFragment";
     private MainController controller;
     private MessageListAdapter adapter;
+    private ArrayList<VicinityMessage> history;
     public MessagesSectionFragment(){}
 
     @Override
@@ -44,17 +45,22 @@ public class MessagesSectionFragment extends Fragment {
         //Returns the chat IDs of all messages
         int[] ids = controller.viewChatIds();
 
-
+        ArrayList<VicinityMessage> temp;
         //Make a case for 1 later
         try{
         //Fills an ArrayList with the last message of every chat to send it to the adapter for display
         for (int i=0; i<ids.length; i++){
-            ArrayList<VicinityMessage> temp = controller.getChatMessages(ids[i]);
-            //Log.i(TAG, "From id: "+temp.get(i).getMessageBody());
+            temp = controller.getChatMessages(ids[i]);
 
-            chatMsgs.add(temp.get(temp.size()-1));
-            if(ids[i]==0)
+            if(temp.size()==0)
                 break;
+            if(temp.size()==1)
+                chatMsgs.add(temp.get(0));
+            else {
+                chatMsgs.add(temp.get(temp.size() - 1));
+                if (ids[i] == 0)
+                    break;
+            }
         }
         }
         catch (ArrayIndexOutOfBoundsException e){
@@ -82,7 +88,7 @@ public class MessagesSectionFragment extends Fragment {
                     public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
                         int msgId = ((VicinityMessage) adapter.getItem(position)).getChatId();
                         Log.i(TAG, ((VicinityMessage) adapter.getItem(position)).getMessageBody());
-
+                        setMsgs(msgId);
                         Intent intent = new Intent(ctx, ChatActivity.class);
                         intent.putExtra("MSG_ID", msgId);
                         startActivity(intent);
@@ -95,12 +101,20 @@ public class MessagesSectionFragment extends Fragment {
     }
 
 
-    @Override
+   /* @Override
     public void onAttach(Activity activity) {
         super.onAttach(activity);
         adapter.notifyDataSetChanged();
 
+    }*/
+
+
+    public ArrayList<VicinityMessage> getMsgs(){
+        return history;
     }
 
+    public void setMsgs(int id){
+        history = controller.getChatMessages(id);
+    }
 
 }

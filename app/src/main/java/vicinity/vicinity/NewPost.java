@@ -16,12 +16,13 @@ import android.text.TextWatcher;
 import android.widget.EditText;
 import android.widget.Button;
 import android.util.Log;
-import android.content.Context;
+
 import java.sql.SQLException;
 
+import vicinity.ConnectionManager.PostManager;
 import vicinity.Controller.MainController;
 import vicinity.model.Post;
-import vicinity.model.User;
+
 import static vicinity.vicinity.TimelineSectionFragment.*;
 
 public class NewPost extends ActionBarActivity {
@@ -30,6 +31,7 @@ public class NewPost extends ActionBarActivity {
     private EditText postTextField ;
     private Button sendPostButton;
     private MainController mc ;
+    private PostManager postManager;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -56,6 +58,7 @@ public class NewPost extends ActionBarActivity {
 
         mc = new MainController(this);
 
+        postManager = new PostManager(this);
         postTextField = (EditText) findViewById(R.id.postTextField);
         sendPostButton = (Button) findViewById(R.id.sendPostButton);
         sendPostButton.setEnabled(false);
@@ -84,20 +87,21 @@ public class NewPost extends ActionBarActivity {
                         Post aPost = null;
                         try {
 
-                            String username = mc.retrieveCurrentUsername();
-                            aPost = new Post(new User(username), postText);
+                            aPost = new Post(mc.retrieveCurrentUsername(), postText, true);
+                            postManager.setPost(aPost);
 
+                            postManager.execute();
 
-                            if (mc.addPost(aPost))
+                           /* if (mc.addPost(aPost))
                                 Log.i(TAG, "post is saved to DB");
                             else
-                                Log.i(TAG, "post is not saved to DB");
+                                Log.i(TAG, "post is not saved to DB")*/
 
                         } catch (SQLException e) {
                             e.printStackTrace();
                             Log.i(TAG, "A problem in adding post to DB");
                         }
-                        postToTimeline(aPost);
+                       // postToTimeline(aPost);
                         finish();
                     }
                 }

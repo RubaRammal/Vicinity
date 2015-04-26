@@ -43,6 +43,7 @@ public class ChatActivity extends ActionBarActivity {
     public static Context ctx;
     private static MainController controller;
     private int msgId;
+    ArrayList<VicinityMessage> history;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -88,6 +89,10 @@ public class ChatActivity extends ActionBarActivity {
         }
 
         Log.i(TAG, msgId+"");
+
+        MessagesSectionFragment m = new MessagesSectionFragment();
+        history = m.getMsgs();
+//        Log.i(TAG, history.get(0).getMessageBody());
 
         //getHistory();
 
