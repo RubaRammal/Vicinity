@@ -14,6 +14,7 @@ public class Post  implements Serializable {
     private String postedBy;
     private String postBody;
     private ArrayList<Comment> postComments;
+    private String PhotoPath;
     private boolean isText;// to see if the post is an image or a text
     //Constructor
 
@@ -76,6 +77,8 @@ public class Post  implements Serializable {
     public void setPostedAt(String postedAt) {
                this.postedAt=postedAt;
            }
+    public String getPhotoPath(){return  PhotoPath;}
+    public void setPhotoPath(String PhotoPath){this.PhotoPath = PhotoPath;}
 
 
     /**
