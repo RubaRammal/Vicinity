@@ -1,10 +1,14 @@
 package vicinity.vicinity;
 
 import android.content.Context;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.BaseAdapter;
+import android.widget.ImageView;
 import android.widget.TextView;
 
 import java.sql.SQLException;
@@ -12,7 +16,6 @@ import java.util.ArrayList;
 
 import vicinity.Controller.MainController;
 import vicinity.model.Post;
-import vicinity.vicinity.R;
 
 /**
  * An adapter that takes a list of posts and displays it in a ListView
@@ -22,6 +25,7 @@ public class PostListAdapter  extends BaseAdapter {
     public static ArrayList<Post> posts;
     private LayoutInflater mInflater;
     MainController controller;
+    private String TAG = "PostAdapter";
 
 
     public PostListAdapter(Context context, ArrayList<Post> postsList){
@@ -75,6 +79,7 @@ public class PostListAdapter  extends BaseAdapter {
             holder = new ViewHolder();
             holder.txtName = (TextView) convertView.findViewById(R.id.name);
             holder.txtPost = (TextView) convertView.findViewById(R.id.post);
+            holder.imageView = (ImageView) convertView.findViewById(R.id.imageBox);
             holder.txtComments  = (TextView) convertView.findViewById(R.id.comments);
 
             convertView.setTag(holder);
@@ -82,14 +87,28 @@ public class PostListAdapter  extends BaseAdapter {
             holder = (ViewHolder) convertView.getTag();
         }
 
-        holder.txtName.setText(posts.get(position).getPostedBy());
-        holder.txtPost.setText(posts.get(position).getPostBody());
-        holder.txtComments.setText("0 comments");
+        Bitmap bitmap = BitmapFactory.decodeFile(posts.get(position).getPhotoPath());
+        holder.imageView.setVisibility(View.GONE);
+        holder.txtPost.setVisibility(View.GONE);
+
+        String m = posts.get(position).getPhotoPath().substring(0,9);
+        Log.i(TAG, m);
+
+        if(posts.get(position).getPostBody() == null){
+            holder.imageView.setVisibility(View.VISIBLE);
+            holder.imageView.setImageBitmap(bitmap);
+        }
+        else {
+            holder.txtName.setText(posts.get(position).getPostedBy());
+            holder.txtPost.setText(posts.get(position).getPostBody());
+            holder.txtComments.setText("0 comments");
+        }
 
         return convertView;
     }
 
     static class ViewHolder{
         TextView txtName, txtPost, txtComments;
+        ImageView imageView;
     }
 }
