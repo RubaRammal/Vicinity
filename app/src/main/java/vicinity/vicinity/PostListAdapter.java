@@ -76,6 +76,8 @@ public class PostListAdapter  extends BaseAdapter {
             holder.txtName = (TextView) convertView.findViewById(R.id.name);
             holder.txtPost = (TextView) convertView.findViewById(R.id.post);
             holder.txtComments  = (TextView) convertView.findViewById(R.id.comments);
+            holder.txtDate  = (TextView) convertView.findViewById(R.id.date);
+
 
             convertView.setTag(holder);
         } else {
@@ -84,12 +86,13 @@ public class PostListAdapter  extends BaseAdapter {
 
         holder.txtName.setText(posts.get(position).getPostedBy());
         holder.txtPost.setText(posts.get(position).getPostBody());
-        holder.txtComments.setText("0 comments");
+        holder.txtDate.setText(posts.get(position).getPostedAt());
+        holder.txtComments.setText("2 comments");
 
         return convertView;
     }
 
     static class ViewHolder{
-        TextView txtName, txtPost, txtComments;
+        TextView txtName, txtPost, txtComments, txtDate;
     }
 }

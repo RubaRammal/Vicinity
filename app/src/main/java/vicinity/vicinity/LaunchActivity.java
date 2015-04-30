@@ -44,7 +44,7 @@ public class LaunchActivity extends Activity {
             public void run() {
 
                 try {
-                    if (controller.retrieveCurrentUsername().equals(null)) {
+                    if (controller.retrieveCurrentUsername()==null) {
                         Intent intent = new Intent(context, NameActivity.class);
                         startActivity(intent);
                         finish();

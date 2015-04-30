@@ -213,5 +213,55 @@
         android:layout_below="@+id/clearComments"
         android:id="@+id/line4" />
 
+    <TextView
+        android:layout_marginTop="13dip"
+        android:layout_below="@+id/line4"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Clear Timeline"
+        android:id="@+id/ct"
+        android:textSize="18dp"
+        android:textStyle="bold"
+        android:gravity="center_horizontal"
+        android:paddingLeft="5dp"
+        android:layout_alignParentLeft="true"
+        android:layout_alignParentStart="true" />
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Clear all posts from timeline"
+        android:textSize="10dp"
+        android:textColor="#81020202"
+        android:textStyle="bold"
+        android:layout_below="@+id/ct"
+        android:gravity="center_horizontal"
+        android:layout_alignParentLeft="true"
+        android:layout_alignParentStart="true"
+        android:paddingLeft="5dp"/>
+
+    <Button
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:id="@+id/clearTimeline"
+        android:text="Clear"
+        android:textStyle="bold"
+        android:layout_below="@+id/line4"
+        android:layout_alignParentRight="true"
+        android:layout_alignParentEnd="true"
+        android:layout_marginTop="10dip"
+        android:background="@drawable/red_button_style"
+        android:textColor="#fff"/>
+
+    <TextView
+        android:layout_marginTop="10dip"
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:background="#503e3e3d"
+        android:text=" "
+        android:textSize="0.4dip"
+        android:layout_below="@+id/clearTimeline"
+        android:id="@+id/line5" />
+
 
 </RelativeLayout>

@@ -32,6 +32,7 @@ import vicinity.model.WiFiP2pService;
 import vicinity.vicinity.ChatActivity;
 import vicinity.vicinity.FriendListAdapter;
 import vicinity.vicinity.NeighborListAdapter;
+import vicinity.vicinity.NeighborSectionFragment;
 import vicinity.vicinity.NeighborSectionFragment.DeviceClickListener;
 
 
@@ -148,15 +149,16 @@ public class ConnectAndDiscoverService extends Service
                                 Log.i(TAG, "is this my friend? "+controller.isThisMyFriend("3a:aa:3c:64:08:b0"));
                                 if(controller.isThisMyFriend(srcDevice.deviceAddress))
                                 {
-                                  friends.add(service);
-                                  friendListAdapter.setServices(friends);
-                                  friendListAdapter.notifyDataSetChanged();
+                                  //friends.add(service);
+                                  //friendListAdapter.setServices(friends);
+                                  //friendListAdapter.notifyDataSetChanged();
+                                    NeighborSectionFragment.addToFriendsList(service);
                                 }
                                 else{
-                                 neighbors.add(service);
-                                 neighborListAdapter.setServices(neighbors);
-                                 neighborListAdapter.notifyDataSetChanged();
-
+                                 //neighbors.add(service);
+                                 //neighborListAdapter.setServices(neighbors);
+                                 //neighborListAdapter.notifyDataSetChanged();
+                                    NeighborSectionFragment.addToNeighborssList(service);
                                 }
 
                         }

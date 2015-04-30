@@ -86,7 +86,8 @@ public class MainController {
             dbH.openDataBase();
             query="SELECT Username FROM CurrentUser";
             cursor = database.rawQuery(query,null);
-            cursor.moveToFirst();
+
+            if(cursor.moveToFirst())
             username2=cursor.getString(cursor.getColumnIndex("Username"));
             cursor.close();
             dbH.close();
@@ -378,6 +379,19 @@ public class MainController {
                         }
                 return post;
             } //END getPost
+
+
+    public Post getPost2(int id){
+        Post p = new Post();
+        ArrayList<Post> allPosts = viewAllPosts();
+
+
+        for (int i=0; i<allPosts.size(); i++){
+            if(allPosts.get(i).getPostID()==id)
+                p =  allPosts.get(i);
+        }
+        return p;
+    }
 
                 /**
           * Fetches the comments on a specified post

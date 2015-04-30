@@ -14,6 +14,7 @@ public class Post  implements Serializable {
     private String postedBy;
     private String postBody;
     private ArrayList<Comment> postComments;
+    private int commentsCount;
     private boolean isText;// to see if the post is an image or a text
     //Constructor
 
@@ -31,6 +32,8 @@ public class Post  implements Serializable {
                 this.postedBy=postedBy;
                 this.isText=flag;
                 postComments = new ArrayList<Comment>();
+                commentsCount=0;
+
     }
 
 
@@ -42,6 +45,7 @@ public class Post  implements Serializable {
         this.postedBy=postedBy;
         this.postID = postID;
         postComments = new ArrayList<Comment>();
+        commentsCount=0;
     }
 
     //Setters and getters
@@ -76,6 +80,14 @@ public class Post  implements Serializable {
     public void setPostedAt(String postedAt) {
                this.postedAt=postedAt;
            }
+
+    public int getCommentsCount(){
+        return commentsCount;
+    }
+
+    public void setCommentCount(int c){
+        commentsCount = c;
+    }
 
 
     /**

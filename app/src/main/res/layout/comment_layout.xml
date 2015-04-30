@@ -3,10 +3,10 @@
     android:layout_width="fill_parent"
     android:layout_height="fill_parent"
     android:orientation="vertical"
-    android:paddingBottom="5dip"
-    android:paddingLeft="5dip"
-    android:paddingTop="5dip"
-    android:paddingRight="5dip"
+    android:paddingBottom="10dip"
+    android:paddingLeft="10dip"
+    android:paddingTop="10dip"
+    android:paddingRight="10dip"
     android:id="@+id/commentRow"
     >
 

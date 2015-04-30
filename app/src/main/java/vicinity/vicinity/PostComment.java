@@ -10,6 +10,7 @@ import android.support.v7.app.ActionBarActivity;
 import android.util.Log;
 import android.view.Gravity;
 import android.view.View;
+import android.view.ViewGroup;
 import android.widget.AbsListView;
 import android.widget.Button;
 import android.widget.EditText;
@@ -35,6 +36,8 @@ public class PostComment extends ActionBarActivity {
     private ListView commentListView;
     private EditText commentTextField;
     private Button sendCommentButton;
+    private TextView commentedOnName;
+    private TextView commentedOnText;
     private Comment comment;
     private static CommentListAdapter adapter;
     public static Context ctx;
@@ -43,6 +46,7 @@ public class PostComment extends ActionBarActivity {
     private int postID;
     private String TAG = "PostComment";
     private MainController controller;
+    private int commentCount;
 
 
     @Override
@@ -71,6 +75,8 @@ public class PostComment extends ActionBarActivity {
         Bundle extras = getIntent().getExtras();
         postID = extras.getInt("POST_ID");
 
+        commentedOn = controller.getPost2(postID);
+
         /*if (savedInstanceState == null) {
             Bundle extras = getIntent().getExtras();
             if (extras == null) {
@@ -82,7 +88,6 @@ public class PostComment extends ActionBarActivity {
             postID = (int) savedInstanceState.getSerializable("POST_ID");
         }
 
-                commentedOn = controller.getPost(postID);
         comment = new Comment(commentedOn.getPostBody(), commentedOn.getPostedBy().getUsername());
         commentsList.add(comment);
         commentsList.add(new Comment("", "Comments"));
@@ -90,10 +95,16 @@ public class PostComment extends ActionBarActivity {
         */
 
         commentsList = controller.getPostComments(postID);
-        commentListView = (ListView) findViewById(android.R.id.list);
+        commentCount = commentsList.size();
+        commentListView = (ListView) findViewById(R.id.commentsList);
         adapter = new CommentListAdapter(ctx, commentsList);
+        View cHeader = getLayoutInflater().inflate(R.layout.comment_header, null);
+        commentListView.addHeaderView(cHeader);
         commentListView.setAdapter(adapter);
         commentListView.setTranscriptMode(AbsListView.TRANSCRIPT_MODE_ALWAYS_SCROLL);
+
+
+
         commentListView.getAdapter().registerDataSetObserver(new DataSetObserver() {
             @Override
             public void onChanged() {
@@ -103,6 +114,10 @@ public class PostComment extends ActionBarActivity {
         });
 
         commentTextField = (EditText) findViewById(R.id.commentTextField);
+        commentedOnName = (TextView) findViewById(R.id.commentedOnName);
+        commentedOnText = (TextView) findViewById(R.id.commentedOn);
+        commentedOnName.setText(commentedOn.getPostedBy());
+        commentedOnText.setText(commentedOn.getPostBody());
         sendCommentButton = (Button) findViewById(R.id.sendCommentButton);
         sendCommentButton.setEnabled(false);
         commentTextField.addTextChangedListener(new TextWatcher() {
@@ -131,8 +146,9 @@ public class PostComment extends ActionBarActivity {
                         try {
                             String username = controller.retrieveCurrentUsername();
                             aComment = new Comment (postID, commentText, username);
-                            if (controller.addAcomment(aComment))
-                                Log.i(TAG, "Comment is added to DB");
+                            if (controller.addAcomment(aComment)){
+                                commentCount++;
+                                Log.i(TAG, "Comment is added to DB");}
                             else
                                 Log.i(TAG, "Comment is NOT added to DB");
 
@@ -142,6 +158,8 @@ public class PostComment extends ActionBarActivity {
                         commentsList.add(aComment);
                         adapter.notifyDataSetChanged();
                         commentTextField.setText("");
+                        commentedOn.setCommentCount(commentCount);
+
                     }
                 }
         );

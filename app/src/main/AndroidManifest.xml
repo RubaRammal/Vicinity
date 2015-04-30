@@ -74,9 +74,9 @@
         </service>
 
         <service
-                    android:name="vicinity.ConnectionManager.UDPpacketListner"
-                    android:enabled="true"
-                    android:exported="true" >
+            android:name="vicinity.ConnectionManager.UDPpacketListner"
+            android:enabled="true"
+            android:exported="true" >
         </service>
 
         <activity

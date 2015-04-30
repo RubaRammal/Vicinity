@@ -58,11 +58,11 @@ public class ChatActivity extends ActionBarActivity {
                 ActionBar.LayoutParams.MATCH_PARENT,
                 Gravity.CENTER);
         TextView textviewTitle = (TextView) viewActionBar.findViewById(R.id.actionbar_textview);
-        textviewTitle.setText("Friend's name");
+        textviewTitle.setText("Amal");
         abar.setCustomView(viewActionBar, params);
         abar.setDisplayShowCustomEnabled(true);
         abar.setDisplayShowTitleEnabled(false);
-        abar.setDisplayHomeAsUpEnabled(true);
+        abar.setDisplayHomeAsUpEnabled(false);
         abar.setHomeButtonEnabled(true);
 
         //Initializations

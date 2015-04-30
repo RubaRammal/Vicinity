@@ -79,33 +79,7 @@ public class NewPost extends ActionBarActivity {
             }
         }); //END addTextChangedListener
 
-        // When the send button is clicked
-        sendPostButton.setOnClickListener(
-                new Button.OnClickListener() {
-                    public void onClick(View view) {
-                        String postText = postTextField.getText().toString();
-                        Post aPost = null;
-                        try {
 
-                            aPost = new Post(mc.retrieveCurrentUsername(), postText, true);
-                            postManager.setPost(aPost);
-
-                            postManager.execute();
-
-                           /* if (mc.addPost(aPost))
-                                Log.i(TAG, "post is saved to DB");
-                            else
-                                Log.i(TAG, "post is not saved to DB")*/
-
-                        } catch (SQLException e) {
-                            e.printStackTrace();
-                            Log.i(TAG, "A problem in adding post to DB");
-                        }
-                       // postToTimeline(aPost);
-                        finish();
-                    }
-                }
-        ); //END onClickListener
     } //END onCreate
 
 
@@ -118,17 +92,38 @@ public class NewPost extends ActionBarActivity {
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
-        // Handle action bar item clicks here. The action bar will
-        // automatically handle clicks on the Home/Up button, so long
-        // as you specify a parent activity in AndroidManifest.xml.
-        int id = item.getItemId();
+        // Handle presses on the action bar items
+        switch (item.getItemId()) {
+            case R.id.action_send_post:
+                sendPost();
+                return true;
 
-        //noinspection SimplifiableIfStatement
-        if (id == R.id.action_settings) {
-            return true;
+            default:
+                return super.onOptionsItemSelected(item);
         }
+    }
 
-        return super.onOptionsItemSelected(item);
+    public void sendPost(){
+        String postText = postTextField.getText().toString();
+        Post aPost = null;
+        try {
+
+            aPost = new Post(mc.retrieveCurrentUsername(), postText, true);
+            postManager.setPost(aPost);
+
+            postManager.execute();
+
+                           /* if (mc.addPost(aPost))
+                                Log.i(TAG, "post is saved to DB");
+                            else
+                                Log.i(TAG, "post is not saved to DB")*/
+
+        } catch (SQLException e) {
+            e.printStackTrace();
+            Log.i(TAG, "A problem in adding post to DB");
+        }
+        // postToTimeline(aPost);
+        finish();
     }
 
 }
