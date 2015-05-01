@@ -20,8 +20,7 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.TextView;
-
-import java.sql.SQLException;
+import android.widget.Toast;
 
 import vicinity.ConnectionManager.PostManager;
 import vicinity.Controller.MainController;
@@ -35,6 +34,7 @@ public class NewPost extends ActionBarActivity {
     private Button sendPhotoButton;
     private MainController mc ;
     private PostManager postManager;
+    private Post aPost;
     private int SELECT_PICTURE =1;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -67,6 +67,7 @@ public class NewPost extends ActionBarActivity {
         sendPostButton = (Button) findViewById(R.id.sendPostButton);
         sendPhotoButton = (Button) findViewById(R.id.AddButton);
         sendPostButton.setEnabled(false);
+        aPost = new Post();
         postTextField.addTextChangedListener(new TextWatcher() {
             @Override
             public void beforeTextChanged(CharSequence s, int start, int count, int after) {
@@ -89,24 +90,19 @@ public class NewPost extends ActionBarActivity {
                 new Button.OnClickListener() {
                     public void onClick(View view) {
                         String postText = postTextField.getText().toString();
-                        Post aPost = null;
-                        try {
 
-                            aPost = new Post(mc.retrieveCurrentUsername(), postText);
-                            postManager.setPost(aPost);
+                        aPost.setPostBody(postText);
 
-                            postManager.execute();
+                        postManager.setPost(aPost);
+
+                        postManager.execute();
 
                            /* if (mc.addPost(aPost))
                                 Log.i(TAG, "post is saved to DB");
                             else
                                 Log.i(TAG, "post is not saved to DB")*/
 
-                        } catch (SQLException e) {
-                            e.printStackTrace();
-                            Log.i(TAG, "A problem in adding post to DB");
-                        }
-                       // postToTimeline(aPost);
+                        // postToTimeline(aPost);
                         finish();
                     }
                 }
@@ -150,18 +146,10 @@ public class NewPost extends ActionBarActivity {
 
     }
     public void sendPhotoObj( String photoPath)  {
-        Post aPost=null;
-
-        try {
-            aPost = new Post(null, null);
             aPost.setPhotoPath(photoPath);
-            postManager.setPost(aPost);
-            postManager.execute();
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-
-        finish();
+             sendPostButton.setEnabled(true);
+        Toast.makeText(getApplicationContext(), "Photo attached to Post",
+                Toast.LENGTH_LONG).show();
     }
 
 

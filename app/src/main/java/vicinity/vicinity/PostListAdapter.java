@@ -3,7 +3,6 @@ package vicinity.vicinity;
 import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -92,19 +91,26 @@ public class PostListAdapter  extends BaseAdapter {
         //holder.txtPost.setVisibility(View.GONE);
 
 
-        if(posts.get(position).getPostBody() == null ){
+        if(posts.get(position).getPostBody() != null && posts.get(position).getPhotoPath() == null ){
             holder.txtName.setText(posts.get(position).getPostedBy());
             holder.txtPost.setText(posts.get(position).getPostBody());
             holder.txtComments.setText("0 comments");
 
         }
-        else {
+        else if (posts.get(position).getPostBody() == null && posts.get(position).getPhotoPath() != null ) {
 
-            String m = posts.get(position).getPhotoPath().substring(0,9);
-            Log.i(TAG, m);
             Bitmap bitmap = BitmapFactory.decodeFile(posts.get(position).getPhotoPath());
             holder.imageView.setVisibility(View.VISIBLE);
             holder.imageView.setImageBitmap(bitmap);
+        }
+        else{
+            holder.txtName.setText(posts.get(position).getPostedBy());
+            holder.txtPost.setText(posts.get(position).getPostBody());
+            holder.txtComments.setText("0 comments");
+            Bitmap bitmap = BitmapFactory.decodeFile(posts.get(position).getPhotoPath());
+            holder.imageView.setVisibility(View.VISIBLE);
+            holder.imageView.setImageBitmap(bitmap);
+
         }
 
         return convertView;
