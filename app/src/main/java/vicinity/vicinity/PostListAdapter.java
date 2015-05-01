@@ -1,10 +1,13 @@
 package vicinity.vicinity;
 
 import android.content.Context;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.BaseAdapter;
+import android.widget.ImageView;
 import android.widget.TextView;
 
 import java.sql.SQLException;
@@ -75,6 +78,7 @@ public class PostListAdapter  extends BaseAdapter {
             holder = new ViewHolder();
             holder.txtName = (TextView) convertView.findViewById(R.id.name);
             holder.txtPost = (TextView) convertView.findViewById(R.id.post);
+            holder.imageView = (ImageView) convertView.findViewById(R.id.imageBox);
             holder.txtComments  = (TextView) convertView.findViewById(R.id.comments);
             holder.txtDate  = (TextView) convertView.findViewById(R.id.date);
 
@@ -85,14 +89,23 @@ public class PostListAdapter  extends BaseAdapter {
         }
 
         holder.txtName.setText(posts.get(position).getPostedBy());
-        holder.txtPost.setText(posts.get(position).getPostBody());
-        holder.txtDate.setText(posts.get(position).getPostedAt());
-        holder.txtComments.setText("2 comments");
+
+        try {
+            holder.txtPost.setText(posts.get(position).getPostBody());
+            holder.txtComments.setText("0 comments");
+            holder.txtDate.setText(posts.get(position).getPostedAt());
+            Bitmap bitmap = BitmapFactory.decodeFile(posts.get(position).getPhotoPath());
+            holder.imageView.setImageBitmap(bitmap);
+        }
+        catch (NullPointerException e){
+            e.printStackTrace();
+        }
 
         return convertView;
     }
 
     static class ViewHolder{
         TextView txtName, txtPost, txtComments, txtDate;
+        ImageView imageView;
     }
 }

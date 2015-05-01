@@ -15,8 +15,9 @@ public class Post  implements Serializable {
     private String postBody;
     private ArrayList<Comment> postComments;
     private int commentsCount;
-    private boolean isText;// to see if the post is an image or a text
-    //Constructor
+    private String PhotoPath;
+
+        //Constructor
 
     //we need this in the MainController -Sarah
     public Post()
@@ -24,13 +25,12 @@ public class Post  implements Serializable {
 
     }
 
-    public Post(String postedBy, String postBody, boolean flag){
+    public Post(String postedBy, String postBody){
                 Date currentDate= new Date();
                 DateFormat dF=  new SimpleDateFormat("yyyy/MM/dd HH:mm:ss");
                 postedAt= dF.format(currentDate);
                 this.postBody=postBody;
                 this.postedBy=postedBy;
-                this.isText=flag;
                 postComments = new ArrayList<Comment>();
                 commentsCount=0;
 
@@ -89,8 +89,13 @@ public class Post  implements Serializable {
         commentsCount = c;
     }
 
+    public String getPhotoPath(){
+        return  PhotoPath;}
 
-    /**
+    public void setPhotoPath(String PhotoPath){
+        this.PhotoPath = PhotoPath;}
+
+         /**
           * adds a comment to the ArrayList postComments
           * @param comment
           */
