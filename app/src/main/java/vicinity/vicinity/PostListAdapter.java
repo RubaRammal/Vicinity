@@ -87,21 +87,24 @@ public class PostListAdapter  extends BaseAdapter {
             holder = (ViewHolder) convertView.getTag();
         }
 
-        Bitmap bitmap = BitmapFactory.decodeFile(posts.get(position).getPhotoPath());
-        holder.imageView.setVisibility(View.GONE);
-        holder.txtPost.setVisibility(View.GONE);
 
-        String m = posts.get(position).getPhotoPath().substring(0,9);
-        Log.i(TAG, m);
+        //holder.imageView.setVisibility(View.GONE);
+        //holder.txtPost.setVisibility(View.GONE);
 
-        if(posts.get(position).getPostBody() == null){
-            holder.imageView.setVisibility(View.VISIBLE);
-            holder.imageView.setImageBitmap(bitmap);
-        }
-        else {
+
+        if(posts.get(position).getPostBody() != null){
             holder.txtName.setText(posts.get(position).getPostedBy());
             holder.txtPost.setText(posts.get(position).getPostBody());
             holder.txtComments.setText("0 comments");
+
+        }
+        else {
+
+            String m = posts.get(position).getPhotoPath().substring(0,9);
+            Log.i(TAG, m);
+            Bitmap bitmap = BitmapFactory.decodeFile(posts.get(position).getPhotoPath());
+            holder.imageView.setVisibility(View.VISIBLE);
+            holder.imageView.setImageBitmap(bitmap);
         }
 
         return convertView;
