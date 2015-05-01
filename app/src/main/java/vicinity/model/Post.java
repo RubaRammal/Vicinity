@@ -15,7 +15,7 @@ public class Post  implements Serializable {
     private String postBody;
     private ArrayList<Comment> postComments;
     private String PhotoPath;
-    private boolean isText;// to see if the post is an image or a text
+
     //Constructor
 
     //we need this in the MainController -Sarah
@@ -24,13 +24,12 @@ public class Post  implements Serializable {
 
     }
 
-    public Post(String postedBy, String postBody, boolean flag){
+    public Post(String postedBy, String postBody){
                 Date currentDate= new Date();
                 DateFormat dF=  new SimpleDateFormat("yyyy/MM/dd HH:mm:ss");
                 postedAt= dF.format(currentDate);
                 this.postBody=postBody;
                 this.postedBy=postedBy;
-                this.isText=flag;
                 postComments = new ArrayList<Comment>();
     }
 

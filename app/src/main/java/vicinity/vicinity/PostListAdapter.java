@@ -92,7 +92,7 @@ public class PostListAdapter  extends BaseAdapter {
         //holder.txtPost.setVisibility(View.GONE);
 
 
-        if(posts.get(position).getPostBody() != null){
+        if(posts.get(position).getPostBody() == null ){
             holder.txtName.setText(posts.get(position).getPostedBy());
             holder.txtPost.setText(posts.get(position).getPostBody());
             holder.txtComments.setText("0 comments");

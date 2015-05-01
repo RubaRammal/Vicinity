@@ -92,7 +92,7 @@ public class NewPost extends ActionBarActivity {
                         Post aPost = null;
                         try {
 
-                            aPost = new Post(mc.retrieveCurrentUsername(), postText, true);
+                            aPost = new Post(mc.retrieveCurrentUsername(), postText);
                             postManager.setPost(aPost);
 
                             postManager.execute();
@@ -153,7 +153,7 @@ public class NewPost extends ActionBarActivity {
         Post aPost=null;
 
         try {
-            aPost = new Post(null, null , false);
+            aPost = new Post(null, null);
             aPost.setPhotoPath(photoPath);
             postManager.setPost(aPost);
             postManager.execute();
