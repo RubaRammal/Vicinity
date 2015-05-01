@@ -10,4 +10,13 @@ public class Globals {
     public static final int MESSAGE_READ = 0x400 + 1;
     public static final int MY_HANDLE = 0x400 + 2;
     public static boolean Notification = true;
+
+
+
+    public static final int MSG_SIZE = 50;    // the lastest 50 messages
+    public static final String MSG_SENDER = "sender";
+    public static final String MSG_CONTENT = "body";
+    public static final String MSG_ID = "id";
+    public static final String MSG_MINE = "isMyMsg";
+
 }

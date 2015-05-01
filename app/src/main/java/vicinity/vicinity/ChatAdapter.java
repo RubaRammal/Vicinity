@@ -73,7 +73,7 @@ public class ChatAdapter extends ArrayAdapter<VicinityMessage> {
             holder.chat_text.setBackgroundDrawable(vicinityMessages.get(position).isMyMsg() ?
                     ctx.getResources().getDrawable(R.drawable.chatboxright) : ctx.getResources().getDrawable(R.drawable.chatboxleft));
 
-        holder.name_text.setText(vicinityMessages.get(position).isMyMsg() ? "" : "Amal");
+        holder.name_text.setText(vicinityMessages.get(position).isMyMsg() ? "" : vicinityMessages.get(position).getFriendID());
 
         LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(LayoutParams.WRAP_CONTENT, LayoutParams.WRAP_CONTENT);
 

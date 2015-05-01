@@ -10,6 +10,9 @@ import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteException;
 import android.util.Log;
 
+import org.json.JSONArray;
+import org.json.JSONObject;
+
 import java.sql.SQLException;
 import java.util.ArrayList;
 
@@ -27,6 +30,7 @@ public class MainController {
     public String query;
     public Cursor cursor;
     private ArrayList<Comment> commentsList;
+    JSONArray mMessageArray = new JSONArray();		// limit to the latest 50 messages
 
 
 
@@ -686,7 +690,14 @@ public class MainController {
         return chat;
     }
 
-
+    public String shiftInsertMessage(VicinityMessage row) {
+        JSONObject jsonobj = VicinityMessage.getAsJSONObject(row);
+        if( jsonobj != null ){
+            mMessageArray.put(jsonobj);
+        }
+        mMessageArray = JSONUtils.truncateJSONArray(mMessageArray, 10);  // truncate the oldest 10.
+        return jsonobj.toString();
+    }
 
 
 }

@@ -114,13 +114,19 @@ public class ChatActivity extends ActionBarActivity {
                         if (chatManager != null) {
 
                             //Message
-                            vicinityMessage = new VicinityMessage(ctx,  "40-123943",5, true, chatText.getText().toString());
+                            try {
+                                vicinityMessage = new VicinityMessage(ctx,  controller.retrieveCurrentUsername(),
+                                        5, true, chatText.getText().toString());
+                            } catch (SQLException e) {
+                                e.printStackTrace();
+                            }
 
                             //Display Message to user
                             pushMessage(vicinityMessage);
 
-                            //Send vicinityMessage to ChatManager
-                            chatManager.write(chatText.getText().toString().getBytes());
+                            String jsonstring = controller.shiftInsertMessage(vicinityMessage);
+
+                            chatManager.write(jsonstring.getBytes());
                             Log.i(TAG,"Writing vicinityMessage successful");
 
 
@@ -160,8 +166,13 @@ public class ChatActivity extends ActionBarActivity {
                     byte[] readBuf = (byte[]) msg.obj;
                     // construct a string from the valid bytes in the buffer
                     String readMessage = new String(readBuf, 0, msg.arg1);
+
                     Log.d(TAG, readMessage);
-                    message = new VicinityMessage(ctx, "30-123943", 5, false, readMessage);
+
+                    message = VicinityMessage.parseMessageRow(readMessage);
+
+                    message.setIsMyMsg(false);
+
                     if(Globals.Notification)
                     VicinityNotifications.newMessageNotification(message);
                     Log.i(TAG,"message "+message.getMessageBody());

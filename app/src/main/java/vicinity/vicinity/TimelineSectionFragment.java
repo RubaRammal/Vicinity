@@ -3,7 +3,6 @@ package vicinity.vicinity;
 import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
-import android.os.Handler;
 import android.support.v4.app.Fragment;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -12,6 +11,7 @@ import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.Button;
 import android.widget.ListView;
+
 import java.util.ArrayList;
 import java.util.Timer;
 import java.util.TimerTask;
@@ -19,7 +19,6 @@ import java.util.TimerTask;
 import vicinity.ConnectionManager.UDPpacketListner;
 import vicinity.Controller.MainController;
 import vicinity.model.Post;
-import android.app.Activity;
 
 
 /**
@@ -78,7 +77,7 @@ public class TimelineSectionFragment extends Fragment {
         adapter.notifyDataSetChanged();
         lv.setAdapter(adapter);
         lv.setOnItemClickListener(
-                new AdapterView.OnItemClickListener(){
+                new AdapterView.OnItemClickListener() {
                     @Override
                     public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
 
@@ -95,7 +94,7 @@ public class TimelineSectionFragment extends Fragment {
 
         //When Post is clicked
         addPost.setOnClickListener(
-                new Button.OnClickListener(){
+                new Button.OnClickListener() {
                     public void onClick(View v) {
                         Intent intent = new Intent(getActivity(), NewPost.class);
                         startActivity(intent);
@@ -103,8 +102,7 @@ public class TimelineSectionFragment extends Fragment {
                 }
         );
 
-
-
+        try {
 
         Timer myTimer;
         myTimer = new Timer();
@@ -116,6 +114,10 @@ public class TimelineSectionFragment extends Fragment {
 
         }, 0, 10000);
 
+    }
+    catch(NullPointerException e){
+        e.printStackTrace();
+    }
 
         return rootView;
     } //END onCreateView

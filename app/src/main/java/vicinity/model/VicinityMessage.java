@@ -3,26 +3,20 @@ package vicinity.model;
 import android.content.ContentResolver;
 import android.content.Context;
 import android.content.ContextWrapper;
-import android.database.Cursor;
-import android.database.DatabaseUtils;
 import android.database.sqlite.SQLiteDatabase;
-import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
+import android.os.Parcel;
+import android.os.Parcelable;
 import android.util.Log;
-import android.widget.ImageView;
 
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileNotFoundException;
-import java.io.FileOutputStream;
-import java.io.IOException;
-import java.sql.SQLException;
+import org.json.JSONException;
+import org.json.JSONObject;
+
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 
 
-public class VicinityMessage {
+public class VicinityMessage implements Parcelable{
 
     private static final String TAG = "MessageClass";
     private static Context getApplicationContext;
@@ -44,7 +38,7 @@ public class VicinityMessage {
      * Public constructor, initiates a message
      * attaches to it its timestamp and date
      * @param context activity context
-     * @param friend Friend
+     * @param friendId String
      * @param isMyMsg boolean
      * @param messageBody string
      */
@@ -63,6 +57,10 @@ public class VicinityMessage {
         //VicinityMessage's timestamp: Messages for each friend shall be ordered according to this attribute.
         msgTimestamp = msgSentAt.getTime();
 
+    }
+
+    public VicinityMessage(Parcel in) {
+        readFromParcel(in);
     }
 
 
@@ -109,108 +107,78 @@ public class VicinityMessage {
         chatId = cid;
     }
 
+    public static JSONObject getAsJSONObject(VicinityMessage msgrow) {
+        JSONObject jsonobj = new JSONObject();
+        try{
+            jsonobj.put(Globals.MSG_SENDER, msgrow.getFriendID());
+            jsonobj.put(Globals.MSG_ID, msgrow.getChatId());
+            jsonobj.put(Globals.MSG_CONTENT, msgrow.getMessageBody());
+            jsonobj.put(Globals.MSG_MINE, msgrow.isMyMsg());
 
-
-    /** UNTESTED METHODS
-     *  WILL BE TESTED AFTER CONNECTING
-     *  TO THE INTERFACES
-     * */
-
-    /**
-     * this method saves the image to the gallery and not to the DB
-     * */
-
-   private void saveImage(Bitmap bitmapImage){
-
-        //this single line of code is only if we want to save the image to the phone gallery along with all the images
-        //MediaStore.Images.Media.insertImage(getContentResolver(), yourBitmap, yourTitle , yourDescription);
-
-        capturePhotoUtils = new CapturePhotoUtils();
-        capturePhotoUtils.insertImage(contentResolver, bitmapImage, " " , " ");
+        }catch(JSONException e){
+           Log.i(TAG, "getAsJSONObject : " + e.toString());
+        }
+        return jsonobj;
     }
 
+
     /**
-     * Inserts image to the DB
-     * */
-
-    private String insertImage(Bitmap bitmapImage){//inserts the Image to the DB
-
-
-        // path to /data/data/Vicinity/app_data/imageDir
-        File directory = cw.getDir("imageDir" , Context.MODE_PRIVATE);
-        // Create imageDir
-        File mypath = new File(directory , "profile.jpg");
-
-        FileOutputStream fos = null;
-
-        try {
-            fos = new FileOutputStream(mypath);
-
-            // Use the compress method on the BitMap object to write image to the OutputStream
-            bitmapImage.compress(Bitmap.CompressFormat.PNG, 100, fos);
-
-            try {
-                fos.close();
-            } catch (IOException e) {
-                e.printStackTrace();
+     * convert json object to message row.
+     */
+    public static VicinityMessage parseMessageRow(JSONObject jsonobj) {
+        VicinityMessage row = null;
+        if( jsonobj != null ){
+            try{
+                row = new VicinityMessage(getApplicationContext,
+                        jsonobj.getString(Globals.MSG_SENDER),
+                        Integer.parseInt(jsonobj.getString(Globals.MSG_ID)),
+                        Boolean.parseBoolean(jsonobj.getString(Globals.MSG_MINE)),
+                        jsonobj.getString(Globals.MSG_CONTENT));
+            }catch(JSONException e){
+                Log.i(TAG, "parseMessageRow: " + e.toString());
             }
-
-        } catch (Exception e) {
-            e.printStackTrace();
         }
-
-        return directory.getAbsolutePath();
-
+        return row;
     }
 
     /**
-     * Retrieves image from DB
-     * */
+     * convert a json string representation of messagerow into messageRow object.
+     */
+    public static VicinityMessage parseMessageRow(String jsonMsg){
+        JSONObject jsonobj = JSONUtils.getJsonObject(jsonMsg);
+        Log.i(TAG, "parseMessageRow : " + jsonobj.toString());
+        return parseMessageRow(jsonobj);
+    }
 
-    private void loadImage(String path){
-        try {
-            File f = new File(path , "profile.jpg");
-            Bitmap b = BitmapFactory.decodeStream(new FileInputStream(f));
-            ImageView img = null;
-            // img = (ImageView) findViewById(android.support.v7.appcompat.R.id.imgPicker);
-            //img.setImageBitmap(b);
-
-        } catch (FileNotFoundException e) {
-            e.printStackTrace();
+    public static final Parcelable.Creator<VicinityMessage> CREATOR = new Parcelable.Creator<VicinityMessage>() {
+        public VicinityMessage createFromParcel(Parcel in) {
+            return new VicinityMessage(in);
         }
 
+        public VicinityMessage[] newArray(int size) {
+            return new VicinityMessage[size];
+        }
+    };
+
+    @Override
+    public int describeContents() {
+        return 0;
+    }
+
+    @Override
+    public void writeToParcel(Parcel dest, int flags) {
+        dest.writeString(friendID);
+        dest.writeString(messageBody);
+        dest.writeString(String.valueOf(isMyMsg));
+        dest.writeString(String.valueOf(chatId));
 
     }
 
-    //this method can be replaced by alternatives (e.g. list) after connecteing to the interfaces
-    public void viewMessage(int messageID) throws SQLException{
-
-        String Table_Name = "VicinityMessage";
-        String selectQuery = "SELECT * FROM" + Table_Name + "WHERE _ID=" + messageID;
-
-
-        try {
-            db = dbh.getReadableDatabase();
-            dbh.openDataBase();
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-
-
-        Cursor cursor = db.rawQuery(selectQuery, null);
-        String[] data = null;// we need to use this later in order to store the message
-
-        if (cursor.moveToFirst()) {
-            do {
-                // get the  data into array,or class variable, instead i'm printing it for now
-
-                Log.i(TAG, DatabaseUtils.dumpCursorToString(cursor));
-
-            } while (cursor.moveToNext());
-
-
-        }
-        db.close();
+    public void readFromParcel(Parcel in) {
+        friendID = in.readString();
+        messageBody = in.readString();
+        isMyMsg = Boolean.parseBoolean(in.readString());
+        chatId = Integer.parseInt(in.readString());
 
     }
 }
