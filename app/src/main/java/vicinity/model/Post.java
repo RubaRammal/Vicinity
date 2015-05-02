@@ -15,6 +15,7 @@ public class Post  implements Serializable {
     private String postBody;
     private ArrayList<Comment> postComments;
     private String PhotoPath;
+    Photo aphoto;
 
     //Constructor
 
@@ -78,6 +79,9 @@ public class Post  implements Serializable {
            }
     public String getPhotoPath(){return  PhotoPath;}
     public void setPhotoPath(String PhotoPath){this.PhotoPath = PhotoPath;}
+    public void setPhoto(Photo photo){
+        photo = new Photo();
+    }
 
 
     /**

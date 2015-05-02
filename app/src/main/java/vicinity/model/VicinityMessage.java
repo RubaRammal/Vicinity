@@ -16,13 +16,14 @@ import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.Serializable;
 import java.sql.SQLException;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 
 
-public class VicinityMessage {
+public class VicinityMessage implements Serializable{
 
     private static final String TAG = "MessageClass";
     private static Context getApplicationContext;
@@ -38,6 +39,7 @@ public class VicinityMessage {
     private boolean isMyMsg;
     private String messageBody;
     private int chatId;
+    Photo aphoto;
 
     public VicinityMessage(){}
     /**
@@ -107,6 +109,9 @@ public class VicinityMessage {
 
     public void setChatId( int cid){
         chatId = cid;
+    }
+    public void setPhoto(Photo photo){
+        photo = new Photo();
     }
 
 

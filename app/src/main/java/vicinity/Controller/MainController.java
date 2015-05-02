@@ -376,9 +376,14 @@ public class MainController {
      * @return
      */
 
-    public Bitmap retrievePhoto(int ID){ //could be the id of the photo, post or VicinityMessage
+    public Bitmap retrievePhoto(int ID){ /*could be the id of the photo, post or VicinityMessage that is holding the photo.
+                                         we are still not sure if we should create an entire class for photo or
+                                         just save it as an attribute in Post and VicinityMessage classes
+                                         because we're still facing problems at the receiver side and we cannot
+                                         tell what's causing the problems-AMAL
+                                         */
 
-        String query = "select img  from table where feedid=" + ID;
+        String query = "select img  from table where id=" + ID;//we can change this query when we choose the table that will save the photo Blob-AMAL
         Cursor cur = database.rawQuery(query, null);
 
         if (cur.moveToFirst()){
