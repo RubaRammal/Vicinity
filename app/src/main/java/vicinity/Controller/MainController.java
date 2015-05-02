@@ -1,17 +1,25 @@
 package vicinity.Controller;
 
 
-import vicinity.model.*;
-
 import android.content.ContentValues;
 import android.content.Context;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteException;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.util.Log;
 
+import java.io.ByteArrayOutputStream;
 import java.sql.SQLException;
 import java.util.ArrayList;
+
+import vicinity.model.Comment;
+import vicinity.model.CurrentUser;
+import vicinity.model.DBHandler;
+import vicinity.model.Post;
+import vicinity.model.VicinityMessage;
+import vicinity.model.WiFiP2pService;
 
 
 public class MainController {
@@ -341,7 +349,50 @@ public class MainController {
         }
         return isAdded;}
 
+    /**
+     * This method inserts the photo into the db
+     * for now i'll leave it as a separate method until whether to create a
+     * new Photo class or just leave it as photoPath attribute in(Post and VicinityMessage)
+     * @param bitmap
+     * @return
+     */
 
+       public boolean insertPhoto(Bitmap bitmap) throws SQLException {
+           boolean isInserted;
+           ByteArrayOutputStream stream = new ByteArrayOutputStream();
+           bitmap.compress(Bitmap.CompressFormat.PNG, 0, stream);
+           byte[] byteArray = stream.toByteArray();
+           database = dbH.getReadableDatabase();
+           dbH.openDataBase();
+           ContentValues values = new ContentValues();
+           values.put("Photo" , byteArray);
+           isInserted=database.insert("Photo", null, values)>0;
+           dbH.close();
+      return isInserted;
+       }
+
+    /**
+     * Again this method retrieves the photo functions separately until we settle with a solution for the objects' structure
+     * @return
+     */
+
+    public Bitmap retrievePhoto(int ID){ //could be the id of the photo, post or VicinityMessage
+
+        String query = "select img  from table where feedid=" + ID;
+        Cursor cur = database.rawQuery(query, null);
+
+        if (cur.moveToFirst()){
+            byte[] imgByte = cur.getBlob(0);
+            cur.close();
+            return BitmapFactory.decodeByteArray(imgByte, 0, imgByte.length);
+        }
+        if (cur != null && !cur.isClosed()) {
+            cur.close();
+        }
+
+        return null ;
+
+    }
 
     /**
      +     * gets a post from the postList given its id
