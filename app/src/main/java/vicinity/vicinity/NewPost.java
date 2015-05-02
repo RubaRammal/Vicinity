@@ -2,6 +2,8 @@ package vicinity.vicinity;
 
 import android.content.Intent;
 import android.database.Cursor;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.graphics.Color;
 import android.graphics.drawable.ColorDrawable;
 import android.net.Uri;
@@ -9,6 +11,7 @@ import android.provider.MediaStore;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.ActionBarActivity;
 import android.os.Bundle;
+import android.util.Base64;
 import android.view.Gravity;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -22,6 +25,7 @@ import android.widget.Button;
 import android.util.Log;
 import android.widget.Toast;
 
+import java.io.ByteArrayOutputStream;
 import java.sql.SQLException;
 
 import vicinity.ConnectionManager.PostManager;
@@ -37,7 +41,7 @@ public class NewPost extends ActionBarActivity {
     private Button sendImgButton;
     private MainController mc ;
     private PostManager postManager;
-    private int SELECT_PICTURE = 1;
+    private static final int SELECT_PICTURE_ACTIVITY_REQUEST_CODE = 0;
     Post aPost;
 
 
@@ -94,11 +98,7 @@ public class NewPost extends ActionBarActivity {
 
             @Override
             public void onClick(View v) {
-                Intent i = new Intent(
-                        Intent.ACTION_PICK,
-                        android.provider.MediaStore.Images.Media.EXTERNAL_CONTENT_URI);
-
-                startActivityForResult(i, SELECT_PICTURE);
+                selectPicture();
 
             }
         });//END onClickListener
@@ -155,36 +155,47 @@ public class NewPost extends ActionBarActivity {
 
 
 
-
     @Override
-    public  void onActivityResult(int requestCode, int resultCode, Intent data){
-        super.onActivityResult(requestCode, resultCode, data);
+    protected void onActivityResult(int requestCode, int resultCode, Intent imageReturnedIntent) {
+        super.onActivityResult(requestCode, resultCode, imageReturnedIntent);
 
-        if (requestCode == SELECT_PICTURE && resultCode == RESULT_OK && null != data) {
-            Uri selectedImage = data.getData();
-            String[] filePathColumn = { MediaStore.Images.Media.DATA };
-
-            Cursor cursor = getContentResolver().query(selectedImage,
-                    filePathColumn, null, null, null);
-            cursor.moveToFirst();
-
-            int columnIndex = cursor.getColumnIndex(filePathColumn[0]);
-            String picturePath = cursor.getString(columnIndex);
-            Log.i(TAG, picturePath);
-            cursor.close();
-            sendPhotoObj(picturePath);
-
-
+        switch (requestCode) {
+            case SELECT_PICTURE_ACTIVITY_REQUEST_CODE:
+                if (resultCode == RESULT_OK) {
+                    Uri selectedImage = imageReturnedIntent.getData();
+                    String[] filePathColumn = {MediaStore.Images.Media.DATA};
+                    Cursor cursor = getContentResolver().query(selectedImage, filePathColumn, null, null, null);
+                    if (cursor.moveToFirst()) {
+                        int columnIndex = cursor.getColumnIndex(filePathColumn[0]);
+                        String filePath = cursor.getString(columnIndex);
+                        Bitmap bitmap = BitmapFactory.decodeFile(filePath);
+                        sendPhotoObj(bitmap);
+                    }
+                    cursor.close();
+                }
+                break;
         }
-
     }
 
-    public void sendPhotoObj( String photoPath)  {
-        aPost.setPhotoPath(photoPath);
-        Log.i(TAG, aPost.getPhotoPath());
+    public void sendPhotoObj(Bitmap b)  {
+        ByteArrayOutputStream baos = new ByteArrayOutputStream();
+        Bitmap resized = Bitmap.createScaledBitmap(b,(int)(b.getWidth()*0.3), (int)(b.getHeight()*0.3), true);
+        resized.compress(Bitmap.CompressFormat.JPEG, 5, baos);
+
+        Log.i(TAG, resized.getHeight()* resized.getWidth()+"");
+        byte[] imageBytes = baos.toByteArray();
+        String encodedImage = Base64.encodeToString(imageBytes, Base64.DEFAULT);
+        aPost.setBitmap(encodedImage);
         Toast.makeText(getApplicationContext(), "Photo attached to Post",
                 Toast.LENGTH_LONG).show();
     }
+
+    private void selectPicture() {
+        Intent intent = new Intent(Intent.ACTION_PICK);
+        intent.setType("image/*");
+        startActivityForResult(intent, SELECT_PICTURE_ACTIVITY_REQUEST_CODE);
+    }
+
 
 }
 

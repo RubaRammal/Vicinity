@@ -3,6 +3,7 @@ package vicinity.vicinity;
 import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+import android.util.Base64;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -10,6 +11,7 @@ import android.widget.BaseAdapter;
 import android.widget.ImageView;
 import android.widget.TextView;
 
+import java.io.ByteArrayOutputStream;
 import java.sql.SQLException;
 import java.util.ArrayList;
 
@@ -90,16 +92,18 @@ public class PostListAdapter  extends BaseAdapter {
 
         holder.txtName.setText(posts.get(position).getPostedBy());
 
-        try {
             holder.txtPost.setText(posts.get(position).getPostBody());
             holder.txtComments.setText("0 comments");
             holder.txtDate.setText(posts.get(position).getPostedAt());
-            Bitmap bitmap = BitmapFactory.decodeFile(posts.get(position).getPhotoPath());
-            holder.imageView.setImageBitmap(bitmap);
+
+        if(!posts.get(position).getBitmap().equals("")){
+            String imageBitmap = posts.get(position).getBitmap();
+            byte[] decodedString = Base64.decode(imageBitmap, Base64.DEFAULT);
+            Bitmap decodedByte = BitmapFactory.decodeByteArray(decodedString, 0, decodedString.length);
+            holder.imageView.setImageBitmap(decodedByte);
+
         }
-        catch (NullPointerException e){
-            e.printStackTrace();
-        }
+
 
         return convertView;
     }
@@ -108,4 +112,6 @@ public class PostListAdapter  extends BaseAdapter {
         TextView txtName, txtPost, txtComments, txtDate;
         ImageView imageView;
     }
+
+
 }

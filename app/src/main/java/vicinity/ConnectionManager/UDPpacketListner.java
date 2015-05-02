@@ -55,7 +55,7 @@ public class UDPpacketListner extends Service {
     }
     public void lsnToPostBroadcast(DatagramSocket socket)throws IOException {
 
-        byte[] buf = new byte[1024];
+        byte[] buf = new byte[69000];
         try {
             while (true) {
                 DatagramPacket packet = new DatagramPacket(buf, buf.length);
@@ -88,14 +88,7 @@ public class UDPpacketListner extends Service {
                 postListAdapter.updatePosts(posts);
 
 
-                //postListAdapter.addPost(p);
 
-                //String s = new String(packet.getData(), 0, packet.getLength());
-                // String senderIP = packet.getAddress().getHostAddress();
-                // Log.d(TAG, "Received response: "+s+" senderIP: "+senderIP);
-                // postListAdapter.addPost(new Post(new User(senderIP),s));
-                //broadcastIntent(senderIP,s);//-Lama
-                //TimelineSectionFragment.postToTimeline(new Post(new User(senderIP),s));
             }
         }
         catch (ClassNotFoundException e) {

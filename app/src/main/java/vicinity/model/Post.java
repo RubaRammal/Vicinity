@@ -1,5 +1,7 @@
 package vicinity.model;
 
+import android.graphics.Bitmap;
+
 import java.io.Serializable;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
@@ -16,12 +18,14 @@ public class Post  implements Serializable {
     private ArrayList<Comment> postComments;
     private int commentsCount;
     private String PhotoPath;
+    private String image;
 
         //Constructor
 
     //we need this in the MainController -Sarah
     public Post()
     {
+        image = "";
 
     }
 
@@ -33,6 +37,7 @@ public class Post  implements Serializable {
                 this.postedBy=postedBy;
                 postComments = new ArrayList<Comment>();
                 commentsCount=0;
+        image = "";
 
     }
 
@@ -46,6 +51,7 @@ public class Post  implements Serializable {
         this.postID = postID;
         postComments = new ArrayList<Comment>();
         commentsCount=0;
+        image = "";
     }
 
     //Setters and getters
@@ -94,6 +100,14 @@ public class Post  implements Serializable {
 
     public void setPhotoPath(String PhotoPath){
         this.PhotoPath = PhotoPath;}
+
+    public void setBitmap(String img){
+        image = img;
+    }
+
+    public String getBitmap(){
+        return image;
+    }
 
          /**
           * adds a comment to the ArrayList postComments
