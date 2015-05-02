@@ -38,14 +38,7 @@ public class TimelineSectionFragment extends Fragment {
     private MainController controller;
     private static ArrayList<Post> posts ;
     BroadcastReceiver updatePostList;
-    //private TimelineInterface tlCommander;
 
-    /* this is not tested - amjad
-    // Interface to communicate with PostComment activity
-    public interface TimelineInterface {
-        public void sendClickedPost(Post post);
-    }
-    */
     @Override
     public void onAttach(Activity activity) {
         super.onAttach(activity);
@@ -73,6 +66,7 @@ public class TimelineSectionFragment extends Fragment {
     public void onActivityCreated(Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
         Log.i(TAG,"onActivityCreated");
+        setRetainInstance(true);
         if (savedInstanceState != null) {
             // Restore last state for checked position.
         }

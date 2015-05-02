@@ -30,18 +30,19 @@ public class TabsActivity extends FragmentActivity implements ActionBar.TabListe
     private ImageButton muteButton;
     public static Context ctx;
     public static MainController controller;
+    private static Fragment timeline = new TimelineSectionFragment()
+            , neighbors = new NeighborSectionFragment(), chat = new MessagesSectionFragment(),
+            settings= new SettingsSectionFragment();
 
 
-
-    static NeighborSectionFragment neighborFragment;
 
     public void onCreate(Bundle savedInstanceState) {
 
         super.onCreate(savedInstanceState);
         ctx=TabsActivity.this;
         controller = new MainController(ctx);
-        //Handling unhandled exception
-       // Thread.setDefaultUncaughtExceptionHandler(new UnhandledExceptionHandler(this));
+
+
         //Starting the service
         startService(new Intent(this, ConnectAndDiscoverService.class));
         startService(new Intent(this, UDPpacketListner.class));
@@ -168,20 +169,20 @@ public class TabsActivity extends FragmentActivity implements ActionBar.TabListe
         public Fragment getItem(int i) {
             switch (i) {
                 case 0:
-                    return new TimelineSectionFragment();
+                    return timeline;
 
                 case 1:
-                    return new NeighborSectionFragment();
+                    return neighbors;
 
                 case 2:
-                    return new MessagesSectionFragment();
+                    return chat;
 
                 case 3:
-                    return new SettingsSectionFragment();
+                    return settings;
 
                 default:
                     // The other sections of the app are dummy placeholders.
-                    return new TimelineSectionFragment();
+                    return timeline;
             }
         }
 

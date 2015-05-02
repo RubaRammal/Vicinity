@@ -1,5 +1,6 @@
 package vicinity.vicinity;
 
+import android.app.Activity;
 import android.app.AlertDialog;
 import android.content.Context;
 import android.content.DialogInterface;
@@ -47,6 +48,46 @@ public class NeighborSectionFragment extends Fragment {
 
     public NeighborSectionFragment(){}
 
+    @Override
+    public void onAttach(Activity activity) {
+        super.onAttach(activity);
+        try {
+            Log.i(TAG, "OnAttach");
+        } catch (ClassCastException e) {
+            throw new ClassCastException(activity.toString()
+                    + " must implement TimelineInterface");
+        }
+    }
+
+    @Override
+    public void onDetach() {
+        super.onDetach();
+        Log.i(TAG, "OnDetach");
+    }
+
+    @Override
+    public void onSaveInstanceState(final Bundle outState) {
+        super.onSaveInstanceState(outState);
+        Log.i(TAG,"onSaveInstanceState");
+        //outState.putInt("jj",0);
+        //if(listOfServices.size()!=0)
+         //   outState.putSerializable("Users", listOfServices);
+
+    }
+    @Override
+    public void onActivityCreated(Bundle savedInstanceState) {
+        super.onActivityCreated(savedInstanceState);
+        Log.i(TAG,"onActivityCreated");
+        setRetainInstance(true);
+        if (savedInstanceState != null) {
+            Log.i(TAG,"SavedInstance!=null");
+            //listOfServices = (ArrayList<WiFiP2pService>)savedInstanceState.getSerializable("Users");
+           // neighborListAdapter.notifyDataSetChanged();
+
+            // Restore last state for checked position.
+        }
+
+    }
 
 
     @Override

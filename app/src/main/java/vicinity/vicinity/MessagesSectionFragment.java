@@ -31,6 +31,39 @@ public class MessagesSectionFragment extends Fragment {
     public MessagesSectionFragment(){}
 
     @Override
+    public void onAttach(Activity activity) {
+        super.onAttach(activity);
+        try {
+            Log.i(TAG, "OnAttach");
+        } catch (ClassCastException e) {
+            throw new ClassCastException(activity.toString()
+                    + " must implement TimelineInterface");
+        }
+    }
+
+    @Override
+    public void onDetach() {
+        super.onDetach();
+        Log.i(TAG, "OnDetach");
+    }
+
+    @Override
+    public void onSaveInstanceState(final Bundle outState) {
+        super.onSaveInstanceState(outState);
+        Log.i(TAG,"onSaveInstanceState");
+
+    }
+    @Override
+    public void onActivityCreated(Bundle savedInstanceState) {
+        super.onActivityCreated(savedInstanceState);
+        Log.i(TAG,"onActivityCreated");
+        setRetainInstance(true);
+        if (savedInstanceState != null) {
+            // Restore last state for checked position.
+        }
+
+    }
+    @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         View rootView = inflater.inflate(R.layout.fragment_messages, container, false);
@@ -100,13 +133,6 @@ public class MessagesSectionFragment extends Fragment {
         return rootView;
     }
 
-
-   /* @Override
-    public void onAttach(Activity activity) {
-        super.onAttach(activity);
-        adapter.notifyDataSetChanged();
-
-    }*/
 
 
     public ArrayList<VicinityMessage> getMsgs(){

@@ -33,13 +33,6 @@ public class FriendListAdapter extends BaseAdapter {
 
     }
 
-    public void setServices(ArrayList<WiFiP2pService> s){
-        if(s.size()!=0) {
-            for (int i = 0; i < s.size(); i++) {
-                services.add(s.get(i));
-            }
-        }
-    }
 
 
     @Override

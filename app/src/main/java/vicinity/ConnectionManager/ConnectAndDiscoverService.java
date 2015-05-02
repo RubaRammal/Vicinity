@@ -22,7 +22,6 @@ import java.io.IOException;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.sql.SQLException;
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
 import vicinity.Controller.MainController;
@@ -52,8 +51,6 @@ public class ConnectAndDiscoverService extends Service
     private Channel channel;
     private BroadcastReceiver receiver = null;
     private WifiP2pDnsSdServiceRequest serviceRequest;
-    public static ArrayList<WiFiP2pService> neighbors = new ArrayList<WiFiP2pService>();
-    public static ArrayList<WiFiP2pService> friends = new ArrayList<WiFiP2pService>();
     public static NeighborListAdapter neighborListAdapter;
     public static FriendListAdapter friendListAdapter;
     public MainController controller;
@@ -146,18 +143,14 @@ public class ConnectAndDiscoverService extends Service
                                 WiFiP2pService service = new WiFiP2pService(srcDevice);
                                 service.setServiceRegistrationType(registrationType);
                                 Log.i(TAG, "Name: " + service.getInstanceName() + " Address: " + service.getDeviceAddress());
-                                Log.i(TAG, "is this my friend? "+controller.isThisMyFriend("3a:aa:3c:64:08:b0"));
+
                                 if(controller.isThisMyFriend(srcDevice.deviceAddress))
                                 {
-                                  //friends.add(service);
-                                  //friendListAdapter.setServices(friends);
-                                  //friendListAdapter.notifyDataSetChanged();
+
                                     NeighborSectionFragment.addToFriendsList(service);
                                 }
                                 else{
-                                 //neighbors.add(service);
-                                 //neighborListAdapter.setServices(neighbors);
-                                 //neighborListAdapter.notifyDataSetChanged();
+
                                     NeighborSectionFragment.addToNeighborssList(service);
                                 }
 

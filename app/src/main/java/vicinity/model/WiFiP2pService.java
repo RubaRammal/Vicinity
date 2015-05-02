@@ -2,11 +2,14 @@
 package vicinity.model;
 
 import android.net.wifi.p2p.WifiP2pDevice;
+import android.os.Parcelable;
+
+import java.io.Serializable;
 
 /**
  * A structure to hold service information.
  */
-public class WiFiP2pService {
+public class WiFiP2pService{
     protected WifiP2pDevice device;
     protected String instanceName;
     protected String serviceRegistrationType;
