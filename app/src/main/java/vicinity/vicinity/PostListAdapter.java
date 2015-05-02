@@ -51,8 +51,9 @@ public class PostListAdapter  extends BaseAdapter {
         }
     }
 
-    public void addPostToList(Post p){
+    public void addPost(Post p){
         posts.add(p);
+        notifyDataSetChanged();
     }
 
     @Override

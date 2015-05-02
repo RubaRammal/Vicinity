@@ -1,9 +1,13 @@
 package vicinity.vicinity;
 
+import android.app.Activity;
+import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
+import android.content.IntentFilter;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
+import android.support.v4.content.LocalBroadcastManager;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -12,6 +16,7 @@ import android.widget.AdapterView;
 import android.widget.Button;
 import android.widget.ListView;
 
+import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Timer;
 import java.util.TimerTask;
@@ -32,6 +37,7 @@ public class TimelineSectionFragment extends Fragment {
     private static String TAG = "Timeline";
     private MainController controller;
     private static ArrayList<Post> posts ;
+    BroadcastReceiver updatePostList;
     //private TimelineInterface tlCommander;
 
     /* this is not tested - amjad
@@ -39,12 +45,12 @@ public class TimelineSectionFragment extends Fragment {
     public interface TimelineInterface {
         public void sendClickedPost(Post post);
     }
-
+    */
     @Override
     public void onAttach(Activity activity) {
         super.onAttach(activity);
         try {
-            tlCommander = (TimelineInterface)  activity;
+            Log.i(TAG, "OnAttach");
         } catch (ClassCastException e) {
             throw new ClassCastException(activity.toString()
                     + " must implement TimelineInterface");
@@ -54,10 +60,24 @@ public class TimelineSectionFragment extends Fragment {
     @Override
     public void onDetach() {
         super.onDetach();
-        tlCommander = null;
-    }*/
+         Log.i(TAG, "OnDetach");
+    }
 
+    @Override
+    public void onSaveInstanceState(final Bundle outState) {
+        super.onSaveInstanceState(outState);
+        Log.i(TAG,"onSaveInstanceState");
 
+    }
+    @Override
+    public void onActivityCreated(Bundle savedInstanceState) {
+        super.onActivityCreated(savedInstanceState);
+        Log.i(TAG,"onActivityCreated");
+        if (savedInstanceState != null) {
+            // Restore last state for checked position.
+        }
+
+    }
 
 
     @Override
@@ -91,6 +111,28 @@ public class TimelineSectionFragment extends Fragment {
                     }
                 }
         ); //END setOnItemClickListener
+        updatePostList = new BroadcastReceiver() {
+            @Override
+            public void onReceive(Context context, Intent intent) {
+                Log.i(TAG,"onReceive");
+                final Bundle bundle = intent.getExtras();
+                Post receivedPost = (Post) bundle.getSerializable("NEW_POST");
+                Log.i(TAG,"Received in timeline: "+receivedPost.toString());
+                adapter.addPost(receivedPost);
+
+                try{
+                    controller.addPost(receivedPost);}
+                catch (SQLException e){
+                    e.printStackTrace();
+                }
+
+
+
+            }
+        };
+        LocalBroadcastManager.getInstance(getActivity()).registerReceiver((updatePostList),
+                new IntentFilter("POST")
+        );
 
         //When Post is clicked
         addPost.setOnClickListener(
@@ -135,18 +177,6 @@ public class TimelineSectionFragment extends Fragment {
         }
     };
 
-    /**
-     * sends post form NewPost activity to TimelineSectionFragment
-     * @param  aPost the post to be added to posts list
-     */
-    public static void postToTimeline (Post aPost) {
-        if (aPost != null) {
-            posts.add(aPost);
-            adapter.notifyDataSetChanged();
-        }
-        else
-            Log.i(TAG, "Post object is null");
-    } //END postToTimeline
 
 
 }
