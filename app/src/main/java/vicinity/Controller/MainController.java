@@ -1,8 +1,6 @@
 package vicinity.Controller;
 
 
-import vicinity.model.*;
-
 import android.content.ContentValues;
 import android.content.Context;
 import android.database.Cursor;
@@ -15,6 +13,14 @@ import org.json.JSONObject;
 
 import java.sql.SQLException;
 import java.util.ArrayList;
+
+import vicinity.model.Comment;
+import vicinity.model.CurrentUser;
+import vicinity.model.DBHandler;
+import vicinity.model.JSONUtils;
+import vicinity.model.Post;
+import vicinity.model.VicinityMessage;
+import vicinity.model.WiFiP2pService;
 
 
 public class MainController {
@@ -92,7 +98,7 @@ public class MainController {
             cursor = database.rawQuery(query,null);
 
             if(cursor.moveToFirst())
-            username2=cursor.getString(cursor.getColumnIndex("Username"));
+                username2=cursor.getString(cursor.getColumnIndex("Username"));
             cursor.close();
             dbH.close();
             return username2;
@@ -186,36 +192,36 @@ public class MainController {
 
     public ArrayList<Friend> viewFriendsList(){
 
-        friendsList=new ArrayList<>();
+    friendsList=new ArrayList<>();
 
-        try{
-            database=dbH.getReadableDatabase();
-            dbH.openDataBase();
-            String query="SELECT * FROM Friend";
-            cursor = database.rawQuery(query,null);
-            if (cursor.moveToFirst()) {
-                do {
+    try{
+    database=dbH.getReadableDatabase();
+    dbH.openDataBase();
+    String query="SELECT * FROM Friend";
+    cursor = database.rawQuery(query,null);
+    if (cursor.moveToFirst()) {
+    do {
 
-                    Friend myFriend = new Friend();
-                    myFriend.setInstanceName(cursor.getString(1)); //getting username from database column #: 1
-                    //myFriend.setStatus(myFriend.isOnline());
-                    myFriend.setAliasName(cursor.getString(3));
-                    friendsList.add(myFriend);
+    Friend myFriend = new Friend();
+    myFriend.setInstanceName(cursor.getString(1)); //getting username from database column #: 1
+    //myFriend.setStatus(myFriend.isOnline());
+    myFriend.setAliasName(cursor.getString(3));
+    friendsList.add(myFriend);
 
-                } while (cursor.moveToNext());
-            }
-            else{
-                Log.i(TAG, "There are no friends in the DB.");
-            }
-            cursor.close();
-            dbH.close();
-        }
-        catch(SQLException e){
-            Log.i(TAG,"SQLException > viewFriendsList > MainController");
-            e.printStackTrace();
-        }
+    } while (cursor.moveToNext());
+    }
+    else{
+    Log.i(TAG, "There are no friends in the DB.");
+    }
+    cursor.close();
+    dbH.close();
+    }
+    catch(SQLException e){
+    Log.i(TAG,"SQLException > viewFriendsList > MainController");
+    e.printStackTrace();
+    }
 
-        return friendsList;}//end of viewFriendsList
+    return friendsList;}//end of viewFriendsList
      */
     /**
      * This method calls nameValidation from MainController to validate the new username
@@ -289,21 +295,22 @@ public class MainController {
             String query = "SELECT * FROM Post WHERE 1";
             Cursor c = database.rawQuery(query, null);
             if (c.moveToFirst())
-            {
-                do
-                {
+                do {
+
                     Post post = new Post();
                     post.setPostBody(c.getString(c.getColumnIndex("postBody")));
                     post.setPostedBy(c.getString(c.getColumnIndex("postedBy")));
                     post.setPostedAt(c.getString(c.getColumnIndex("postedAt")));
                     post.setPostID(Integer.valueOf(c.getString(c.getColumnIndex("_id"))));
-                     //post.setPostedBy(new User(c.getString(2)));
+                    // post.setBitmap(c.getString(c.getColumnIndex("image")));
+
+
+                    //post.setPostedBy(new User(c.getString(2)));
                     //contact.setPicture(c.getBlob(3));
 
                     // Adding post to postList
                     postList.add(post);
                 } while (c.moveToNext());
-            }
 
             else
             {
@@ -337,6 +344,9 @@ public class MainController {
             values.put("postBody", post.getPostBody());
             values.put("postedBy", post.getPostedBy());
             values.put("postedAt", post.getPostedAt());
+            Log.i(TAG, "PHOTO INSERTED TO DATABASE");
+            values.put("image", post.getBitmap());
+
             isAdded=database.insert("Post", null, values)>0;
             dbH.close();
         }
@@ -353,36 +363,37 @@ public class MainController {
      +     * @param postID The integer id of the selected post.
      +     * @return returns the post.
      +     */
-        public Post getPost(int postID)
+    public Post getPost(int postID)
+    {
+        Post post = null;
+        try
         {
-               Post post = null;
-                try
-                {
-                           database = dbH.getReadableDatabase();
-                   dbH.openDataBase();
-                    String query = "SELECT * FORM Post WHERE postID="+"'"+postID+"'";
-                   Cursor c = database.rawQuery(query, null);
-                    if (c.moveToFirst()) {
-                            post = new Post();
-                            post.setPostID(c.getColumnIndex("_id"));
-                            post.setPostBody(c.getString(c.getColumnIndex("postBody")));
-                            post.setPostedBy(c.getString(c.getColumnIndex("postedBy")));
-                                                    //contact.setPicture(c.getBlob(3));
-                               }
-                    else
-                    {
-                                Log.i(TAG, "This postID doesn't exist in the DB.");
-                    }
-                   dbH.close();
-               }
-               catch (SQLException e)
-                {
-                            e.printStackTrace();
-                    Log.i(TAG, "Error in getting post from DB.");
+            database = dbH.getReadableDatabase();
+            dbH.openDataBase();
+            String query = "SELECT * FORM Post WHERE postID="+"'"+postID+"'";
+            Cursor c = database.rawQuery(query, null);
+            if (c.moveToFirst()) {
+                post = new Post();
+                post.setPostID(c.getColumnIndex("_id"));
+                post.setPostBody(c.getString(c.getColumnIndex("postBody")));
+                post.setPostedBy(c.getString(c.getColumnIndex("postedBy")));
+                // post.setBitmap(c.getString(c.getColumnIndex("image")));
+                //contact.setPicture(c.getBlob(3));
+            }
+            else
+            {
+                Log.i(TAG, "This postID doesn't exist in the DB.");
+            }
+            dbH.close();
+        }
+        catch (SQLException e)
+        {
+            e.printStackTrace();
+            Log.i(TAG, "Error in getting post from DB.");
 
-                        }
-                return post;
-            } //END getPost
+        }
+        return post;
+    } //END getPost
 
 
     public Post getPost2(int id){
@@ -397,81 +408,81 @@ public class MainController {
         return p;
     }
 
-                /**
-          * Fetches the comments on a specified post
-          * @param postID the integer id of the selected post
-          * @return an ArrayList containing all comments on the specified post
-          */
-                public ArrayList<Comment> getPostComments(int postID)
+    /**
+     * Fetches the comments on a specified post
+     * @param postID the integer id of the selected post
+     * @return an ArrayList containing all comments on the specified post
+     */
+    public ArrayList<Comment> getPostComments(int postID)
+    {
+        commentsList = new ArrayList<Comment>();
+        try
         {
-               commentsList = new ArrayList<Comment>();
-                try
+            database = dbH.getReadableDatabase();
+            dbH.openDataBase();
+            String query = "SELECT * FROM Comment WHERE postID="+"'"+postID+"'";
+            Cursor c = database.rawQuery(query, null);
+            if (c.moveToFirst())
+            {
+                do
                 {
-                           database = dbH.getReadableDatabase();
-                   dbH.openDataBase();
-                   String query = "SELECT * FROM Comment WHERE postID="+"'"+postID+"'";
-                   Cursor c = database.rawQuery(query, null);
-                   if (c.moveToFirst())
-                        {
-                                    do
-                            {
-                                        Comment comment = new Comment ();
-                           comment.setCommentBody(c.getString(c.getColumnIndex("commentBody")));
-                           comment.setCommentedBy(c.getString(c.getColumnIndex("commentedBy")));
-                           comment.setCommentID(c.getColumnIndex("commentID"));
+                    Comment comment = new Comment ();
+                    comment.setCommentBody(c.getString(c.getColumnIndex("commentBody")));
+                    comment.setCommentedBy(c.getString(c.getColumnIndex("commentedBy")));
+                    comment.setCommentID(c.getColumnIndex("commentID"));
 
-                                    // Adding comment to commentsList
-                                           commentsList.add(comment);
-                        } while (c.moveToNext());
-                    }
-                    else
-                    {
-                                Log.i(TAG, "There are no comments on the specified post.");
-                   }
-                   dbH.close();
-               }
-               catch (SQLException e)
-               {
-                           e.printStackTrace();
-                   Log.i(TAG, "Error in getting comments from DB.");
-
-                       }
-
-                       return commentsList;
-           } //END getPostComments
-
-                public boolean addAcomment(Comment comment) {
-                boolean isAdded = false;
-                try
-                {
-                            database = dbH.getReadableDatabase();
-                    dbH.openDataBase();
-                    ContentValues values = new ContentValues();
-                   values.put("commentBody", comment.getCommentBody());
-                    values.put("commentedBy", comment.getCommentedBy());
-                    values.put("postID", comment.getCommentID());
-                    isAdded=database.insert("Comment", null, values)>0;
-                    dbH.close();
-                }
-                catch(SQLException e)
-                {
-                            e.printStackTrace();
-                    Log.i(TAG, "Error in adding comments to DB.");
-                }
-                return isAdded;
-            } //END addAcomment
-
-                //still working on these methods - amjad
-                public boolean deleteAcomment () {
-                return true;
+                    // Adding comment to commentsList
+                    commentsList.add(comment);
+                } while (c.moveToNext());
             }
+            else
+            {
+                Log.i(TAG, "There are no comments on the specified post.");
+            }
+            dbH.close();
+        }
+        catch (SQLException e)
+        {
+            e.printStackTrace();
+            Log.i(TAG, "Error in getting comments from DB.");
 
-                public boolean deleteAllcomments () {
-                return true;
-            }
-        public boolean deleteAllPosts () {
-                return true;
-            }
+        }
+
+        return commentsList;
+    } //END getPostComments
+
+    public boolean addAcomment(Comment comment) {
+        boolean isAdded = false;
+        try
+        {
+            database = dbH.getReadableDatabase();
+            dbH.openDataBase();
+            ContentValues values = new ContentValues();
+            values.put("commentBody", comment.getCommentBody());
+            values.put("commentedBy", comment.getCommentedBy());
+            values.put("postID", comment.getCommentID());
+            isAdded=database.insert("Comment", null, values)>0;
+            dbH.close();
+        }
+        catch(SQLException e)
+        {
+            e.printStackTrace();
+            Log.i(TAG, "Error in adding comments to DB.");
+        }
+        return isAdded;
+    } //END addAcomment
+
+    //still working on these methods - amjad
+    public boolean deleteAcomment () {
+        return true;
+    }
+
+    public boolean deleteAllcomments () {
+        return true;
+    }
+    public boolean deleteAllPosts () {
+        return true;
+    }
 
 
     /*------------------------------Works------------------------------*/
@@ -543,6 +554,7 @@ public class MainController {
 
                     msg = new VicinityMessage();
                     msg.setMessageBody(c.getString(3));
+
                     msg.setFriendID(c.getString(2));
                     msg.setChatId(c.getInt(c.getColumnIndex("chatId")));
 
