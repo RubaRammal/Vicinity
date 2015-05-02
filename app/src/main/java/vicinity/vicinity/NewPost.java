@@ -7,22 +7,21 @@ import android.graphics.BitmapFactory;
 import android.graphics.Color;
 import android.graphics.drawable.ColorDrawable;
 import android.net.Uri;
+import android.os.Bundle;
 import android.provider.MediaStore;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.ActionBarActivity;
-import android.os.Bundle;
+import android.text.Editable;
+import android.text.TextWatcher;
 import android.util.Base64;
+import android.util.Log;
 import android.view.Gravity;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
-import android.widget.TextView;
-import android.text.Editable;
-import android.text.TextUtils;
-import android.text.TextWatcher;
-import android.widget.EditText;
 import android.widget.Button;
-import android.util.Log;
+import android.widget.EditText;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import java.io.ByteArrayOutputStream;
@@ -31,8 +30,6 @@ import java.sql.SQLException;
 import vicinity.ConnectionManager.PostManager;
 import vicinity.Controller.MainController;
 import vicinity.model.Post;
-
-import static vicinity.vicinity.TimelineSectionFragment.*;
 
 public class NewPost extends ActionBarActivity {
 
@@ -139,11 +136,10 @@ public class NewPost extends ActionBarActivity {
 
             postManager.execute();
 
-
-                           /* if (mc.addPost(aPost))
-                                Log.i(TAG, "post is saved to DB");
-                            else
-                                Log.i(TAG, "post is not saved to DB")*/
+               if (mc.addPost(aPost))
+                  Log.i(TAG, "post is saved to DB");
+               else
+                  Log.i(TAG, "post is not saved to DB");
 
         } catch (SQLException e) {
             e.printStackTrace();
