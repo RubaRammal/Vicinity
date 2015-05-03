@@ -44,6 +44,8 @@ public class NeighborSectionFragment extends Fragment {
 
     public interface DeviceClickListener {
         public void connectP2p(WiFiP2pService wifiP2pService);
+        public void chatWithFriend(WiFiP2pService wiFiP2pService);
+
     }
 
     public NeighborSectionFragment(){}
@@ -58,7 +60,11 @@ public class NeighborSectionFragment extends Fragment {
                     + " must implement TimelineInterface");
         }
     }
-
+    @Override
+    public void onDestroy(){
+        super.onDestroy();
+        Log.i(TAG,"onDestroy");
+    }
     @Override
     public void onDetach() {
         super.onDetach();
@@ -69,9 +75,9 @@ public class NeighborSectionFragment extends Fragment {
     public void onSaveInstanceState(final Bundle outState) {
         super.onSaveInstanceState(outState);
         Log.i(TAG,"onSaveInstanceState");
-        //outState.putInt("jj",0);
-        //if(listOfServices.size()!=0)
-         //   outState.putSerializable("Users", listOfServices);
+        if(listOfServices.size()!=0){
+            outState.putParcelableArrayList("Neighbors",listOfServices);
+        }
 
     }
     @Override
@@ -81,10 +87,9 @@ public class NeighborSectionFragment extends Fragment {
         setRetainInstance(true);
         if (savedInstanceState != null) {
             Log.i(TAG,"SavedInstance!=null");
-            //listOfServices = (ArrayList<WiFiP2pService>)savedInstanceState.getSerializable("Users");
-           // neighborListAdapter.notifyDataSetChanged();
-
-            // Restore last state for checked position.
+           //Restore state here
+            listOfServices= savedInstanceState.getParcelableArrayList("Neighbors");
+            neighborListAdapter.notifyDataSetChanged();
         }
 
     }
@@ -126,6 +131,7 @@ public class NeighborSectionFragment extends Fragment {
         //Utility.setListViewHeightBasedOnChildren(lvf);
         //neighborListAdapter.notifyDataSetChanged();
 
+        TextView neighborText = (TextView) rootView.findViewById(R.id.request);
 
         lvn.setOnItemClickListener(new AdapterView.OnItemClickListener() {
 
@@ -134,37 +140,8 @@ public class NeighborSectionFragment extends Fragment {
                 Log.i(TAG,"Clicked: "+neighborListAdapter.getItem(position).toString()) ;
                 final WiFiP2pService neighbor = (WiFiP2pService) neighborListAdapter.getItem(position);
                 final int p = position;
-                new AlertDialog.Builder(getActivity())
-                        .setTitle("Friendship Request")
-                        .setMessage("Do you want to add "+neighbor.getInstanceName()+" as a friend?")
-                        .setPositiveButton(android.R.string.yes, new DialogInterface.OnClickListener() {
-                            public void onClick(DialogInterface dialog, int which) {
-                                try{
-                                boolean isAdded = controller.addFriend(neighbor.getInstanceName(),neighbor.getDeviceAddress());
-                                    if(isAdded){
-                                ((DeviceClickListener) ConnectAndDiscoverService.ctx).connectP2p((WiFiP2pService) neighborListAdapter
-                                        .getItem(p));
-                                    friendServices.add(neighbor);
-                                    friendListAdapter.notifyDataSetChanged();
-                                    listOfServices.remove(neighbor);
-                                    neighborListAdapter.notifyDataSetChanged();
-                                    }
-                                }
-                                catch(SQLException e){
-                                    e.printStackTrace();
-                                }
-
-                            }
-                        })
-                        .setNegativeButton(android.R.string.no, new DialogInterface.OnClickListener() {
-                            public void onClick(DialogInterface dialog, int which) {
-                                Log.i(TAG, "no");
-
-                            }
-                        })
-                        .setIcon(android.R.drawable.ic_dialog_alert)
-                        .show();
-
+                ((DeviceClickListener) ConnectAndDiscoverService.ctx).connectP2p((WiFiP2pService) neighborListAdapter
+                        .getItem(p));
             }
         });
 
@@ -179,6 +156,12 @@ public class NeighborSectionFragment extends Fragment {
                 friendListAdapter.notifyDataSetChanged();
                 neighborListAdapter.notifyDataSetChanged();
             }
+        public static void updateAddedFriend(WiFiP2pService neighbor){
+            friendServices.add(neighbor);
+            friendListAdapter.notifyDataSetChanged();
+            listOfServices.remove(neighbor);
+            neighborListAdapter.notifyDataSetChanged();
+        }
 
     public static void addToFriendsList(WiFiP2pService friend){
         friendServices.add(friend);

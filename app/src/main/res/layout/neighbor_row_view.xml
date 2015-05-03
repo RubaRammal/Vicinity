@@ -20,7 +20,7 @@
         android:layout_height="wrap_content"
         android:id="@+id/request"
         android:textSize="10sp"
-        android:text="Tab to send a request..."
+        android:text="Tap to connect..."
         android:layout_below="@+id/neighbor_row"
         android:layout_alignParentLeft="true"
         android:layout_alignParentStart="true"

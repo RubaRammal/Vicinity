@@ -293,7 +293,13 @@ public class ConnectAndDiscoverService extends Service
 
         //Starting a new chat activity with a connected peer.
         startChatting();
+
     }
+    @Override
+    public void chatWithFriend(WiFiP2pService friend){
+        startChatting();
+    }
+
 
     public void startChatting(){
         Intent intent = new Intent();

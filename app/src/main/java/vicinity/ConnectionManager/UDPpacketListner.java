@@ -3,6 +3,7 @@ package vicinity.ConnectionManager;
 import android.app.Service;
 import android.content.Intent;
 import android.os.IBinder;
+import android.support.v4.content.LocalBroadcastManager;
 import android.util.Log;
 
 import java.io.ByteArrayInputStream;
@@ -25,8 +26,12 @@ public class UDPpacketListner extends Service {
     Integer port = Globals.SERVER_PORT;
     ArrayList<Post> posts = new ArrayList<>();
     static PostListAdapter postListAdapter;
+    LocalBroadcastManager updateUIThread;
 
-
+    public void onCreate(){
+        super.onCreate();
+        updateUIThread= LocalBroadcastManager.getInstance(this);
+    }
 
     Thread UDPBroadcastThread;
     @Override
@@ -38,7 +43,6 @@ public class UDPpacketListner extends Service {
                     socket = new DatagramSocket(null);
                     socket.setReuseAddress(true);
                     SocketAddress socketAddr = new InetSocketAddress(port);
-
                     socket.setBroadcast(true);
                     socket.bind(socketAddr);
                     lsnToPostBroadcast(socket);
@@ -62,31 +66,13 @@ public class UDPpacketListner extends Service {
                 socket.setBroadcast(true);
                 socket.receive(packet);
                 byte[] data = packet.getData();
-                //TESSTTT
                 ByteArrayInputStream inputStream = new ByteArrayInputStream(data);
                 ObjectInputStream objectInputStream = new ObjectInputStream(inputStream);
                 String senderIP = packet.getAddress().getHostAddress();
                 Post p = (Post) objectInputStream.readObject();
                 Log.i(TAG,"received object: "+p.getPostBody()+" from: "+senderIP+" "+p.getPostedBy()+" posted at: "+p.getPostedAt());
 
-                Boolean isPosted = true;
-
-                /*for(int i=0; i<posts.size(); i++){
-                    if(!(p.getPostBody().equals(posts.get(i).getPostBody())) &&
-                            !(p.getPostedBy().equals(posts.get(i).getPostedBy()))){
-                        isPosted = false;
-                    }
-                    else{
-                        isPosted = true;
-                    }
-                }
-
-                if(isPosted)*/
-
-                posts.add(p);
-
-                postListAdapter.updatePosts(posts);
-
+                updateUIPosts(p);
 
 
             }
@@ -96,12 +82,13 @@ public class UDPpacketListner extends Service {
         }
     }
 
-    private void broadcastIntent(String senderIP, String message) {
-        Intent intent = new Intent(this,TimelineSectionFragment.class);
-        intent.putExtra("sender", senderIP);
-        intent.putExtra("message", message);
-        sendBroadcast(intent);
+    private void updateUIPosts(Post p) {
+        Log.i(TAG,"updateUIPosts");
+        Intent intent = new Intent("POST");
+        intent.putExtra("NEW_POST", p);
+        updateUIThread.sendBroadcast(intent);
     }
+
 
     public UDPpacketListner() {
     }

@@ -131,11 +131,8 @@ public class NewPost extends ActionBarActivity {
             //Can send post only if connected to a network
             if(Globals.isConnectedToANetwork){
                 aPost.setPostBody(postText);
-
                 aPost.setPostedBy(mc.retrieveCurrentUsername());
-
                 postManager.setPost(aPost);
-
                 postManager.execute();
                 finish();
 
@@ -150,7 +147,6 @@ public class NewPost extends ActionBarActivity {
 
         } catch (SQLException e) {
             e.printStackTrace();
-            Log.i(TAG, "A problem in adding post to DB");
         }
     }
 

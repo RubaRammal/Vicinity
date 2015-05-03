@@ -338,11 +338,15 @@ public class MainController {
             values.put("postedBy", post.getPostedBy());
             values.put("postedAt", post.getPostedAt());
             isAdded=database.insert("Post", null, values)>0;
-            dbH.close();
+
         }
         catch(SQLException e)
         {
             e.printStackTrace();
+        }
+        finally{
+            if(database!=null && database.isOpen())
+                dbH.close();
         }
         return isAdded;}
 

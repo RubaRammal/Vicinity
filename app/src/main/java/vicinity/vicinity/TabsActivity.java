@@ -14,7 +14,6 @@ import android.view.View;
 import android.view.Window;
 import android.widget.ImageButton;
 import android.content.Context;
-
 import vicinity.ConnectionManager.UDPpacketListner;
 import vicinity.ConnectionManager.ConnectAndDiscoverService;
 import vicinity.Controller.MainController;
@@ -35,10 +34,18 @@ public class TabsActivity extends FragmentActivity implements ActionBar.TabListe
             settings= new SettingsSectionFragment();
 
 
-
+    Fragment neghbors = new Fragment();
     public void onCreate(Bundle savedInstanceState) {
 
         super.onCreate(savedInstanceState);
+
+        /*------saving instance-----*/
+        if(savedInstanceState!=null){
+            neghbors =  getSupportFragmentManager().getFragment(
+                    savedInstanceState, "NeighborsFragment");
+        }
+
+
         ctx=TabsActivity.this;
         controller = new MainController(ctx);
 
@@ -77,6 +84,7 @@ public class TabsActivity extends FragmentActivity implements ActionBar.TabListe
                 actionBar.setSelectedNavigationItem(position);
             }
         });
+        mViewPager.setOffscreenPageLimit(4);
 
         //TabsActivity layout (icons + text)
         final int[] LAYOUTS = new int[] {
@@ -105,6 +113,11 @@ public class TabsActivity extends FragmentActivity implements ActionBar.TabListe
 
 
     /********************Overridden Activity methods****************************/
+    @Override
+    protected void onSaveInstanceState(Bundle outState) {
+        super.onSaveInstanceState(outState);
+        getSupportFragmentManager().putFragment(outState, "NeighborsFragment", neighbors);
+    }
     @Override
     public void onResume() {
         super.onResume();
@@ -143,12 +156,16 @@ public class TabsActivity extends FragmentActivity implements ActionBar.TabListe
     /********************TabsActivity Methods****************************/
     @Override
     public void onTabUnselected(ActionBar.Tab tab, FragmentTransaction fragmentTransaction) {
+
     }
+
 
     @Override
     public void onTabSelected(ActionBar.Tab tab, FragmentTransaction fragmentTransaction) {
         // When the given tab is selected, switch to the corresponding page in the ViewPager.
         mViewPager.setCurrentItem(tab.getPosition());
+
+
     }
 
     @Override

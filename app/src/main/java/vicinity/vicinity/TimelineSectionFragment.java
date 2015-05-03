@@ -36,7 +36,7 @@ public class TimelineSectionFragment extends Fragment {
     private Context ctx;
     private static String TAG = "Timeline";
     private MainController controller;
-    private static ArrayList<Post> posts ;
+    //private static ArrayList<Post> posts ;
     BroadcastReceiver updatePostList;
 
     @Override
@@ -81,14 +81,15 @@ public class TimelineSectionFragment extends Fragment {
 
         ctx = this.getActivity();
         controller = new MainController(ctx);
-        posts = new ArrayList<Post>();
-        posts.addAll(controller.viewAllPosts());
-        Button addPost = (Button) rootView.findViewById(R.id.add_post);
+        //posts = new ArrayList<Post>();
+        //posts.addAll(controller.viewAllPosts());
+        final Button addPost = (Button) rootView.findViewById(R.id.add_post);
 
         final ListView lv = (ListView) rootView.findViewById(android.R.id.list);
-        adapter = new PostListAdapter(this.getActivity(), posts);
-        UDPpacketListner.setPostListAdapter(adapter);
-        adapter.notifyDataSetChanged();
+        //adapter = new PostListAdapter(this.getActivity(), posts);
+        adapter = new PostListAdapter(this.getActivity());
+        //UDPpacketListner.setPostListAdapter(adapter);
+        //adapter.notifyDataSetChanged();
         lv.setAdapter(adapter);
         lv.setOnItemClickListener(
                 new AdapterView.OnItemClickListener() {
@@ -105,6 +106,7 @@ public class TimelineSectionFragment extends Fragment {
                     }
                 }
         ); //END setOnItemClickListener
+
         updatePostList = new BroadcastReceiver() {
             @Override
             public void onReceive(Context context, Intent intent) {
@@ -137,7 +139,7 @@ public class TimelineSectionFragment extends Fragment {
                     }
                 }
         );
-
+    /*
         try {
 
         Timer myTimer;
@@ -154,12 +156,12 @@ public class TimelineSectionFragment extends Fragment {
     catch(NullPointerException e){
         e.printStackTrace();
     }
-
+    */
         return rootView;
     } //END onCreateView
 
 
-
+    /*
     private void TimerMethod()
     {
         getActivity().runOnUiThread(Timer_Tick);
@@ -169,7 +171,7 @@ public class TimelineSectionFragment extends Fragment {
         public void run() {
             adapter.notifyDataSetChanged();
         }
-    };
+    };*/
 
 
 
