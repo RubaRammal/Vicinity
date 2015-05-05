@@ -47,7 +47,7 @@ public class WiFiDirectBroadcastReceiver extends BroadcastReceiver {
     @Override
     public void onReceive(Context context, Intent intent) {
         String action = intent.getAction();
-        Log.i(TAG,"WiFi BC onReceive" );
+        //Log.i(TAG,"WiFi BC onReceive" );
 
 
         if (WifiP2pManager.WIFI_P2P_CONNECTION_CHANGED_ACTION.equals(action)) {
@@ -75,7 +75,10 @@ public class WiFiDirectBroadcastReceiver extends BroadcastReceiver {
                 .equals(action)) {
             WifiP2pDevice device = (WifiP2pDevice) intent
                     .getParcelableExtra(WifiP2pManager.EXTRA_WIFI_P2P_DEVICE);
-            Log.d(TAG, "Device name: "+device.deviceName+" Device status -" + device.status);
+            Log.d(TAG, "My device name: "+device.deviceName+" Device status -" + device.status);
+            if(Globals.MY_MAC == null){
+            Globals.MY_MAC = device.deviceAddress;
+            Log.i(TAG,"My WiFi Direct MAC address: "+Globals.MY_MAC);}
 
         }
         else if (WifiP2pManager.WIFI_P2P_PEERS_CHANGED_ACTION.equals(action)) {

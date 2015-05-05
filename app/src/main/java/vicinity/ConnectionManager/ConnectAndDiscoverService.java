@@ -3,6 +3,8 @@ package vicinity.ConnectionManager;
 import android.app.Service;
 import android.content.ComponentName;
 import android.content.Intent;
+import android.net.wifi.WifiInfo;
+import android.net.wifi.WifiManager;
 import android.net.wifi.p2p.WifiP2pGroup;
 import android.os.IBinder;
 import android.content.Context;
@@ -71,7 +73,6 @@ public class ConnectAndDiscoverService extends Service
         controller = new MainController(ctx);
         manager = (WifiP2pManager) getSystemService(Context.WIFI_P2P_SERVICE);
         channel = manager.initialize(this, getMainLooper(), null);
-
         receiver = new WiFiDirectBroadcastReceiver(manager,channel,ctx);
         registerReceiver(receiver,intentFilter);
         //Changing the username depending on the one in the db
@@ -93,10 +94,8 @@ public class ConnectAndDiscoverService extends Service
         Log.i(TAG,"Service destroyed");
         unregisterReceiver(receiver);
 
-        /***TEST***/
+        //TODO delete those lines later
         disconnectPeers();
-        neighborListAdapter.clear();
-        neighborListAdapter.notifyDataSetChanged();
         DBHandler.deleteDatabase();
 
     }
@@ -409,6 +408,7 @@ public class ConnectAndDiscoverService extends Service
         }
 
     }
+
 
 
     static public void setNAdapter(NeighborListAdapter nAdapter){

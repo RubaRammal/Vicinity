@@ -24,13 +24,18 @@ public class UDPpacketListner extends Service {
     private static final String TAG = "UDPpacketListner";
     DatagramSocket socket;
     Integer port = Globals.SERVER_PORT;
-    ArrayList<Post> posts = new ArrayList<>();
-    static PostListAdapter postListAdapter;
     LocalBroadcastManager updateUIThread;
 
+
+    /*---------Overridden Methods------------*/
+    @Override
     public void onCreate(){
         super.onCreate();
         updateUIThread= LocalBroadcastManager.getInstance(this);
+    }
+    @Override
+    public IBinder onBind(Intent intent) {
+        return null;
     }
 
     Thread UDPBroadcastThread;
@@ -47,7 +52,6 @@ public class UDPpacketListner extends Service {
                     socket.bind(socketAddr);
                     lsnToPostBroadcast(socket);
                 }catch(IOException e){
-                    Log.d(TAG, "in method onStartCommand");
                     e.printStackTrace();
                 }
             }
@@ -57,6 +61,18 @@ public class UDPpacketListner extends Service {
         UDPBroadcastThread.start();
         return START_STICKY;
     }
+
+    @Override
+    public void onDestroy(){
+        super.onDestroy();
+        Log.i(TAG,"UDP Service destroyed.");
+    }
+
+    /**
+     * Listens to broadcasted posts
+     * @param socket
+     * @throws IOException
+     */
     public void lsnToPostBroadcast(DatagramSocket socket)throws IOException {
 
         byte[] buf = new byte[69000];
@@ -73,8 +89,6 @@ public class UDPpacketListner extends Service {
                 Log.i(TAG,"received object: "+p.getPostBody()+" from: "+senderIP+" "+p.getPostedBy()+" posted at: "+p.getPostedAt());
 
                 updateUIPosts(p);
-
-
             }
         }
         catch (ClassNotFoundException e) {
@@ -82,6 +96,12 @@ public class UDPpacketListner extends Service {
         }
     }
 
+
+    /**
+     * Sends intent to the broadcast receiver in Timeline
+     * to display Post
+     * @param p a new post to update UI (Timeline) thread
+     */
     private void updateUIPosts(Post p) {
         Log.i(TAG,"updateUIPosts");
         Intent intent = new Intent("POST");
@@ -90,15 +110,8 @@ public class UDPpacketListner extends Service {
     }
 
 
-    public UDPpacketListner() {
-    }
 
-    @Override
-    public IBinder onBind(Intent intent) {
-        return null;
-    }
 
-    public static void setPostListAdapter(PostListAdapter pla){
-        postListAdapter = pla;
-    }
+
+
 }
