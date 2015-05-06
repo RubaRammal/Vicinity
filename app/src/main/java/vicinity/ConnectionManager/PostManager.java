@@ -16,36 +16,36 @@ import java.net.SocketAddress;
 import vicinity.model.Globals;
 import vicinity.model.Post;
 
-
+/**
+ * This class extends AsyncTask and performs broadcasting a post operation in the
+ * background, this was implemented as a solution for NetworkOnMainThreadException
+ * that occurs when performing network operations on main thread.
+ */
 public class PostManager extends AsyncTask <Void, Void, Void> {
 
     private static final String TAG = "PostManager";
-    private Context context;
     private Post post;
-    WifiManager wifiManager;
     private static final int TIMEOUT_MS = 500;
     DatagramSocket socket;
 
-    public PostManager(Context context){
-        this.context=context;
-        wifiManager = (WifiManager) context.getSystemService(Context.WIFI_SERVICE);
 
-    }
+    /**
+     * Set post from the NewPost class
+     * @param post a new post to be broadcasted
+     */
     public void setPost(Post post){
-
         this.post=post;
     }
+
     @Override
     protected void onPreExecute(){
-        Log.i(TAG,"onPreExecute");
 
 
     }
 
     @Override
     protected Void doInBackground(Void... param){
-        Log.i(TAG,"doInBackground");
-        Log.i(TAG,"Post: "+post);
+        Log.i(TAG,"doInBackground() -> Post: "+post);
 
         try{
 
@@ -67,28 +67,27 @@ public class PostManager extends AsyncTask <Void, Void, Void> {
 
     @Override
     protected void onPostExecute (Void result){
-        Log.i(TAG,"onPostExecute");
 
     }
 
+    /**
+     * Broadcasts a new post to the broadcast address 192.168.49.255
+     * @param post a new post to be broadcasted
+     * @param socket DatagramSocket
+     */
     public void sendPost(Post post, DatagramSocket socket){
         try{
-
-            Log.i(TAG,"Sending post: "+post);
             socket.setBroadcast(true);
-
             ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
             ObjectOutputStream objectOutputStream = new ObjectOutputStream(outputStream);
             objectOutputStream.writeObject(post);
             byte [] data = outputStream.toByteArray();
-
-            Log.i(TAG,"socket.getInetAddress();: "+socket.getInetAddress());
             InetAddress broadcastIP = InetAddress.getByName("192.168.49.255");
             DatagramPacket datagramPacket = new DatagramPacket(data, data.length,
                     broadcastIP, Globals.SERVER_PORT);
             socket.send(datagramPacket);
             String senderIP = datagramPacket.getAddress().getHostAddress();
-            Log.d(TAG, " senderIP: "+senderIP);
+            Log.d(TAG, "Sending post: "+post+" senderIP: "+senderIP);
 
         }
         catch(IOException e){

@@ -151,7 +151,6 @@ public class MainController {
             dbH.close();
         }
         catch(SQLException e){
-            Log.i(TAG,"SQLException > addFriend > MainController");
             e.printStackTrace();
         }
         return isAdded;

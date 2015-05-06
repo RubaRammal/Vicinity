@@ -15,13 +15,7 @@ import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.Button;
 import android.widget.ListView;
-
 import java.sql.SQLException;
-import java.util.ArrayList;
-import java.util.Timer;
-import java.util.TimerTask;
-
-import vicinity.ConnectionManager.UDPpacketListner;
 import vicinity.Controller.MainController;
 import vicinity.model.Post;
 

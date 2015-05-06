@@ -147,6 +147,7 @@ public class TabsActivity extends FragmentActivity implements ActionBar.TabListe
         //Destroying ConnectAndDiscover service
         //This means the service is only stopped when the user shuts down the app completely
         stopService(new Intent(this, ConnectAndDiscoverService.class));
+        stopService(new Intent(this, UDPpacketListner.class));
         super.onDestroy();
 
     }

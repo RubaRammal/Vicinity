@@ -5,7 +5,6 @@ import android.net.wifi.p2p.WifiP2pDevice;
 import android.os.Parcel;
 import android.os.Parcelable;
 
-import java.io.Serializable;
 
 /**
  * A structure to hold service information.
@@ -16,6 +15,7 @@ public class WiFiP2pService implements Parcelable{
     protected String serviceRegistrationType;
     protected String deviceAddress;
     private String _aliasName;//for friends only
+    private String ipAddress;
 
 
 

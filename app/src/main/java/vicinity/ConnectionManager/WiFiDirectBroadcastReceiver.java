@@ -41,13 +41,10 @@ public class WiFiDirectBroadcastReceiver extends BroadcastReceiver {
 
     /**
      * WiFi events happen here
-     * @param context
-     * @param intent
      */
     @Override
     public void onReceive(Context context, Intent intent) {
         String action = intent.getAction();
-        //Log.i(TAG,"WiFi BC onReceive" );
 
 
         if (WifiP2pManager.WIFI_P2P_CONNECTION_CHANGED_ACTION.equals(action)) {
@@ -59,10 +56,8 @@ public class WiFiDirectBroadcastReceiver extends BroadcastReceiver {
                     .getParcelableExtra(WifiP2pManager.EXTRA_NETWORK_INFO);
 
             if (networkInfo.isConnected()) {
+
                 Globals.isConnectedToANetwork=true;
-                // we are connected with the other device, request connection
-                // info to find group owner IP
-                Log.i(TAG,"Connected to p2p network. Requesting network details...");
                 Log.i(TAG,"Network info: "+Globals.isConnectedToANetwork);
                 manager.requestConnectionInfo(channel,(ConnectionInfoListener) context);
             } else {
@@ -75,10 +70,12 @@ public class WiFiDirectBroadcastReceiver extends BroadcastReceiver {
                 .equals(action)) {
             WifiP2pDevice device = (WifiP2pDevice) intent
                     .getParcelableExtra(WifiP2pManager.EXTRA_WIFI_P2P_DEVICE);
-            Log.d(TAG, "My device name: "+device.deviceName+" Device status -" + device.status);
-            if(Globals.MY_MAC == null){
-            Globals.MY_MAC = device.deviceAddress;
-            Log.i(TAG,"My WiFi Direct MAC address: "+Globals.MY_MAC);}
+            //obtaining this device's mac address
+            if(Globals.MY_MAC == null)
+                {
+                    Globals.MY_MAC = device.deviceAddress;
+                    Log.i(TAG, "My device name: " + device.deviceName + " Device status: " + ConnectAndDiscoverService.getDeviceStatus(device.status) + " My WiFi Direct MAC address: " + Globals.MY_MAC);
+                }
 
         }
         else if (WifiP2pManager.WIFI_P2P_PEERS_CHANGED_ACTION.equals(action)) {
@@ -86,13 +83,17 @@ public class WiFiDirectBroadcastReceiver extends BroadcastReceiver {
             // The peer list has changed!
             //update devices list here
 
-
-        } else if (WifiP2pManager.WIFI_P2P_CONNECTION_CHANGED_ACTION.equals(action)) {
-            Log.i(TAG,"WIFI_P2P_CONNECTION_CHANGED_ACTION");
-            // Connection state changed!
-
-
+        }
+        else if(WifiP2pManager.WIFI_P2P_STATE_CHANGED_ACTION.equals(action)){
+            //Broadcast intent action to indicate whether Wi-Fi p2p is enabled or disabled.
+            int state = intent.getIntExtra(WifiP2pManager.EXTRA_WIFI_STATE, -1);
+            if(state == WifiP2pManager.WIFI_P2P_STATE_DISABLED){
+                Log.i(TAG,"WiFi Direct is disabled");
+            }
+            else
+                Log.i(TAG,"WiFi Direct is enabled");
 
         }
+
     }
 }

@@ -14,11 +14,11 @@ import java.net.DatagramSocket;
 import java.net.InetSocketAddress;
 import vicinity.model.Globals;
 import vicinity.model.Post;
-import vicinity.vicinity.PostListAdapter;
-import vicinity.vicinity.TimelineSectionFragment;
 import java.net.SocketAddress;
-import java.util.ArrayList;
 
+/**
+ * A Service that listens for incoming UDP broadcasts
+ */
 public class UDPpacketListner extends Service {
 
     private static final String TAG = "UDPpacketListner";
@@ -86,7 +86,7 @@ public class UDPpacketListner extends Service {
                 ObjectInputStream objectInputStream = new ObjectInputStream(inputStream);
                 String senderIP = packet.getAddress().getHostAddress();
                 Post p = (Post) objectInputStream.readObject();
-                Log.i(TAG,"received object: "+p.getPostBody()+" from: "+senderIP+" "+p.getPostedBy()+" posted at: "+p.getPostedAt());
+                Log.i(TAG,"received object: "+p.toString());
 
                 updateUIPosts(p);
             }

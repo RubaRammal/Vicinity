@@ -3,10 +3,8 @@ package vicinity.model;
 
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
-import android.database.sqlite.SQLiteException;
 import android.content.Context;
 import android.util.Log;
-
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
@@ -14,6 +12,9 @@ import java.io.FileOutputStream;
 import java.io.OutputStream;
 import java.sql.SQLException;
 
+/**
+ * This class handles database operations.
+ */
 public class DBHandler extends SQLiteOpenHelper {
 
 
@@ -47,9 +48,17 @@ public class DBHandler extends SQLiteOpenHelper {
 
     }
 
+    @Override
+    public synchronized void close() {
+
+        if(vicinityDB != null)
+            vicinityDB.close();
+        super.close();
+    }
+
 
     /**
-     * Creates a empty database on the system and rewrites it with your own database.
+     * Creates an empty database on the system and rewrites it with your own database.
      */
     public void createDataBase() throws IOException{
 
@@ -129,13 +138,6 @@ public class DBHandler extends SQLiteOpenHelper {
         return deleted;
     }
 
-    @Override
-    public synchronized void close() {
-
-        if(vicinityDB != null)
-            vicinityDB.close();
-        super.close();
-    }
 
 
 

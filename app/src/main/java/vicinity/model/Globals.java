@@ -1,6 +1,9 @@
 package vicinity.model;
 
-
+/**
+ * This class contains the frequently used variables
+ * and constants among classes
+ */
 public class Globals {
     public static final String TXTRECORD_PROP_AVAILABLE = "available";
     public static final String SERVICE_NAME = "_VicinityApp";

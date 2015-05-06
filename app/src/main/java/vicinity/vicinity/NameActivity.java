@@ -12,7 +12,6 @@ import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
-import android.widget.TextView;
 import android.widget.Toast;
 
 import vicinity.Controller.MainController;
@@ -29,17 +28,15 @@ public class NameActivity extends Activity {
     MainController controller;
 
     @Override
-    protected void onCreate(Bundle savedInstanceState) {//Lama
+    protected void onCreate(Bundle savedInstanceState) {
         controller = new MainController(NameActivity.this);
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_name);
-        Log.i(TAG, "onCreate");
 
         username_input = (EditText) findViewById(R.id.username);
         submit_button = (Button) findViewById(R.id.button);
         submit_button.setEnabled(false);
 
-        //Validating username input
 
         username_input.addTextChangedListener(new TextWatcher() {
             @Override
@@ -66,7 +63,6 @@ public class NameActivity extends Activity {
                             //Controller will add the user to the database
                             if(controller.createNewUser(username_input.getText().toString()))
                             {
-
                                 CharSequence text = "Welcome to Vicinity!";
                                 int duration = Toast.LENGTH_SHORT;
                                 Toast toast = Toast.makeText(context, text, duration);//we can customize this Toast later -Afnan
@@ -149,7 +145,6 @@ public class NameActivity extends Activity {
     public boolean onCreateOptionsMenu(Menu menu) {
         // Inflate the menu; this adds items to the action bar if it is present.
         getMenuInflater().inflate(R.menu.menu_main, menu);
-        Log.i(TAG, "onCreateOptionsMenu");
         return true;
     }
 
@@ -162,15 +157,9 @@ public class NameActivity extends Activity {
 
         //noinspection SimplifiableIfStatement
         if (id == R.id.action_settings) {
-            Log.i(TAG, "onOptionsItemSelected");
             return true;
         }
-        Log.i(TAG, "onOptionsItemSelected");
         return super.onOptionsItemSelected(item);
     }
 
-    /*public void getWifiActivity(View view) {
-        Intent intent = new Intent(getApplicationContext(), WiFiActivity.class);
-        startActivity(intent);
-    }*/
 }

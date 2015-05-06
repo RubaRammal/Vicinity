@@ -263,6 +263,7 @@ public class ConnectAndDiscoverService extends Service
          * client socket for every client. This is handled by {@code
          * GroupOwnerSocketHandler}
          */
+        //TODO a condition for neighbor and friend
 
         try {
         if (p2pInfo.isGroupOwner) {
@@ -313,42 +314,7 @@ public class ConnectAndDiscoverService extends Service
     }
 
 
-    //TEST
-      public void requestGroupInfo(){
-           manager.requestGroupInfo(channel, new WifiP2pManager.GroupInfoListener() {
-                    @Override
-                    public void onGroupInfoAvailable(WifiP2pGroup group) {
-                              Log.i(TAG,"onGroupInfoAvailable");
-                              //gets a list of clients participating in this group
-                                       /*Collection <WifiP2pDevice> clients;
-               if(group.getClientList().size()!=0)
-                   clients = group.getClientList();*/
-                                              //Who owns this group?
-                                        //                WifiP2pDevice groupOwner = group.getOwner();
-                                                              //  Log.i(TAG,"GO: "+groupOwner.deviceName);
-                                                                       //String network name
-                                                                              //String networkName = group.getNetworkName();
-                                                                                      // Log.i(TAG,"Network name: "+networkName);
-                                                                                           }
-                    });
 
-                  }
-        //TESST
-               public void createPersistentGroup(){
-                manager.createGroup(channel, new WifiP2pManager.ActionListener() {
-                       @Override
-                        public void onSuccess() {
-                                requestGroupInfo();
-                                Log.i(TAG,"Created a group");
-                            }
-
-                                @Override
-                        public void onFailure(int reason) {
-                              Log.i(TAG,"failed to create a group");
-                           }
-
-                            });
-            }
 
     /**
      * This method changes the original device name
@@ -408,6 +374,30 @@ public class ConnectAndDiscoverService extends Service
         }
 
     }
+
+
+    /**
+     *
+     * @param deviceStatus int a WiFiP2pDevice status
+     * @return A String that translates that status
+     */
+    public static String getDeviceStatus(int deviceStatus) {
+        switch (deviceStatus) {
+            case WifiP2pDevice.AVAILABLE:
+                return "Available";
+            case WifiP2pDevice.INVITED:
+                return "Invited";
+            case WifiP2pDevice.CONNECTED:
+                return "Connected";
+            case WifiP2pDevice.FAILED:
+                return "Failed";
+            case WifiP2pDevice.UNAVAILABLE:
+                return "Unavailable";
+            default:
+                return "Unknown = " + deviceStatus;
+        }
+    }
+
 
 
 

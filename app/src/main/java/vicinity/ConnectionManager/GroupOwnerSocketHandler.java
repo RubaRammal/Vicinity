@@ -94,7 +94,7 @@ public class GroupOwnerSocketHandler extends Thread {
             try {
                 // A blocking operation. Initiate a ChatManager instance when
                 // there is a new connection
-                /*----------------*/
+                /*--------getting client's mac address and IP--------*/
                 addressesSocket = new ServerSocket(Globals.ADDRESSES_PORT);
                 clientSocket = addressesSocket.accept();
                 BufferedReader bufferedReader = new BufferedReader(new InputStreamReader(clientSocket.getInputStream()));
