@@ -18,7 +18,6 @@ import android.view.MenuItem;
 import android.view.View;
 import android.widget.TextView;
 import android.text.Editable;
-import android.text.TextUtils;
 import android.text.TextWatcher;
 import android.widget.EditText;
 import android.widget.Button;
@@ -30,9 +29,9 @@ import java.sql.SQLException;
 
 import vicinity.ConnectionManager.PostManager;
 import vicinity.Controller.MainController;
+import vicinity.model.Globals;
 import vicinity.model.Post;
 
-import static vicinity.vicinity.TimelineSectionFragment.*;
 
 public class NewPost extends ActionBarActivity {
 
@@ -129,28 +128,26 @@ public class NewPost extends ActionBarActivity {
     public void sendPost(){
         String postText = postTextField.getText().toString();
         try {
+            //Can send post only if connected to a network
+            if(Globals.isConnectedToANetwork){
+                aPost.setPostBody(postText);
+                aPost.setPostedBy(mc.retrieveCurrentUsername());
+                postManager.setPost(aPost);
+                postManager.execute();
+                finish();
 
-
-            aPost.setPostBody(postText);
-
-            aPost.setPostedBy(mc.retrieveCurrentUsername());
-
-            postManager.setPost(aPost);
-
-            postManager.execute();
-
-
-                           /* if (mc.addPost(aPost))
-                                Log.i(TAG, "post is saved to DB");
-                            else
-                                Log.i(TAG, "post is not saved to DB")*/
+            }
+            else{
+                CharSequence text = "You are not connected to a network!";
+                int duration = Toast.LENGTH_SHORT;
+                Toast toast = Toast.makeText(NewPost.this, text, duration);
+                toast.setGravity(Gravity.CENTER|Gravity.CENTER, 0, 0);
+                toast.show();
+            }
 
         } catch (SQLException e) {
             e.printStackTrace();
-            Log.i(TAG, "A problem in adding post to DB");
         }
-        // postToTimeline(aPost);
-        finish();
     }
 
 

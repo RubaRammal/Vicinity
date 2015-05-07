@@ -12,10 +12,7 @@ import android.net.wifi.p2p.WifiP2pManager;
 import android.net.wifi.p2p.WifiP2pManager.Channel;
 import android.net.wifi.p2p.WifiP2pManager.ConnectionInfoListener;
 import android.util.Log;
-
-import java.util.ArrayList;
-
-import vicinity.model.WiFiP2pService;
+import vicinity.model.Globals;
 
 /**
  * this class is a WiFi BroadcastReceiver
@@ -35,7 +32,7 @@ public class WiFiDirectBroadcastReceiver extends BroadcastReceiver {
      * @param context activity associated with the receiver
      */
     public WiFiDirectBroadcastReceiver(WifiP2pManager manager, Channel channel,
-            Context context) {
+                                       Context context) {
         super();
         this.manager = manager;
         this.channel = channel;
@@ -50,12 +47,11 @@ public class WiFiDirectBroadcastReceiver extends BroadcastReceiver {
     @Override
     public void onReceive(Context context, Intent intent) {
         String action = intent.getAction();
-        Log.i(TAG,"WiFi BC onReceive" );
+        //Log.i(TAG,"WiFi BC onReceive" );
 
 
         if (WifiP2pManager.WIFI_P2P_CONNECTION_CHANGED_ACTION.equals(action)) {
             //Broadcast intent action indicating that peer discovery has either started or stopped.
-            Log.i(TAG,"WIFI_P2P_CONNECTION_CHANGED_ACTION");
             if (manager == null) {
                 return;
             }
@@ -63,29 +59,33 @@ public class WiFiDirectBroadcastReceiver extends BroadcastReceiver {
                     .getParcelableExtra(WifiP2pManager.EXTRA_NETWORK_INFO);
 
             if (networkInfo.isConnected()) {
-
+                Globals.isConnectedToANetwork=true;
                 // we are connected with the other device, request connection
                 // info to find group owner IP
-                Log.d(TAG,"Connected to p2p network. Requesting network details...");
-                Log.d(TAG,"Network info: "+networkInfo.isConnected());
+                Log.i(TAG,"Connected to p2p network. Requesting network details...");
+                Log.i(TAG,"Network info: "+Globals.isConnectedToANetwork);
                 manager.requestConnectionInfo(channel,(ConnectionInfoListener) context);
             } else {
+                Globals.isConnectedToANetwork=false;
                 Log.d(TAG,"NOT Connected to P2P network!");
-                // It's a disconnect
+
             }
         }
         else if (WifiP2pManager.WIFI_P2P_THIS_DEVICE_CHANGED_ACTION
                 .equals(action)) {
-            Log.i(TAG,"WIFI_P2P_THIS_DEVICE_CHANGED_ACTION");
             WifiP2pDevice device = (WifiP2pDevice) intent
                     .getParcelableExtra(WifiP2pManager.EXTRA_WIFI_P2P_DEVICE);
-            Log.d(TAG, "Device status -" + device.status);
+            Log.d(TAG, "My device name: "+device.deviceName+" Device status -" + device.status);
+            if(Globals.MY_MAC == null){
+            Globals.MY_MAC = device.deviceAddress;
+            Log.i(TAG,"My WiFi Direct MAC address: "+Globals.MY_MAC);}
 
         }
         else if (WifiP2pManager.WIFI_P2P_PEERS_CHANGED_ACTION.equals(action)) {
             Log.i(TAG,"WIFI_P2P_PEERS_CHANGED_ACTION");
             // The peer list has changed!
-            //should update the list here
+            //update devices list here
+
 
         } else if (WifiP2pManager.WIFI_P2P_CONNECTION_CHANGED_ACTION.equals(action)) {
             Log.i(TAG,"WIFI_P2P_CONNECTION_CHANGED_ACTION");

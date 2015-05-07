@@ -34,7 +34,15 @@ public class PostListAdapter  extends BaseAdapter {
         mInflater = LayoutInflater.from(context);
         controller = new MainController(context);
     }
+    public PostListAdapter(Context context){
+        posts = new ArrayList<>();
+        controller = new MainController(context);
+        posts.addAll(controller.viewAllPosts());
+        mInflater = LayoutInflater.from(context);
 
+
+    }
+    /*
     public void updatePosts(ArrayList<Post> p) {
         if(p.size()!=0) {
             posts.clear();
@@ -49,10 +57,11 @@ public class PostListAdapter  extends BaseAdapter {
 
             }
         }
-    }
+    }*/
 
-    public void addPostToList(Post p){
+    public void addPost(Post p){
         posts.add(p);
+        notifyDataSetChanged();
     }
 
     @Override

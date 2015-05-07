@@ -3,6 +3,8 @@ package vicinity.ConnectionManager;
 import android.app.Service;
 import android.content.ComponentName;
 import android.content.Intent;
+import android.net.wifi.WifiInfo;
+import android.net.wifi.WifiManager;
 import android.net.wifi.p2p.WifiP2pGroup;
 import android.os.IBinder;
 import android.content.Context;
@@ -22,7 +24,6 @@ import java.io.IOException;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.sql.SQLException;
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
 import vicinity.Controller.MainController;
@@ -52,8 +53,6 @@ public class ConnectAndDiscoverService extends Service
     private Channel channel;
     private BroadcastReceiver receiver = null;
     private WifiP2pDnsSdServiceRequest serviceRequest;
-    public static ArrayList<WiFiP2pService> neighbors = new ArrayList<WiFiP2pService>();
-    public static ArrayList<WiFiP2pService> friends = new ArrayList<WiFiP2pService>();
     public static NeighborListAdapter neighborListAdapter;
     public static FriendListAdapter friendListAdapter;
     public MainController controller;
@@ -74,7 +73,6 @@ public class ConnectAndDiscoverService extends Service
         controller = new MainController(ctx);
         manager = (WifiP2pManager) getSystemService(Context.WIFI_P2P_SERVICE);
         channel = manager.initialize(this, getMainLooper(), null);
-
         receiver = new WiFiDirectBroadcastReceiver(manager,channel,ctx);
         registerReceiver(receiver,intentFilter);
         //Changing the username depending on the one in the db
@@ -96,10 +94,8 @@ public class ConnectAndDiscoverService extends Service
         Log.i(TAG,"Service destroyed");
         unregisterReceiver(receiver);
 
-        /***TEST***/
+        //TODO delete those lines later
         disconnectPeers();
-        neighborListAdapter.clear();
-        neighborListAdapter.notifyDataSetChanged();
         DBHandler.deleteDatabase();
 
     }
@@ -146,18 +142,14 @@ public class ConnectAndDiscoverService extends Service
                                 WiFiP2pService service = new WiFiP2pService(srcDevice);
                                 service.setServiceRegistrationType(registrationType);
                                 Log.i(TAG, "Name: " + service.getInstanceName() + " Address: " + service.getDeviceAddress());
-                                Log.i(TAG, "is this my friend? "+controller.isThisMyFriend("3a:aa:3c:64:08:b0"));
+
                                 if(controller.isThisMyFriend(srcDevice.deviceAddress))
                                 {
-                                  //friends.add(service);
-                                  //friendListAdapter.setServices(friends);
-                                  //friendListAdapter.notifyDataSetChanged();
+
                                     NeighborSectionFragment.addToFriendsList(service);
                                 }
                                 else{
-                                 //neighbors.add(service);
-                                 //neighborListAdapter.setServices(neighbors);
-                                 //neighborListAdapter.notifyDataSetChanged();
+
                                     NeighborSectionFragment.addToNeighborssList(service);
                                 }
 
@@ -300,7 +292,13 @@ public class ConnectAndDiscoverService extends Service
 
         //Starting a new chat activity with a connected peer.
         startChatting();
+
     }
+    @Override
+    public void chatWithFriend(WiFiP2pService friend){
+        startChatting();
+    }
+
 
     public void startChatting(){
         Intent intent = new Intent();
@@ -410,6 +408,7 @@ public class ConnectAndDiscoverService extends Service
         }
 
     }
+
 
 
     static public void setNAdapter(NeighborListAdapter nAdapter){

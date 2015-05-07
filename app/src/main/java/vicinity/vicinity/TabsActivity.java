@@ -14,7 +14,6 @@ import android.view.View;
 import android.view.Window;
 import android.widget.ImageButton;
 import android.content.Context;
-
 import vicinity.ConnectionManager.UDPpacketListner;
 import vicinity.ConnectionManager.ConnectAndDiscoverService;
 import vicinity.Controller.MainController;
@@ -30,18 +29,27 @@ public class TabsActivity extends FragmentActivity implements ActionBar.TabListe
     private ImageButton muteButton;
     public static Context ctx;
     public static MainController controller;
+    private static Fragment timeline = new TimelineSectionFragment()
+            , neighbors = new NeighborSectionFragment(), chat = new MessagesSectionFragment(),
+            settings= new SettingsSectionFragment();
 
 
-
-    static NeighborSectionFragment neighborFragment;
-
+    Fragment neghbors = new Fragment();
     public void onCreate(Bundle savedInstanceState) {
 
         super.onCreate(savedInstanceState);
+
+        /*------saving instance-----*/
+        if(savedInstanceState!=null){
+            neghbors =  getSupportFragmentManager().getFragment(
+                    savedInstanceState, "NeighborsFragment");
+        }
+
+
         ctx=TabsActivity.this;
         controller = new MainController(ctx);
-        //Handling unhandled exception
-       // Thread.setDefaultUncaughtExceptionHandler(new UnhandledExceptionHandler(this));
+
+
         //Starting the service
         startService(new Intent(this, ConnectAndDiscoverService.class));
         startService(new Intent(this, UDPpacketListner.class));
@@ -76,6 +84,7 @@ public class TabsActivity extends FragmentActivity implements ActionBar.TabListe
                 actionBar.setSelectedNavigationItem(position);
             }
         });
+        mViewPager.setOffscreenPageLimit(4);
 
         //TabsActivity layout (icons + text)
         final int[] LAYOUTS = new int[] {
@@ -104,6 +113,11 @@ public class TabsActivity extends FragmentActivity implements ActionBar.TabListe
 
 
     /********************Overridden Activity methods****************************/
+    @Override
+    protected void onSaveInstanceState(Bundle outState) {
+        super.onSaveInstanceState(outState);
+        getSupportFragmentManager().putFragment(outState, "NeighborsFragment", neighbors);
+    }
     @Override
     public void onResume() {
         super.onResume();
@@ -142,12 +156,16 @@ public class TabsActivity extends FragmentActivity implements ActionBar.TabListe
     /********************TabsActivity Methods****************************/
     @Override
     public void onTabUnselected(ActionBar.Tab tab, FragmentTransaction fragmentTransaction) {
+
     }
+
 
     @Override
     public void onTabSelected(ActionBar.Tab tab, FragmentTransaction fragmentTransaction) {
         // When the given tab is selected, switch to the corresponding page in the ViewPager.
         mViewPager.setCurrentItem(tab.getPosition());
+
+
     }
 
     @Override
@@ -168,20 +186,20 @@ public class TabsActivity extends FragmentActivity implements ActionBar.TabListe
         public Fragment getItem(int i) {
             switch (i) {
                 case 0:
-                    return new TimelineSectionFragment();
+                    return timeline;
 
                 case 1:
-                    return new NeighborSectionFragment();
+                    return neighbors;
 
                 case 2:
-                    return new MessagesSectionFragment();
+                    return chat;
 
                 case 3:
-                    return new SettingsSectionFragment();
+                    return settings;
 
                 default:
                     // The other sections of the app are dummy placeholders.
-                    return new TimelineSectionFragment();
+                    return timeline;
             }
         }
 

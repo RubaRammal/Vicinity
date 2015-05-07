@@ -1,4 +1,5 @@
 package vicinity.vicinity;
+import android.app.Activity;
 import android.app.AlertDialog;
 import android.content.DialogInterface;
 import android.content.Intent;
@@ -20,9 +21,42 @@ import vicinity.model.Globals;
 
 public class SettingsSectionFragment extends Fragment {
 
-    Button deleteAccount, clearChat, clearComments;
+    Button deleteAccount, clearChat, clearComments, clearPosts;
     Switch notificationSwitch;
     public final String TAG = "Settings";
+    @Override
+    public void onAttach(Activity activity) {
+        super.onAttach(activity);
+        try {
+            Log.i(TAG, "OnAttach");
+        } catch (ClassCastException e) {
+            throw new ClassCastException(activity.toString()
+                    + " must implement TimelineInterface");
+        }
+    }
+
+    @Override
+    public void onDetach() {
+        super.onDetach();
+        Log.i(TAG, "OnDetach");
+    }
+
+    @Override
+    public void onSaveInstanceState(final Bundle outState) {
+        super.onSaveInstanceState(outState);
+        Log.i(TAG,"onSaveInstanceState");
+
+    }
+    @Override
+    public void onActivityCreated(Bundle savedInstanceState) {
+        super.onActivityCreated(savedInstanceState);
+        Log.i(TAG,"onActivityCreated");
+        setRetainInstance(true);
+        if (savedInstanceState != null) {
+            // Restore last state for checked position.
+        }
+
+    }
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
@@ -109,7 +143,6 @@ public class SettingsSectionFragment extends Fragment {
                         .setPositiveButton(android.R.string.yes, new DialogInterface.OnClickListener() {
                             public void onClick(DialogInterface dialog, int which) {
                                 Log.i(TAG,"YES");
-                                DBHandler.deleteDatabase();
                                 CharSequence text = "Deleted chat history";
                                 int duration = Toast.LENGTH_LONG;
                                 Toast toast = Toast.makeText(getActivity(), text, duration);
@@ -143,8 +176,40 @@ public class SettingsSectionFragment extends Fragment {
                         .setPositiveButton(android.R.string.yes, new DialogInterface.OnClickListener() {
                             public void onClick(DialogInterface dialog, int which) {
                                 Log.i(TAG,"YES");
-                                DBHandler.deleteDatabase();
                                 CharSequence text = "Cleared Timeline comments";
+                                int duration = Toast.LENGTH_LONG;
+                                Toast toast = Toast.makeText(getActivity(), text, duration);
+                                toast.show();
+
+                            }
+                        })
+                        .setNegativeButton(android.R.string.no, new DialogInterface.OnClickListener() {
+                            public void onClick(DialogInterface dialog, int which) {
+                                Log.i(TAG, "no");
+
+                            }
+                        })//
+                        .setIcon(android.R.drawable.ic_dialog_alert)
+                        .show();
+
+
+            }
+        });
+        /*
+        *Clear timeline button event
+         */
+        clearPosts = (Button) rootView.findViewById(R.id.clearTimeline);
+        clearPosts.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Log.i(TAG,"Clear Timeline");
+                new AlertDialog.Builder(getActivity())
+                        .setTitle("Clear Timeline Posts")
+                        .setMessage("Are you sure you want to clear your Timeline?")
+                        .setPositiveButton(android.R.string.yes, new DialogInterface.OnClickListener() {
+                            public void onClick(DialogInterface dialog, int which) {
+                                Log.i(TAG,"YES");
+                                CharSequence text = "Cleared Timeline posts";
                                 int duration = Toast.LENGTH_LONG;
                                 Toast toast = Toast.makeText(getActivity(), text, duration);
                                 toast.show();
