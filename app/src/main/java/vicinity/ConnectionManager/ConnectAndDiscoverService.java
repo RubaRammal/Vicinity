@@ -3,9 +3,6 @@ package vicinity.ConnectionManager;
 import android.app.Service;
 import android.content.ComponentName;
 import android.content.Intent;
-import android.net.wifi.WifiInfo;
-import android.net.wifi.WifiManager;
-import android.net.wifi.p2p.WifiP2pGroup;
 import android.os.IBinder;
 import android.content.Context;
 import android.content.IntentFilter;
@@ -23,6 +20,7 @@ import android.net.wifi.p2p.WifiP2pManager.Channel;
 import java.io.IOException;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
+import java.net.InetAddress;
 import java.sql.SQLException;
 import java.util.HashMap;
 import java.util.Map;
@@ -56,6 +54,9 @@ public class ConnectAndDiscoverService extends Service
     public static NeighborListAdapter neighborListAdapter;
     public static FriendListAdapter friendListAdapter;
     public MainController controller;
+
+    /*---this is a hashmap to store broadcasted addresses from GO--*/
+    public static HashMap<String, InetAddress> addressesCache = new HashMap<>();
 
 
 
@@ -108,7 +109,6 @@ public class ConnectAndDiscoverService extends Service
      * then calls discoverService()
      */
     private void startRegistrationAndDiscovery() {
-        Log.i(TAG,"startRegistrationAndDiscovery");
         Map<String, String> record = new HashMap<String, String>();
         record.put(Globals.TXTRECORD_PROP_AVAILABLE, "visible");
         WifiP2pDnsSdServiceInfo service = WifiP2pDnsSdServiceInfo.newInstance(Globals.SERVICE_NAME, Globals.SERVICE_REG_TYPE, record);
@@ -136,12 +136,12 @@ public class ConnectAndDiscoverService extends Service
                     @Override
                     public void onDnsSdServiceAvailable(String instanceName,
                                                         String registrationType, WifiP2pDevice srcDevice) {
-                        Log.i(TAG,"Instance name "+instanceName+" Reg type: "+registrationType);
+                        /*---Filtering services so the user can only see Vicinity users---*/
                         if (instanceName.equals(Globals.SERVICE_NAME)) {
 
                                 WiFiP2pService service = new WiFiP2pService(srcDevice);
-                                service.setServiceRegistrationType(registrationType);
-                                Log.i(TAG, "Name: " + service.getInstanceName() + " Address: " + service.getDeviceAddress());
+                                //service.setServiceRegistrationType(registrationType);
+                                //Log.i(TAG, "Name: " + service.getInstanceName() + " Address: " + service.getDeviceAddress());
 
                                 if(controller.isThisMyFriend(srcDevice.deviceAddress))
                                 {
@@ -218,7 +218,7 @@ public class ConnectAndDiscoverService extends Service
         WifiP2pConfig config = new WifiP2pConfig();
         config.deviceAddress = service.getDevice().deviceAddress;//device unique MAC address
         final String name=service.getDevice().deviceName;//Device name
-        config.wps.setup = WpsInfo.PBC;
+        config.wps.setup = WpsInfo.PBC;//Wifi permission
 
         if (serviceRequest != null)
             manager.removeServiceRequest(channel, serviceRequest,
@@ -237,7 +237,9 @@ public class ConnectAndDiscoverService extends Service
 
             @Override
             public void onSuccess() {
-                Log.i(TAG,"Connecting to "+ name );
+                Log.i(TAG,"Connecting to "+ name);
+                //TODO check if peer's ip address exists in cache, then set it here
+
             }
 
             @Override
@@ -399,8 +401,9 @@ public class ConnectAndDiscoverService extends Service
     }
 
 
-
-
+    /**
+     * Setters for neighbors and friends list adapters.
+     */
     static public void setNAdapter(NeighborListAdapter nAdapter){
         neighborListAdapter = nAdapter;
     }

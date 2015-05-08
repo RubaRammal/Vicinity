@@ -10,7 +10,6 @@ import android.support.v7.app.ActionBarActivity;
 import android.util.Log;
 import android.view.Gravity;
 import android.view.View;
-import android.view.ViewGroup;
 import android.widget.AbsListView;
 import android.widget.Button;
 import android.widget.EditText;
@@ -19,12 +18,12 @@ import android.widget.TextView;
 import java.util.ArrayList;
 import vicinity.Controller.MainController;
 import vicinity.model.Comment;
-import vicinity.model.Globals;
 import vicinity.model.Post;
 import android.text.Editable;
 import android.text.TextUtils;
 import android.text.TextWatcher;
 import java.sql.SQLException;
+import vicinity.ConnectionManager.PostManager;
 
 /* this class is supposed to implement the method sendClickedPost from TimelineInterface
 * still working on it
@@ -47,7 +46,7 @@ public class PostComment extends ActionBarActivity {
     private String TAG = "PostComment";
     private MainController controller;
     private int commentCount;
-
+    private PostManager postManager;//-Lama
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -72,6 +71,8 @@ public class PostComment extends ActionBarActivity {
 
         ctx = this;
         controller = new MainController(ctx);
+        comment = new Comment();//-Lama
+        postManager = new PostManager();//-Lama
         Bundle extras = getIntent().getExtras();
         postID = extras.getInt("POST_ID");
 
@@ -142,26 +143,32 @@ public class PostComment extends ActionBarActivity {
                 new Button.OnClickListener() {
                     public void onClick(View view) {
                         String commentText = commentTextField.getText().toString();
-                        Comment aComment = null;
                         try {
-                            String username = controller.retrieveCurrentUsername();
-                            aComment = new Comment (postID, commentText, username);
-                            if (controller.addAcomment(aComment)){
+
+                            comment.setCommentBody(commentText);
+                            comment.setCommentedBy(controller.retrieveCurrentUsername());
+                            postManager.setComment(comment);
+                        /*
+                            if (controller.addAcomment(comment)){
                                 commentCount++;
                                 Log.i(TAG, "Comment is added to DB");}
                             else
                                 Log.i(TAG, "Comment is NOT added to DB");
-
+                        */
                         } catch (SQLException e) {
                             Log.i(TAG, "A problem in adding comment to DB");
                         }
-                        commentsList.add(aComment);
+                        commentsList.add(comment);
                         adapter.notifyDataSetChanged();
                         commentTextField.setText("");
                         commentedOn.setCommentCount(commentCount);
+                        postManager.execute();
+                        finish();
+
 
                     }
                 }
         );
     }//End onCreate
+
 }

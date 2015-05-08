@@ -69,6 +69,7 @@ public class NameActivity extends Activity {
                                 toast.show();
                                 Intent intent = new Intent(context, TabsActivity.class);
                                 startActivity(intent);
+                                finish();
                             }
 
 
@@ -131,14 +132,12 @@ public class NameActivity extends Activity {
     @Override
     protected void onSaveInstanceState(Bundle outState) {
         super.onSaveInstanceState(outState);
-        Log.i(TAG, "onSaveInstanceState");
     }
 
 
     @Override
     protected void onRestoreInstanceState(Bundle savedInstanceState) {
         super.onRestoreInstanceState(savedInstanceState);
-        Log.i(TAG, "onRestoreInstanceState");
     }
 
     @Override

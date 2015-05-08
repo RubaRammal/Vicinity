@@ -23,7 +23,7 @@ public class VicinityNotifications {
         android.app.NotificationManager notificationManager = (android.app.NotificationManager) ChatActivity.ctx.getSystemService(ChatActivity.ctx.NOTIFICATION_SERVICE);
         Notification notification = new Notification(R.drawable.vicinity_logo, newMsg.getMessageBody(), System.currentTimeMillis());
         notification.defaults |= Notification.DEFAULT_VIBRATE;
-        CharSequence title = "Afnan";//change this after you get the friend's name
+        CharSequence title = "Afnan";//TODO change this to the friend's name
         CharSequence text = newMsg.getMessageBody();
 
         Intent notificationIntent = new Intent(ChatActivity.ctx, ChatActivity.class);

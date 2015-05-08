@@ -1,6 +1,4 @@
 package vicinity.ConnectionManager;
-import android.content.Context;
-import android.net.wifi.WifiManager;
 import android.os.AsyncTask;
 import android.util.Log;
 
@@ -12,7 +10,9 @@ import java.net.DatagramSocket;
 import java.net.InetAddress;
 import java.net.InetSocketAddress;
 import java.net.SocketAddress;
+import java.util.HashMap;
 
+import vicinity.model.Comment;
 import vicinity.model.Globals;
 import vicinity.model.Post;
 
@@ -23,8 +23,12 @@ import vicinity.model.Post;
  */
 public class PostManager extends AsyncTask <Void, Void, Void> {
 
+    //TODO this class shall be named UDPBroadcastManager
+
     private static final String TAG = "PostManager";
     private Post post;
+    private Comment comment;
+    private boolean flag;//to determine if it's a comment or a post
     private static final int TIMEOUT_MS = 500;
     DatagramSocket socket;
 
@@ -35,7 +39,17 @@ public class PostManager extends AsyncTask <Void, Void, Void> {
      */
     public void setPost(Post post){
         this.post=post;
+        flag = true;
+
     }
+
+    /**
+     * Sets comment from addComment class
+     * @param comment a new comment to be broadcasted
+     */
+    public void setComment(Comment comment){this.comment = comment;
+    flag=false;}
+
 
     @Override
     protected void onPreExecute(){
@@ -55,7 +69,14 @@ public class PostManager extends AsyncTask <Void, Void, Void> {
             socket.setBroadcast(true);
             socket.bind(socketAddr);
             socket.setSoTimeout(TIMEOUT_MS);
-            sendPost(post,socket);
+            if(flag == true) {//-Lama
+                Log.i(TAG,"inside if, flag= "+flag);
+                sendPost(post, socket);
+            }
+            else{
+                Log.i(TAG,"inside else, flag= "+flag);
+                sendComment(comment, socket);
+            }
 
         }
         catch (IOException e){
@@ -95,6 +116,51 @@ public class PostManager extends AsyncTask <Void, Void, Void> {
         }
     }
 
+    public void sendComment(Comment comment, DatagramSocket socket){//-Lama
+        try{
+
+            Log.i(TAG,"Sending comment: "+comment);
+            socket.setBroadcast(true);
+
+            ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
+            ObjectOutputStream objectOutputStream = new ObjectOutputStream(outputStream);
+            objectOutputStream.writeObject(comment);
+            byte [] data = outputStream.toByteArray();
+
+            Log.i(TAG,"socket.getInetAddress();: "+socket.getInetAddress());
+            InetAddress broadcastIP = InetAddress.getByName("192.168.49.255");
+            DatagramPacket datagramPacket = new DatagramPacket(data, data.length,
+                    broadcastIP, Globals.SERVER_PORT);
+            socket.send(datagramPacket);
+            String senderIP = datagramPacket.getAddress().getHostAddress();
+            Log.d(TAG, " senderIP: "+senderIP);
+
+        }
+        catch(IOException e){
+            e.printStackTrace();
+        }
+    }
+    public void sendAdresses(HashMap addresses){
+        try{
+            if(!addresses.isEmpty()) {
+                Log.i(TAG, "Sending addresses");
+                socket.setBroadcast(true);
+                ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
+                ObjectOutputStream objectOutputStream = new ObjectOutputStream(outputStream);
+                objectOutputStream.writeObject(addresses);
+                byte[] data = outputStream.toByteArray();
+
+                Log.i(TAG, "socket.getInetAddress();: " + socket.getInetAddress());
+                InetAddress broadcastIP = InetAddress.getByName("192.168.49.255");
+                DatagramPacket datagramPacket = new DatagramPacket(data, data.length,
+                        broadcastIP, Globals.SERVER_PORT);
+                socket.send(datagramPacket);
+            }
+        }
+        catch(IOException e){
+            e.printStackTrace();
+        }
+    }
 
 }
 

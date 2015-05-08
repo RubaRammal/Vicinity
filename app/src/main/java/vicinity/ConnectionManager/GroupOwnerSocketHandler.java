@@ -2,14 +2,12 @@
 package vicinity.ConnectionManager;
 
 import android.os.Handler;
-import android.os.Looper;
 import android.util.Log;
-
 import java.io.BufferedReader;
-import java.io.DataInputStream;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.net.InetAddress;
+import java.net.InetSocketAddress;
 import java.net.ServerSocket;
 import java.net.Socket;
 import java.util.concurrent.LinkedBlockingQueue;
@@ -28,23 +26,21 @@ import vicinity.model.Globals;
 public class GroupOwnerSocketHandler extends Thread {
 
     ServerSocket socket = null;
-    ServerSocket addressesSocket = null;
     Socket clientSocket = null;
     private final int THREAD_COUNT = 10;
     private Handler handler;
-    private static final String TAG = "GroupOwnerSocketHandler";
-    private BufferedReader bufferedReader;
+    private static final String TAG = "GroupOwner";
+    PostManager postManager = new PostManager();
 
     public GroupOwnerSocketHandler(Handler handler) throws IOException {
+        postManager.execute();
+        this.handler = handler;
+
         try {
-            socket = new ServerSocket(Globals.SERVER_PORT);
-
-            /*---test---*/
-            //another socket with a different port
-
-            this.handler = handler;
-            Log.d(TAG, "Socket Started");
-            //getClientsAddresses();
+          socket = new ServerSocket(Globals.SERVER_PORT);
+           // socket = new ServerSocket();
+           // socket.setReuseAddress(true);
+           // socket.bind(new InetSocketAddress(Globals.SERVER_PORT));
         } catch (IOException e) {
             e.printStackTrace();
             pool.shutdownNow();
@@ -52,35 +48,8 @@ public class GroupOwnerSocketHandler extends Thread {
         }
 
     }
-    /*
-    public void getClientsAddresses(){
-        // Collect client ip's -Lama
 
-        Runnable r = new Runnable() {
-            public void run() {
-                Looper.prepare();
-                try {
-                    //clients.clear();
-                    while (true)
 
-                    {
-                        clientSocket = addressesSocket.accept();
-                        BufferedReader fromClient = new BufferedReader(new InputStreamReader(clientSocket.getInputStream()));
-                        InetAddress clientIP = clientSocket.getInetAddress();
-                        String clientMAC = fromClient.readLine();
-                        Log.i(TAG,"Client's IP: "+clientIP+" Client's MAC: "+clientMAC);
-
-                       // clients.add(clientSocket.getInetAddress());
-                        //clientSocket.close();
-                        //Log.d(TAG, "client id" + clients.toString());
-                    }
-                }catch (IOException e){e.printStackTrace();}
-            }
-        };
-        Thread t = new Thread(r);
-        t.start();
-    }
-    */
     /**
      * A ThreadPool for client sockets.
      */
@@ -92,19 +61,12 @@ public class GroupOwnerSocketHandler extends Thread {
     public void run() {
         while (true) {
             try {
-                // A blocking operation. Initiate a ChatManager instance when
-                // there is a new connection
-                /*--------getting client's mac address and IP--------*/
-                addressesSocket = new ServerSocket(Globals.ADDRESSES_PORT);
-                clientSocket = addressesSocket.accept();
-                BufferedReader bufferedReader = new BufferedReader(new InputStreamReader(clientSocket.getInputStream()));
-                InetAddress clientIP = clientSocket.getInetAddress();
-                String clientMAC = bufferedReader.readLine();
-                Log.i(TAG,"Client's IP: "+clientIP+" Client's MAC: "+clientMAC);
-                /*----------------*/
 
+
+
+                getClientAddress();
                 pool.execute(new ChatManager(socket.accept(), handler));
-                Log.d(TAG, "Launching the I/O handler");
+
 
             } catch (IOException e) {
                 try {
@@ -117,6 +79,31 @@ public class GroupOwnerSocketHandler extends Thread {
                 pool.shutdownNow();
                 break;
             }
+        }
+    }
+
+    /**
+     * Opens a client socket to receive MAC address
+     * and gets the IP of the client from the client socket,
+     * maps them by storing them in the "peersAddresses" hashMaps
+     * then broadcasts the hashmap to the peers in the area
+     */
+    public void getClientAddress(){
+        try{
+
+        clientSocket = socket.accept();
+        BufferedReader bufferedReader = new BufferedReader(new InputStreamReader(clientSocket.getInputStream()));
+        InetAddress clientIP = clientSocket.getInetAddress();
+        String clientMAC = bufferedReader.readLine();
+        Log.i(TAG,"Client MAC: "+clientMAC+" Client IP: "+clientIP);
+        Globals.peersAddresses.put(clientMAC, clientIP);
+        postManager.sendAdresses(Globals.peersAddresses);
+        bufferedReader.close();
+        clientSocket.close();
+
+        }
+        catch(IOException e){
+            e.printStackTrace();
         }
     }
 

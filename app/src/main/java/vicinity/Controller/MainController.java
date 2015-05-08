@@ -46,9 +46,7 @@ public class MainController {
         allMessages = new ArrayList<VicinityMessage>();
 
     }
-/*****************************************User's methods**********************************************/
 
-    /*------------------------------Works------------------------------*/
     /**
      * Creates a new user, this method shall be used once only
      * when the user launches the app for the first time
@@ -72,7 +70,6 @@ public class MainController {
         return isCreated;
     }
 
-    /*------------------------------Works------------------------------*/
     /**
      *
      * Retrieves current user's username from database
@@ -112,14 +109,11 @@ public class MainController {
      */
     public boolean muteUser(String userAddress){
         boolean isMuted = false;
-
+        //TODO after fetching IP addresses
         return isMuted;
     }
 
 
-/***************************************Friend's Methods********************************************************/
-
-    /*------------------------------Works------------------------------*/
     /**
      * Validates an input string (username) that shall contain letters, numbers, "-" and "_" ONLY
      * @param username A string
@@ -130,7 +124,6 @@ public class MainController {
     }
 
 
-    /*------------------------------Works------------------------------*/
     /**
      * Adds a new Friend to the database.
      * @param username a friend's instance name.
@@ -172,50 +165,11 @@ public class MainController {
             dbH.close();
         }
         catch(SQLException e){
-            Log.i(TAG,"SQLException > deleteFriend > MainController");
             e.printStackTrace();
         }
         return isDeleted;
     }
 
-    /**
-     * Fetches user's friends from the database
-     * In order to be displayed.
-     * @return friendsList
-
-    public ArrayList<Friend> viewFriendsList(){
-
-        friendsList=new ArrayList<>();
-
-        try{
-            database=dbH.getReadableDatabase();
-            dbH.openDataBase();
-            String query="SELECT * FROM Friend";
-            cursor = database.rawQuery(query,null);
-            if (cursor.moveToFirst()) {
-                do {
-
-                    Friend myFriend = new Friend();
-                    myFriend.setInstanceName(cursor.getString(1)); //getting username from database column #: 1
-                    //myFriend.setStatus(myFriend.isOnline());
-                    myFriend.setAliasName(cursor.getString(3));
-                    friendsList.add(myFriend);
-
-                } while (cursor.moveToNext());
-            }
-            else{
-                Log.i(TAG, "There are no friends in the DB.");
-            }
-            cursor.close();
-            dbH.close();
-        }
-        catch(SQLException e){
-            Log.i(TAG,"SQLException > viewFriendsList > MainController");
-            e.printStackTrace();
-        }
-
-        return friendsList;}//end of viewFriendsList
-     */
     /**
      * This method calls nameValidation from MainController to validate the new username
      * then adds it to the database as an alias name
@@ -225,10 +179,8 @@ public class MainController {
      */
     public boolean changeName(String aliasName, String friendID) throws SQLException{
         boolean isUpdated=false;
-
         if(nameValidation(aliasName))
         {
-
             try{
                 database = dbH.getReadableDatabase();
                 dbH.openDataBase();
@@ -238,7 +190,6 @@ public class MainController {
                 dbH.close();
             }
             catch(SQLiteException e){
-                Log.i(TAG,"SQLiteException > Friend > ChangeName");
                 e.printStackTrace();
             }
         }
@@ -246,7 +197,6 @@ public class MainController {
         return isUpdated;
     }
 
-    /*------------------------------Works------------------------------*/
     /**
      * Checks if a peer is one of the user's friends
      * @param deviceAddress of a peer
@@ -262,6 +212,7 @@ public class MainController {
             cursor.moveToFirst();
             if(cursor.getCount()==0)
                 isFriend=false;
+            //cursor.close();
         }
         catch(SQLException e){
             e.printStackTrace();
@@ -296,10 +247,7 @@ public class MainController {
                     post.setPostedBy(c.getString(c.getColumnIndex("postedBy")));
                     post.setPostedAt(c.getString(c.getColumnIndex("postedAt")));
                     post.setPostID(Integer.valueOf(c.getString(c.getColumnIndex("_id"))));
-                     //post.setPostedBy(new User(c.getString(2)));
                     //contact.setPicture(c.getBlob(3));
-
-                    // Adding post to postList
                     postList.add(post);
                 } while (c.moveToNext());
             }
@@ -313,7 +261,6 @@ public class MainController {
         catch (SQLException e)
         {
             e.printStackTrace();
-            Log.i(TAG, "Error in fetching all posts from DB.");
         }
         return postList;
     }

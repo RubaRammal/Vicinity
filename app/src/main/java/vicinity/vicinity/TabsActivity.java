@@ -116,7 +116,7 @@ public class TabsActivity extends FragmentActivity implements ActionBar.TabListe
     @Override
     protected void onSaveInstanceState(Bundle outState) {
         super.onSaveInstanceState(outState);
-        getSupportFragmentManager().putFragment(outState, "NeighborsFragment", neighbors);
+        //getSupportFragmentManager().putFragment(outState, "NeighborsFragment", neighbors);
     }
     @Override
     public void onResume() {

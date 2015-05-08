@@ -4,6 +4,7 @@ package vicinity.model;
 import android.net.wifi.p2p.WifiP2pDevice;
 import android.os.Parcel;
 import android.os.Parcelable;
+import java.net.InetAddress;
 
 
 /**
@@ -12,10 +13,10 @@ import android.os.Parcelable;
 public class WiFiP2pService implements Parcelable{
     protected WifiP2pDevice device;
     protected String instanceName;
-    protected String serviceRegistrationType;
+    //protected String serviceRegistrationType;
     protected String deviceAddress;
     private String _aliasName;//for friends only
-    private String ipAddress;
+    private InetAddress ipAddress;
 
 
 
@@ -54,24 +55,30 @@ public class WiFiP2pService implements Parcelable{
     /*-----------------------------------------------------*/
 
 
+    /**
+     * Setters and getters.
+     */
     public void setDevice(WifiP2pDevice device){
         this.device=device;
     }
-    public WifiP2pDevice getDevice(){return this.device;}
-    public void setInstanceName(String instanceName){
-        this.instanceName=instanceName;
-    }
+    public void setInstanceName(String username){instanceName = username;}
     public void setDeviceAddress(String deviceAddress){this.deviceAddress = deviceAddress;}
+    public void setIpAddress(InetAddress ip){this.ipAddress=ip;}
+    public void setAliasName(String newName){_aliasName=newName;}
+
+    public WifiP2pDevice getDevice(){return this.device;}
+    //public void setInstanceName(String instanceName){
+      //  this.instanceName=instanceName;
+    //}
     public String getDeviceAddress(){return this.deviceAddress;}
     public String getInstanceName(){return this.instanceName;}
-    public void setServiceRegistrationType(String serviceRegistrationType){
-        this.serviceRegistrationType=serviceRegistrationType;
-    }
-    public String getServiceRegistrationType(){return this.serviceRegistrationType;}
+    //public void setServiceRegistrationType(String serviceRegistrationType){
+       // this.serviceRegistrationType=serviceRegistrationType;
+    //}
     public String getAliasName(){
         return this._aliasName;
     }
-    public void setAliasName(String newName){_aliasName=newName;}
+    public InetAddress getIpAddress(){return this.ipAddress;}
 
 
 }
