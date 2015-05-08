@@ -1,10 +1,11 @@
 package vicinity.model;
 
+import java.io.Serializable;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 
-public class Comment {
+public class Comment implements Serializable{
     private static final String TAG = "CommentClass";
 
     //Comment Atts

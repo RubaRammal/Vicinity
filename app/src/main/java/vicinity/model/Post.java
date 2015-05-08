@@ -1,6 +1,5 @@
 package vicinity.model;
 
-import android.graphics.Bitmap;
 
 import java.io.Serializable;
 import java.text.DateFormat;
@@ -8,9 +7,11 @@ import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
 
+/**
+ * Class that holds the struture of the post
+ */
 public class Post  implements Serializable {
 
-    private static final String TAG = "PostClass";
     private int postID;
     private String postedAt;
     private String postedBy;
@@ -20,41 +21,32 @@ public class Post  implements Serializable {
     private String PhotoPath;
     private String image;
 
-        //Constructor
 
-    //we need this in the MainController -Sarah
     public Post()
     {
         image = "";
 
     }
 
+
+    /**
+     * Public constructor
+     * @param postedBy username
+     * @param postBody a String containing the post
+     */
     public Post(String postedBy, String postBody){
-                Date currentDate= new Date();
-                DateFormat dF=  new SimpleDateFormat("yyyy/MM/dd HH:mm:ss");
-                postedAt= dF.format(currentDate);
-                this.postBody=postBody;
-                this.postedBy=postedBy;
-                postComments = new ArrayList<Comment>();
-                commentsCount=0;
-        image = "";
-
-    }
-
-
-    public Post(String postedBy, String postBody, int postID){
+        //Date and time the post was sent:
         Date currentDate= new Date();
         DateFormat dF=  new SimpleDateFormat("yyyy/MM/dd HH:mm:ss");
         postedAt= dF.format(currentDate);
         this.postBody=postBody;
         this.postedBy=postedBy;
-        this.postID = postID;
         postComments = new ArrayList<Comment>();
         commentsCount=0;
         image = "";
     }
 
-    //Setters and getters
+    /*------Setters and Getters-----*/
     public int getPostID(){
         return this.postID;
     }
@@ -79,13 +71,17 @@ public class Post  implements Serializable {
         return this.postComments;
     }
 
-    public void setPostID (int postID) {
-                this.postID = postID;
-            }
-
+    public void setPostID(int p){
+        this.postID = p;
+    }
     public void setPostedAt(String postedAt) {
                this.postedAt=postedAt;
            }
+    public void setPostDate(){
+        Date currentDate= new Date();
+        DateFormat dF=  new SimpleDateFormat("yyyy/MM/dd HH:mm:ss");
+        postedAt= dF.format(currentDate);
+    }
 
     public int getCommentsCount(){
         return commentsCount;
@@ -119,7 +115,7 @@ public class Post  implements Serializable {
 
     public String toString()
     {
-        return "Posted by: "+postedBy+ " Post Content: "+ postBody+" Date: "+ postedAt;
+        return "Posted by: "+postedBy+ " Post Content: "+ postBody+" Date: "+ postedAt+" PostID: "+postID;
     }
 
 }

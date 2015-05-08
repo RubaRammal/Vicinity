@@ -11,14 +11,19 @@ import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.net.DatagramPacket;
 import java.net.DatagramSocket;
+import java.net.InetAddress;
 import java.net.InetSocketAddress;
+
+import vicinity.model.Comment;
 import vicinity.model.Globals;
 import vicinity.model.Post;
-import vicinity.vicinity.PostListAdapter;
-import vicinity.vicinity.TimelineSectionFragment;
 import java.net.SocketAddress;
-import java.util.ArrayList;
+import java.nio.channels.DatagramChannel;
+import java.util.HashMap;
 
+/**
+ * A Service that listens for incoming UDP broadcasts
+ */
 public class UDPpacketListner extends Service {
 
     private static final String TAG = "UDPpacketListner";
@@ -44,18 +49,19 @@ public class UDPpacketListner extends Service {
         UDPBroadcastThread = new Thread(new Runnable() {
             public void run() {
                 try {
+                    DatagramChannel channel = DatagramChannel.open();
+                    DatagramSocket socket = channel.socket();
 
-                    socket = new DatagramSocket(null);
+                    //socket = new DatagramSocket(port);
                     socket.setReuseAddress(true);
                     SocketAddress socketAddr = new InetSocketAddress(port);
                     socket.setBroadcast(true);
                     socket.bind(socketAddr);
-                    lsnToPostBroadcast(socket);
+                    lsnToBroadcast(socket);
                 }catch(IOException e){
                     e.printStackTrace();
                 }
             }
-
 
         });
         UDPBroadcastThread.start();
@@ -69,11 +75,11 @@ public class UDPpacketListner extends Service {
     }
 
     /**
-     * Listens to broadcasted posts
+     * Listens to UDP broadcasts
      * @param socket
      * @throws IOException
      */
-    public void lsnToPostBroadcast(DatagramSocket socket)throws IOException {
+    public void lsnToBroadcast(DatagramSocket socket)throws IOException {
 
         byte[] buf = new byte[69000];
         try {
@@ -85,10 +91,37 @@ public class UDPpacketListner extends Service {
                 ByteArrayInputStream inputStream = new ByteArrayInputStream(data);
                 ObjectInputStream objectInputStream = new ObjectInputStream(inputStream);
                 String senderIP = packet.getAddress().getHostAddress();
-                Post p = (Post) objectInputStream.readObject();
-                Log.i(TAG,"received object: "+p.getPostBody()+" from: "+senderIP+" "+p.getPostedBy()+" posted at: "+p.getPostedAt());
+                Object obj = objectInputStream.readObject();
+                /*-----Determine if incoming udp packet contains Post, Comment or IpMacPair----*/
+                if (obj instanceof Post){
+                    Post p = (Post) obj;
+                    Log.i(TAG,"received Post object: "+p.getPostBody()+" from: "+senderIP+" "+p.getPostedBy()+" posted at: "+p.getPostedAt());//-Lama
+                    updateUIPosts(p);
 
-                updateUIPosts(p);
+                }
+
+                else if (obj instanceof Comment){
+                    Comment c = (Comment) obj;
+                    Log.i(TAG,"received Comment object: "+c.getCommentBody()+" from: "+senderIP+" "+c.getCommentedBy());
+
+                }
+                else if(obj instanceof HashMap){
+                    Log.i(TAG,"Received addresses hashmap");
+                    HashMap <String, InetAddress> receivedAddresses = (HashMap<String,InetAddress>) obj;
+                    //Update existing hashmap with new addresses if there is any
+                    for (String key : receivedAddresses.keySet()) {
+                        Log.i(TAG,"MAC: "+key+" IP: "+receivedAddresses.get(key));
+                        if (!Globals.peersAddresses.containsKey(key)){
+                            //Add it to the addresses cache if the addresses don't already exist.
+                            Globals.peersAddresses.put(key,receivedAddresses.get(key));
+                            Log.i(TAG,"HashMap: MAC: "+key+" IP: "+Globals.peersAddresses.get(key));
+                        }
+                    }
+
+                }
+
+
+
             }
         }
         catch (ClassNotFoundException e) {

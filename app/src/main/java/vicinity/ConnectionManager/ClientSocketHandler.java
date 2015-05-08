@@ -15,11 +15,10 @@ import vicinity.model.Globals;
 
 public class ClientSocketHandler extends Thread {
 
-    private static final String TAG = "ClientSocketHandler";
+    private static final String TAG = "ClientSocket";
     private Handler handler;
     private ChatManager chat;
     private InetAddress mAddress;
-    private DataOutputStream toGO;
 
     public ClientSocketHandler(Handler handler, InetAddress groupOwnerAddress) {
         this.handler = handler;
@@ -28,27 +27,16 @@ public class ClientSocketHandler extends Thread {
 
     @Override
     public void run() {
-        Socket macSocket = new Socket();
+
         Socket socket = new Socket();
         try {
-            /*-----test----*/
-            //Writing mac address to group owner:
-            if(Globals.MY_MAC!=null){
-                //macSocket.bind(null);
-                macSocket.connect(new InetSocketAddress(mAddress.getHostAddress(),
-                        Globals.ADDRESSES_PORT), 5000);
-                toGO = new DataOutputStream(macSocket.getOutputStream());
-                toGO.writeBytes(Globals.MY_MAC+'\n');
-                toGO.flush();
-                toGO.close();
-                macSocket.close();
-            }
 
+            sendMyMAC();
             socket.bind(null);
             socket.connect(new InetSocketAddress(mAddress.getHostAddress(),
                     Globals.SERVER_PORT), 5000);
-            Log.d(TAG, "Launching the I/O handler");
             chat = new ChatManager(socket, handler);
+
             new Thread(chat).start();
 
         } catch (IOException e) {
@@ -62,4 +50,25 @@ public class ClientSocketHandler extends Thread {
         }
     }
 
+    private void sendMyMAC(){
+        /*-----test----*/
+        try{
+            Socket macSocket = new Socket();
+            DataOutputStream toGO;
+            //Writing mac address to group owner:
+            if(Globals.MY_MAC!=null){
+                //macSocket.bind(null);
+                macSocket.connect(new InetSocketAddress(mAddress.getHostAddress(),
+                        Globals.SERVER_PORT), 5000);
+                toGO = new DataOutputStream(macSocket.getOutputStream());
+                toGO.writeBytes(Globals.MY_MAC+'\n');
+                toGO.flush();
+                toGO.close();
+                macSocket.close();
+            }}
+        catch(IOException e){
+            e.printStackTrace();
+        }
+
+    }
 }

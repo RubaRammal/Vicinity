@@ -120,7 +120,7 @@ public class FriendListAdapter extends BaseAdapter {
                                 Log.i(TAG, "New name: " + value);
                                 try {
                                     if (TabsActivity.controller.changeName(value.toString(), edit.getDeviceAddress())) {
-                                        CharSequence text = edit.getInstanceName() + " is now " + value + "!";
+                                        CharSequence text = edit.getInstanceName() + " is now called" + value + "!";
                                         int duration = Toast.LENGTH_LONG;
                                         Toast toast = Toast.makeText(TabsActivity.ctx, text, duration);
                                         toast.show();

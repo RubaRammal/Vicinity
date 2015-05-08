@@ -70,7 +70,7 @@ public class NewPost extends ActionBarActivity {
 
         mc = new MainController(this);
 
-        postManager = new PostManager(this);
+        postManager = new PostManager();
         postTextField = (EditText) findViewById(R.id.postTextField);
         sendImgButton = (Button) findViewById(R.id.sendImageButton);
         sendImgButton.setEnabled(true);
@@ -132,6 +132,7 @@ public class NewPost extends ActionBarActivity {
             if(Globals.isConnectedToANetwork){
                 aPost.setPostBody(postText);
                 aPost.setPostedBy(mc.retrieveCurrentUsername());
+                aPost.setPostDate();
                 postManager.setPost(aPost);
                 postManager.execute();
                 finish();
