@@ -211,7 +211,7 @@ public class ConnectAndDiscoverService extends Service
      * @param service the service you want to connect to
      */
     @Override
-    public void connectP2p(WiFiP2pService service) {
+    public void connectP2p(final WiFiP2pService service) {
         Log.i(TAG,"connectP2P");
 
         //Wi-Fi P2p configuration for setting up a connection
@@ -238,6 +238,7 @@ public class ConnectAndDiscoverService extends Service
             @Override
             public void onSuccess() {
                 Log.i(TAG,"Connecting to "+ name);
+
                 //TODO check if peer's ip address exists in cache, then set it here
 
             }
@@ -259,7 +260,8 @@ public class ConnectAndDiscoverService extends Service
     public void onConnectionInfoAvailable(WifiP2pInfo p2pInfo) {
         Log.i(TAG,"onConnectionAvailable");
         Thread handler = null;
-
+        //Thread requestServer = new RequestServer();
+        //requestServer.start();
          /*
          * The group owner accepts connections using a server socket and then spawns a
          * client socket for every client. This is handled by {@code
@@ -274,6 +276,8 @@ public class ConnectAndDiscoverService extends Service
                 handler = new GroupOwnerSocketHandler(
                        ChatActivity.handler);
                 handler.start();
+                Thread requestServer = new RequestServer();
+                requestServer.start();
         }
 
         else {
@@ -284,6 +288,8 @@ public class ConnectAndDiscoverService extends Service
                     ChatActivity.handler,
                     p2pInfo.groupOwnerAddress);
             handler.start();
+            Thread requestServer = new RequestServer();
+            requestServer.start();
         }
         }catch (IOException e) {
             Log.d(TAG,"Failed to create a server thread - " + e.getMessage());
@@ -355,6 +361,20 @@ public class ConnectAndDiscoverService extends Service
 
     }
 
+    public static boolean addPeerAsFriend(WiFiP2pService peer){
+
+        if(peer.getIpAddress()==null){
+            //peer.setIpAddress(Globals.peersAddresses.get(peer.getDeviceAddress()));
+           // Log.i("Request","Requested IP: "+Globals.peersAddresses.get(peer.getDeviceAddress()));
+        }
+
+
+
+        return false;
+
+    }
+
+
     /**
      * Disconnects peers
      */
@@ -399,7 +419,6 @@ public class ConnectAndDiscoverService extends Service
                 return "Unknown = " + deviceStatus;
         }
     }
-
 
     /**
      * Setters for neighbors and friends list adapters.

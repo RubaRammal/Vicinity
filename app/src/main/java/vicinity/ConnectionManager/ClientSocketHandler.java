@@ -50,6 +50,10 @@ public class ClientSocketHandler extends Thread {
         }
     }
 
+    /**
+     * Sends MAC address to group owner
+     * when first connected to a group
+     */
     private void sendMyMAC(){
         /*-----test----*/
         try{
@@ -66,6 +70,17 @@ public class ClientSocketHandler extends Thread {
                 toGO.close();
                 macSocket.close();
             }}
+        catch(IOException e){
+            e.printStackTrace();
+        }
+
+    }
+
+    public static void sendFriendRequest(InetAddress requestedIP){
+        try{
+        Socket requestSocket = new Socket (requestedIP, Globals.REQUEST_PORT);
+        requestSocket.close();
+        }
         catch(IOException e){
             e.printStackTrace();
         }

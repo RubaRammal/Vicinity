@@ -24,6 +24,7 @@ public class LaunchActivity extends Activity {
 
     Context context = this;
     MainController controller = new MainController(context);
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -44,6 +45,11 @@ public class LaunchActivity extends Activity {
             public void run() {
 
                 try {
+                    /**
+                    Checks if user is already registered
+                    then navigate to the timeline directly,
+                    if not then display NameActivity to register
+                     */
                     if (controller.retrieveCurrentUsername()==null) {
                         Intent intent = new Intent(context, NameActivity.class);
                         startActivity(intent);

@@ -21,16 +21,24 @@ public class Globals {
     public static final String MSG_ID = "id";
     public static final String MSG_MINE = "isMyMsg";
 
-    public static HashMap<String, InetAddress> peersAddresses = new HashMap<String,InetAddress>();
+
+
+    //public static HashMap<String, InetAddress> peersAddresses = new HashMap<String,InetAddress>();
 
     public static final String REQUEST = "REQ";//sent as a key for friendship request
     public static final String ACCEPT = "YES";
     public static final String DENY = "NO";
-
+    //Port for friend requests among peers
+    public static final int REQUEST_PORT=4144;
+    //A variable for notifications switch if it's on/off
     public static boolean Notification = true;
+    //A variable to check whether the peer is connected to a network or not
     public static boolean isConnectedToANetwork = false;
-    public static String MY_MAC = null;
+    //A variable to check whether WiFi P2P is enabled or not
     public static boolean isWifiEnabled = true;
+    //Current device's P2P MAC address
+    public static String MY_MAC = null;
+
 
 
 
