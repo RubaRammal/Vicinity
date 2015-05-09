@@ -11,12 +11,14 @@ import java.net.InetAddress;
  * A structure to hold service information.
  */
 public class WiFiP2pService implements Parcelable{
+
+
+
     protected WifiP2pDevice device;
-    protected String instanceName;
-    //protected String serviceRegistrationType;
-    protected String deviceAddress;
+    protected String instanceName;//Device name
+    protected String deviceAddress;//Device P2P MAC address
     private String _aliasName;//for friends only
-    private InetAddress ipAddress;
+    private InetAddress ipAddress;//Device local IP address
 
 
 
@@ -65,16 +67,9 @@ public class WiFiP2pService implements Parcelable{
     public void setDeviceAddress(String deviceAddress){this.deviceAddress = deviceAddress;}
     public void setIpAddress(InetAddress ip){this.ipAddress=ip;}
     public void setAliasName(String newName){_aliasName=newName;}
-
     public WifiP2pDevice getDevice(){return this.device;}
-    //public void setInstanceName(String instanceName){
-      //  this.instanceName=instanceName;
-    //}
     public String getDeviceAddress(){return this.deviceAddress;}
     public String getInstanceName(){return this.instanceName;}
-    //public void setServiceRegistrationType(String serviceRegistrationType){
-       // this.serviceRegistrationType=serviceRegistrationType;
-    //}
     public String getAliasName(){
         return this._aliasName;
     }

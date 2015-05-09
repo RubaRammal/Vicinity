@@ -7,9 +7,9 @@ import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.net.InetAddress;
-import java.net.InetSocketAddress;
 import java.net.ServerSocket;
 import java.net.Socket;
+import java.util.HashMap;
 import java.util.concurrent.LinkedBlockingQueue;
 import java.util.concurrent.ThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
@@ -31,6 +31,7 @@ public class GroupOwnerSocketHandler extends Thread {
     private Handler handler;
     private static final String TAG = "GroupOwner";
     PostManager postManager = new PostManager();
+    private HashMap<String, InetAddress> clientsaddresses = new HashMap<>();
 
     public GroupOwnerSocketHandler(Handler handler) throws IOException {
         postManager.execute();
@@ -85,7 +86,7 @@ public class GroupOwnerSocketHandler extends Thread {
     /**
      * Opens a client socket to receive MAC address
      * and gets the IP of the client from the client socket,
-     * maps them by storing them in the "peersAddresses" hashMaps
+     * maps them by storing them in the "clientAddresses" hashMap
      * then broadcasts the hashmap to the peers in the area
      */
     public void getClientAddress(){
@@ -93,11 +94,18 @@ public class GroupOwnerSocketHandler extends Thread {
 
         clientSocket = socket.accept();
         BufferedReader bufferedReader = new BufferedReader(new InputStreamReader(clientSocket.getInputStream()));
+        //getting client's IP from the socket
         InetAddress clientIP = clientSocket.getInetAddress();
+        //reading client's MAC address
         String clientMAC = bufferedReader.readLine();
         Log.i(TAG,"Client MAC: "+clientMAC+" Client IP: "+clientIP);
-        Globals.peersAddresses.put(clientMAC, clientIP);
-        postManager.sendAdresses(Globals.peersAddresses);
+        clientsaddresses.put(clientMAC, clientIP);
+        //Adding group owner mac and address
+        clientsaddresses.put(Globals.MY_MAC,ConnectAndDiscoverService.getGOAddress());
+        //Broadcast all addresses evey time the group owner receives a new address
+        //so new peers can have the whole list of other connected peers
+        postManager.sendAdresses(clientsaddresses);
+
         bufferedReader.close();
         clientSocket.close();
 

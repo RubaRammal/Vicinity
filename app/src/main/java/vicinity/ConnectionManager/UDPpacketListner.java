@@ -34,7 +34,7 @@ public class UDPpacketListner extends Service {
     //To update timeline with posts
     private LocalBroadcastManager updateUIThread;
     //HashMap that stores received addresses pairs
-    private HashMap<String, InetAddress> addressHashMap;
+    private static HashMap<String, InetAddress> addressHashMap;
 
     /*---------Overridden Methods------------*/
     @Override
@@ -160,8 +160,22 @@ public class UDPpacketListner extends Service {
         updateUIThread.sendBroadcast(intent);
     }
 
+    public static InetAddress getPeerAddress(String MAC){
+        if(addressHashMap.containsKey(MAC)){
+            return addressHashMap.get(MAC);
+        }
+        return null;
+    }
+
+    public static boolean doesAddressExist(String MAC){
+        Log.i("Request","Received key= "+MAC);
+        if(addressHashMap.containsKey(MAC))
+            return true;
 
 
+        return false;
+
+    }
 
 
 
