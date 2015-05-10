@@ -16,6 +16,7 @@ import android.widget.BaseAdapter;
 import java.sql.SQLException;
 import java.util.ArrayList;
 
+import vicinity.ConnectionManager.ConnectAndDiscoverService;
 import vicinity.Controller.MainController;
 import vicinity.model.WiFiP2pService;
 
@@ -93,6 +94,10 @@ public class NeighborListAdapter extends BaseAdapter {
                         .setPositiveButton(android.R.string.yes, new DialogInterface.OnClickListener() {
                             public void onClick(DialogInterface dialog, int which) {
                                 try{
+                                    //TODO this button shall be disabled if the user is not connected
+                                    //cause it causes an exception
+
+                                    ConnectAndDiscoverService.addPeerAsFriend(neighbor);
                                     boolean isAdded = controller.addFriend(neighbor.getInstanceName(),neighbor.getDeviceAddress());
                                     if(isAdded){
 

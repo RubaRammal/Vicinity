@@ -27,16 +27,21 @@ import java.util.HashMap;
 public class UDPpacketListner extends Service {
 
     private static final String TAG = "UDPpacketListner";
-    DatagramSocket socket;
-    Integer port = Globals.SERVER_PORT;
-    LocalBroadcastManager updateUIThread;
+    //private DatagramSocket socket;
 
+    //Server port
+    private Integer port = Globals.SERVER_PORT;
+    //To update timeline with posts
+    private LocalBroadcastManager updateUIThread;
+    //HashMap that stores received addresses pairs
+    private static HashMap<String, InetAddress> addressHashMap;
 
     /*---------Overridden Methods------------*/
     @Override
     public void onCreate(){
         super.onCreate();
         updateUIThread= LocalBroadcastManager.getInstance(this);
+        addressHashMap = new HashMap<>();
     }
     @Override
     public IBinder onBind(Intent intent) {
@@ -84,6 +89,7 @@ public class UDPpacketListner extends Service {
         byte[] buf = new byte[69000];
         try {
             while (true) {
+
                 DatagramPacket packet = new DatagramPacket(buf, buf.length);
                 socket.setBroadcast(true);
                 socket.receive(packet);
@@ -91,8 +97,10 @@ public class UDPpacketListner extends Service {
                 ByteArrayInputStream inputStream = new ByteArrayInputStream(data);
                 ObjectInputStream objectInputStream = new ObjectInputStream(inputStream);
                 String senderIP = packet.getAddress().getHostAddress();
+                //Receiving an object
                 Object obj = objectInputStream.readObject();
-                /*-----Determine if incoming udp packet contains Post, Comment or IpMacPair----*/
+
+                /*-----Determine if incoming udp packet contains Post, Comment or HasMap of addresses----*/
                 if (obj instanceof Post){
                     Post p = (Post) obj;
                     Log.i(TAG,"received Post object: "+p.getPostBody()+" from: "+senderIP+" "+p.getPostedBy()+" posted at: "+p.getPostedAt());//-Lama
@@ -111,12 +119,22 @@ public class UDPpacketListner extends Service {
                     //Update existing hashmap with new addresses if there is any
                     for (String key : receivedAddresses.keySet()) {
                         Log.i(TAG,"MAC: "+key+" IP: "+receivedAddresses.get(key));
-                        if (!Globals.peersAddresses.containsKey(key)){
+
+                        if (addressHashMap.isEmpty()){
                             //Add it to the addresses cache if the addresses don't already exist.
-                            Globals.peersAddresses.put(key,receivedAddresses.get(key));
-                            Log.i(TAG,"HashMap: MAC: "+key+" IP: "+Globals.peersAddresses.get(key));
+                            addressHashMap.put(key,receivedAddresses.get(key));
+                            Log.i(TAG,"Hashmap is empty.. MAC: "+key+" IP: "+addressHashMap.get(key));
+                        }
+                        else if (!addressHashMap.containsValue(receivedAddresses.get(key)))
+                        {
+                            addressHashMap.put(key,receivedAddresses.get(key));
+                            Log.i(TAG,"Update hashmap... MAC: "+key+" IP: "+addressHashMap.get(key));
                         }
                     }
+                    /*
+                    for(String key : Globals.peersAddresses.keySet()) {
+                        Log.i(TAG, "Peers addresses " + key + " " + Globals.peersAddresses.get(key));
+                    }*/
 
                 }
 
@@ -142,8 +160,22 @@ public class UDPpacketListner extends Service {
         updateUIThread.sendBroadcast(intent);
     }
 
+    public static InetAddress getPeerAddress(String MAC){
+        if(addressHashMap.containsKey(MAC)){
+            return addressHashMap.get(MAC);
+        }
+        return null;
+    }
+
+    public static boolean doesAddressExist(String MAC){
+        Log.i("Request","Received key= "+MAC);
+        if(addressHashMap.containsKey(MAC))
+            return true;
 
 
+        return false;
+
+    }
 
 
 

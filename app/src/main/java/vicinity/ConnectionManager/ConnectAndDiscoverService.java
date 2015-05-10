@@ -44,7 +44,7 @@ public class ConnectAndDiscoverService extends Service
         implements  WifiP2pManager.ConnectionInfoListener, DeviceClickListener{
 
 
-    public final String TAG = "ConService";
+    private final String TAG = "ConService";
     static public Context ctx;
     private WifiP2pManager manager;
     private final IntentFilter intentFilter = new IntentFilter();
@@ -53,10 +53,11 @@ public class ConnectAndDiscoverService extends Service
     private WifiP2pDnsSdServiceRequest serviceRequest;
     public static NeighborListAdapter neighborListAdapter;
     public static FriendListAdapter friendListAdapter;
-    public MainController controller;
+    private MainController controller;
+    private static final PostManager postManager = new PostManager();
+    private static InetAddress GOIP;
 
-    /*---this is a hashmap to store broadcasted addresses from GO--*/
-    public static HashMap<String, InetAddress> addressesCache = new HashMap<>();
+
 
 
 
@@ -66,6 +67,7 @@ public class ConnectAndDiscoverService extends Service
     public void onCreate(){
         Log.i(TAG,"Service started: "+ Globals.SERVICE_NAME);
 
+        //Registering WiFi P2P intents to broadcastreceiver
         intentFilter.addAction(WifiP2pManager.WIFI_P2P_STATE_CHANGED_ACTION);
         intentFilter.addAction(WifiP2pManager.WIFI_P2P_PEERS_CHANGED_ACTION);
         intentFilter.addAction(WifiP2pManager.WIFI_P2P_CONNECTION_CHANGED_ACTION);
@@ -76,7 +78,8 @@ public class ConnectAndDiscoverService extends Service
         channel = manager.initialize(this, getMainLooper(), null);
         receiver = new WiFiDirectBroadcastReceiver(manager,channel,ctx);
         registerReceiver(receiver,intentFilter);
-        //Changing the username depending on the one in the db
+
+        //Changing the username depending on the registerede one in the database
         try {
             changeDeviceName(controller.retrieveCurrentUsername());
         } catch (SQLException e) {
@@ -211,7 +214,7 @@ public class ConnectAndDiscoverService extends Service
      * @param service the service you want to connect to
      */
     @Override
-    public void connectP2p(WiFiP2pService service) {
+    public void connectP2p(final WiFiP2pService service) {
         Log.i(TAG,"connectP2P");
 
         //Wi-Fi P2p configuration for setting up a connection
@@ -238,13 +241,13 @@ public class ConnectAndDiscoverService extends Service
             @Override
             public void onSuccess() {
                 Log.i(TAG,"Connecting to "+ name);
-                //TODO check if peer's ip address exists in cache, then set it here
 
             }
 
             @Override
             public void onFailure(int errorCode) {
                 Log.i(TAG,"Failed connecting to service");
+                //TODO Cancel any attempt to connect here
             }
         });
     }
@@ -266,7 +269,7 @@ public class ConnectAndDiscoverService extends Service
          * GroupOwnerSocketHandler}
          */
         //TODO a condition for neighbor and friend
-
+        GOIP = p2pInfo.groupOwnerAddress;
         try {
         if (p2pInfo.isGroupOwner) {
             Log.i(TAG, "Connected as group owner");
@@ -274,6 +277,8 @@ public class ConnectAndDiscoverService extends Service
                 handler = new GroupOwnerSocketHandler(
                        ChatActivity.handler);
                 handler.start();
+                Thread requestServer = new RequestServer();
+                requestServer.start();
         }
 
         else {
@@ -284,6 +289,8 @@ public class ConnectAndDiscoverService extends Service
                     ChatActivity.handler,
                     p2pInfo.groupOwnerAddress);
             handler.start();
+            Thread requestServer = new RequestServer();
+            requestServer.start();
         }
         }catch (IOException e) {
             Log.d(TAG,"Failed to create a server thread - " + e.getMessage());
@@ -297,6 +304,8 @@ public class ConnectAndDiscoverService extends Service
         startChatting();
 
     }
+
+
     @Override
     public void chatWithFriend(WiFiP2pService friend){
         startChatting();
@@ -315,7 +324,14 @@ public class ConnectAndDiscoverService extends Service
 
     }
 
-
+    /**
+     * Get Group Owner's IP address of the current network
+     * @return IP address of group owner
+     */
+    public static InetAddress getGOAddress(){
+        Log.i("Request","GO IP: "+GOIP);
+        return GOIP;
+    }
 
 
     /**
@@ -354,6 +370,25 @@ public class ConnectAndDiscoverService extends Service
 
 
     }
+
+
+    public static boolean addPeerAsFriend(WiFiP2pService peer){
+            //fetching device's IP address from cache
+            if(UDPpacketListner.doesAddressExist(peer.getDeviceAddress()))
+            {   peer.setIpAddress(UDPpacketListner.getPeerAddress(peer.getDeviceAddress()));
+                Log.i("Request","Requested IP: "+peer.getIpAddress());
+                postManager.setRequest(peer.getIpAddress());
+                postManager.execute();
+                //TODO possible illegalstateexception cause of .execute(), fix it later
+                return true;
+            }
+            else
+                Log.i("Request","No IP address found");
+
+        return false;
+
+    }
+
 
     /**
      * Disconnects peers
@@ -399,7 +434,6 @@ public class ConnectAndDiscoverService extends Service
                 return "Unknown = " + deviceStatus;
         }
     }
-
 
     /**
      * Setters for neighbors and friends list adapters.

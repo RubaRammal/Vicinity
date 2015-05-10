@@ -9,6 +9,7 @@ import java.net.DatagramPacket;
 import java.net.DatagramSocket;
 import java.net.InetAddress;
 import java.net.InetSocketAddress;
+import java.net.Socket;
 import java.net.SocketAddress;
 import java.util.HashMap;
 
@@ -28,10 +29,26 @@ public class PostManager extends AsyncTask <Void, Void, Void> {
     private static final String TAG = "PostManager";
     private Post post;
     private Comment comment;
-    private boolean flag;//to determine if it's a comment or a post
+    //private boolean flag;//to determine if it's a comment or a post
     private static final int TIMEOUT_MS = 500;
     DatagramSocket socket;
 
+    private boolean requestFlag = false;//request
+    private boolean commentFlag = false;
+    private boolean postFlag = false;
+    InetAddress requestIP;
+
+
+
+    /**
+     * Set requestIP from ConnectAndDiscoverService
+     * to send a friend request to a peer
+     * @param requestIP IP address of a peer
+     */
+    public void setRequest(InetAddress requestIP){
+        this.requestIP = requestIP;
+        requestFlag=true;
+    }
 
     /**
      * Set post from the NewPost class
@@ -39,7 +56,7 @@ public class PostManager extends AsyncTask <Void, Void, Void> {
      */
     public void setPost(Post post){
         this.post=post;
-        flag = true;
+        postFlag = true;
 
     }
 
@@ -48,7 +65,7 @@ public class PostManager extends AsyncTask <Void, Void, Void> {
      * @param comment a new comment to be broadcasted
      */
     public void setComment(Comment comment){this.comment = comment;
-    flag=false;}
+        commentFlag=true;}
 
 
     @Override
@@ -69,12 +86,16 @@ public class PostManager extends AsyncTask <Void, Void, Void> {
             socket.setBroadcast(true);
             socket.bind(socketAddr);
             socket.setSoTimeout(TIMEOUT_MS);
-            if(flag == true) {//-Lama
-                Log.i(TAG,"inside if, flag= "+flag);
+
+            if(requestFlag){
+                sendFriendRequest(requestIP);
+            }
+            else if(postFlag) {
+                Log.i(TAG,"inside if, flag= "+postFlag);
                 sendPost(post, socket);
             }
-            else{
-                Log.i(TAG,"inside else, flag= "+flag);
+            else if (commentFlag){
+                Log.i(TAG,"inside else, flag= "+commentFlag);
                 sendComment(comment, socket);
             }
 
@@ -116,6 +137,11 @@ public class PostManager extends AsyncTask <Void, Void, Void> {
         }
     }
 
+    /**
+     * Broadacasts a comment of a specified post
+     * @param comment Comment object
+     * @param socket DatagramSocket
+     */
     public void sendComment(Comment comment, DatagramSocket socket){//-Lama
         try{
 
@@ -140,6 +166,12 @@ public class PostManager extends AsyncTask <Void, Void, Void> {
             e.printStackTrace();
         }
     }
+
+
+    /**
+     * Broadcast (MAC,IP) Addresses to peers in local network
+     * @param addresses a HashMap containing addresses from group owner
+     */
     public void sendAdresses(HashMap addresses){
         try{
             if(!addresses.isEmpty()) {
@@ -155,11 +187,30 @@ public class PostManager extends AsyncTask <Void, Void, Void> {
                 DatagramPacket datagramPacket = new DatagramPacket(data, data.length,
                         broadcastIP, Globals.SERVER_PORT);
                 socket.send(datagramPacket);
+
             }
         }
         catch(IOException e){
             e.printStackTrace();
         }
+    }
+
+
+    /**
+     * Opens a socket directly to a request server
+     * at another peer to send a friend's request
+     * @param requestedIP IP address of a peer
+     */
+    public static void sendFriendRequest(InetAddress requestedIP){
+        try{
+            Log.i("Request","Sending request to.."+requestedIP);
+            Socket requestSocket = new Socket (requestedIP, Globals.REQUEST_PORT);
+            requestSocket.close();
+        }
+        catch(IOException e){
+            e.printStackTrace();
+        }
+
     }
 
 }

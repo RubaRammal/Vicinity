@@ -50,8 +50,11 @@ public class ClientSocketHandler extends Thread {
         }
     }
 
+    /**
+     * Sends MAC address to group owner
+     * when first connected to a group
+     */
     private void sendMyMAC(){
-        /*-----test----*/
         try{
             Socket macSocket = new Socket();
             DataOutputStream toGO;
@@ -71,4 +74,6 @@ public class ClientSocketHandler extends Thread {
         }
 
     }
+
+
 }
