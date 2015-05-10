@@ -33,6 +33,12 @@ public class GroupOwnerSocketHandler extends Thread {
     PostManager postManager = new PostManager();
     private HashMap<String, InetAddress> clientsaddresses = new HashMap<>();
 
+
+    /**
+     * Public constructor
+     * @param handler/
+     * @throws IOException
+     */
     public GroupOwnerSocketHandler(Handler handler) throws IOException {
         postManager.execute();
         this.handler = handler;
@@ -58,6 +64,8 @@ public class GroupOwnerSocketHandler extends Thread {
             THREAD_COUNT, THREAD_COUNT, 10, TimeUnit.SECONDS,
             new LinkedBlockingQueue<Runnable>());
 
+
+    /*---------Overridden Methods------------*/
     @Override
     public void run() {
         while (true) {
@@ -82,6 +90,7 @@ public class GroupOwnerSocketHandler extends Thread {
             }
         }
     }
+    /*---------------------------------------*/
 
     /**
      * Opens a client socket to receive MAC address
@@ -104,7 +113,7 @@ public class GroupOwnerSocketHandler extends Thread {
         clientsaddresses.put(Globals.MY_MAC,ConnectAndDiscoverService.getGOAddress());
         //Broadcast all addresses evey time the group owner receives a new address
         //so new peers can have the whole list of other connected peers
-        postManager.sendAdresses(clientsaddresses);
+        postManager.sendAddresses(clientsaddresses);
 
         bufferedReader.close();
         clientSocket.close();

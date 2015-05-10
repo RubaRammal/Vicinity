@@ -1,9 +1,7 @@
 package vicinity.vicinity;
 
 import android.app.Activity;
-import android.app.AlertDialog;
 import android.content.Context;
-import android.content.DialogInterface;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -17,11 +15,10 @@ import android.widget.ProgressBar;
 import android.widget.TextView;
 
 
-import java.sql.SQLException;
 import java.util.ArrayList;
 
 import vicinity.ConnectionManager.ConnectAndDiscoverService;
-import vicinity.model.WiFiP2pService;
+import vicinity.model.Neighbor;
 import vicinity.Controller.MainController;
 
 
@@ -30,8 +27,8 @@ public class NeighborSectionFragment extends Fragment {
     public final String TAG = "Neighbors";
 
     private Context ctx;
-    private static ArrayList<WiFiP2pService> listOfServices;
-    private static ArrayList<WiFiP2pService> friendServices;
+    private static ArrayList<Neighbor> listOfServices;
+    private static ArrayList<Neighbor> friendServices;
     private MainController controller;
     private ListView lvn;
     private ListView lvf;
@@ -43,8 +40,8 @@ public class NeighborSectionFragment extends Fragment {
 
 
     public interface DeviceClickListener {
-        public void connectP2p(WiFiP2pService wifiP2pService);
-        public void chatWithFriend(WiFiP2pService wiFiP2pService);
+        public void connectP2p(Neighbor wifiP2pService);
+        public void chatWithFriend(Neighbor neighbor);
 
     }
 
@@ -76,7 +73,7 @@ public class NeighborSectionFragment extends Fragment {
         super.onSaveInstanceState(outState);
         Log.i(TAG,"onSaveInstanceState");
         if(listOfServices.size()!=0){
-            outState.putParcelableArrayList("Neighbors",listOfServices);
+            //outState.putParcelableArrayList("Neighbors",listOfServices);
         }
 
     }
@@ -88,7 +85,7 @@ public class NeighborSectionFragment extends Fragment {
         if (savedInstanceState != null) {
             Log.i(TAG,"SavedInstance!=null");
            //Restore state here
-            listOfServices= savedInstanceState.getParcelableArrayList("Neighbors");
+            //listOfServices= savedInstanceState.getParcelableArrayList("Neighbors");
             neighborListAdapter.notifyDataSetChanged();
         }
 
@@ -102,8 +99,8 @@ public class NeighborSectionFragment extends Fragment {
 
 
         controller = new MainController(getActivity());
-        listOfServices = new ArrayList<WiFiP2pService>();
-        friendServices = new ArrayList<WiFiP2pService>();
+        listOfServices = new ArrayList<Neighbor>();
+        friendServices = new ArrayList<Neighbor>();
         ctx = this.getActivity();
 
         //progress = (ProgressBar) rootView.findViewById(R.id.temp);
@@ -138,9 +135,9 @@ public class NeighborSectionFragment extends Fragment {
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
                 Log.i(TAG,"Clicked: "+neighborListAdapter.getItem(position).toString()) ;
-                final WiFiP2pService neighbor = (WiFiP2pService) neighborListAdapter.getItem(position);
+                final Neighbor neighbor = (Neighbor) neighborListAdapter.getItem(position);
                 final int p = position;
-                ((DeviceClickListener) ConnectAndDiscoverService.ctx).connectP2p((WiFiP2pService) neighborListAdapter
+                ((DeviceClickListener) ConnectAndDiscoverService.ctx).connectP2p((Neighbor) neighborListAdapter
                         .getItem(p));
             }
         });
@@ -150,24 +147,24 @@ public class NeighborSectionFragment extends Fragment {
         return rootView;
     }
 
-        public static void updateDeletedFriend(WiFiP2pService deletedFriend){
+        public static void updateDeletedFriend(Neighbor deletedFriend){
                 friendServices.remove(deletedFriend);
                 listOfServices.add(deletedFriend);
                 friendListAdapter.notifyDataSetChanged();
                 neighborListAdapter.notifyDataSetChanged();
             }
-        public static void updateAddedFriend(WiFiP2pService neighbor){
+        public static void updateAddedFriend(Neighbor neighbor){
             friendServices.add(neighbor);
             friendListAdapter.notifyDataSetChanged();
             listOfServices.remove(neighbor);
             neighborListAdapter.notifyDataSetChanged();
         }
 
-    public static void addToFriendsList(WiFiP2pService friend){
+    public static void addToFriendsList(Neighbor friend){
         friendServices.add(friend);
         friendListAdapter.notifyDataSetChanged();
     }
-    public static void addToNeighborssList(WiFiP2pService neighbor){
+    public static void addToNeighborssList(Neighbor neighbor){
         listOfServices.add(neighbor);
         neighborListAdapter.notifyDataSetChanged();
     }

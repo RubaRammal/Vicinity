@@ -27,7 +27,7 @@ import java.util.Map;
 import vicinity.Controller.MainController;
 import vicinity.model.DBHandler;
 import vicinity.model.Globals;
-import vicinity.model.WiFiP2pService;
+import vicinity.model.Neighbor;
 import vicinity.vicinity.ChatActivity;
 import vicinity.vicinity.FriendListAdapter;
 import vicinity.vicinity.NeighborListAdapter;
@@ -54,7 +54,6 @@ public class ConnectAndDiscoverService extends Service
     public static NeighborListAdapter neighborListAdapter;
     public static FriendListAdapter friendListAdapter;
     private MainController controller;
-    private static final PostManager postManager = new PostManager();
     private static InetAddress GOIP;
 
 
@@ -62,7 +61,7 @@ public class ConnectAndDiscoverService extends Service
 
 
 
-    /******************Overridden Methods******************************/
+    /*---------Overridden Methods------------*/
     @Override
     public void onCreate(){
         Log.i(TAG,"Service started: "+ Globals.SERVICE_NAME);
@@ -72,14 +71,21 @@ public class ConnectAndDiscoverService extends Service
         intentFilter.addAction(WifiP2pManager.WIFI_P2P_PEERS_CHANGED_ACTION);
         intentFilter.addAction(WifiP2pManager.WIFI_P2P_CONNECTION_CHANGED_ACTION);
         intentFilter.addAction(WifiP2pManager.WIFI_P2P_THIS_DEVICE_CHANGED_ACTION);
+
         ctx= ConnectAndDiscoverService.this;
         controller = new MainController(ctx);
+
+        //Initializing WiFiP2pManager
         manager = (WifiP2pManager) getSystemService(Context.WIFI_P2P_SERVICE);
+
+        //Registers the application with the Wi-Fi framework.
         channel = manager.initialize(this, getMainLooper(), null);
+
+        //Initializing and registering broadcastreceiver and its intents
         receiver = new WiFiDirectBroadcastReceiver(manager,channel,ctx);
         registerReceiver(receiver,intentFilter);
 
-        //Changing the username depending on the registerede one in the database
+        //Changing the username depending on the registered one in the database
         try {
             changeDeviceName(controller.retrieveCurrentUsername());
         } catch (SQLException e) {
@@ -90,7 +96,6 @@ public class ConnectAndDiscoverService extends Service
 
     @Override
     public IBinder onBind(Intent intent) {
-        Log.i(TAG, "onBind");
         throw new UnsupportedOperationException("Not yet implemented");
     }
     @Override
@@ -104,7 +109,7 @@ public class ConnectAndDiscoverService extends Service
 
     }
 
-    /************************************************************/
+    /*-----------------------------------------*/
 
 
     /**
@@ -124,13 +129,17 @@ public class ConnectAndDiscoverService extends Service
             @Override
             public void onFailure(int error) {
                 Log.i(TAG,"Failed to add a service");
+                //TODO Must give user feedback here
             }
         });
-    }//end
+    }
 
     /**
-     *First discoverService() registers listeners for DNS-SD services
+     * First discoverService() registers listeners for DNS-SD services
      * Then it creates a service discovery request and initiates service discovery
+     * afterwards, it finds peers with WiFi direct in the area
+     * filters them according to their services, then filters them into two lists
+     * friends and neighbor.
      */
     private void discoverService() {
         Log.i(TAG,"discoverService");
@@ -142,17 +151,14 @@ public class ConnectAndDiscoverService extends Service
                         /*---Filtering services so the user can only see Vicinity users---*/
                         if (instanceName.equals(Globals.SERVICE_NAME)) {
 
-                                WiFiP2pService service = new WiFiP2pService(srcDevice);
-                                //service.setServiceRegistrationType(registrationType);
-                                //Log.i(TAG, "Name: " + service.getInstanceName() + " Address: " + service.getDeviceAddress());
-
+                                Neighbor service = new Neighbor(srcDevice.deviceName,srcDevice.deviceAddress,getDeviceStatus(srcDevice.status));
+                                Log.i(TAG,"Neighbor: "+service.toString());
+                                //Check if he/she is a friend
                                 if(controller.isThisMyFriend(srcDevice.deviceAddress))
                                 {
-
                                     NeighborSectionFragment.addToFriendsList(service);
                                 }
                                 else{
-
                                     NeighborSectionFragment.addToNeighborssList(service);
                                 }
 
@@ -168,9 +174,7 @@ public class ConnectAndDiscoverService extends Service
                     public void onDnsSdTxtRecordAvailable(
                             String fullDomainName, Map<String, String> record,
                             WifiP2pDevice device) {
-                        Log.d(TAG,
-                                device.deviceName + " is "
-                                        + record.get(Globals.TXTRECORD_PROP_AVAILABLE));
+
 
                     }
                 });
@@ -187,7 +191,7 @@ public class ConnectAndDiscoverService extends Service
                     }
                     @Override
                     public void onFailure(int arg0) {
-                        Log.i(TAG,"Failed adding service discovery request");
+                        Log.i(TAG,"Failed adding service discovery request: "+getFailureReason(arg0));
                     }
                 });
         //2. Initiating service discovery.
@@ -200,7 +204,8 @@ public class ConnectAndDiscoverService extends Service
 
             @Override
             public void onFailure(int arg0) {
-                Log.i(TAG, "Service discovery failed");
+                Log.i(TAG, "Service discovery failed: "+getFailureReason(arg0));
+
 
             }
         });
@@ -208,21 +213,23 @@ public class ConnectAndDiscoverService extends Service
     }//end of discoverServices
 
 
-
     /**
-     * This method connects peers with each other
-     * @param service the service you want to connect to
+     * Connects devices together
+     * @param service a Neighbor to be connected to
      */
     @Override
-    public void connectP2p(final WiFiP2pService service) {
+    public void connectP2p(Neighbor service) {
         Log.i(TAG,"connectP2P");
 
         //Wi-Fi P2p configuration for setting up a connection
         WifiP2pConfig config = new WifiP2pConfig();
-        config.deviceAddress = service.getDevice().deviceAddress;//device unique MAC address
-        final String name=service.getDevice().deviceName;//Device name
-        config.wps.setup = WpsInfo.PBC;//Wifi permission
+        config.deviceAddress = service.getDeviceAddress();//device unique MAC address
+        final String name=service.getInstanceName();//Device name
+        config.wps.setup = WpsInfo.PBC;//Wifi permission Push Button
 
+
+        /*//I've deleted this cause it stops service discovery after connection
+        and we do not want that
         if (serviceRequest != null)
             manager.removeServiceRequest(channel, serviceRequest,
                     new WifiP2pManager.ActionListener() {
@@ -234,7 +241,7 @@ public class ConnectAndDiscoverService extends Service
                         @Override
                         public void onFailure(int arg0) {
                         }
-                    });
+                    });*/
 
             manager.connect(channel, config, new WifiP2pManager.ActionListener() {
 
@@ -246,8 +253,21 @@ public class ConnectAndDiscoverService extends Service
 
             @Override
             public void onFailure(int errorCode) {
-                Log.i(TAG,"Failed connecting to service");
-                //TODO Cancel any attempt to connect here
+                Log.i(TAG,"Failed connecting to service: "+getFailureReason(errorCode));
+
+                //Since it resulted in a failure, cancel any attempt to connect to the peer
+                manager.cancelConnect(channel, new WifiP2pManager.ActionListener() {
+                    @Override
+                    public void onSuccess() {
+                        Log.i(TAG,"Connection cancelled");
+                    }
+
+
+                    @Override
+                    public void onFailure(int reason) {
+                        Log.i(TAG,"Reason: "+getFailureReason(reason));
+                    }
+                });
             }
         });
     }
@@ -262,6 +282,7 @@ public class ConnectAndDiscoverService extends Service
     public void onConnectionInfoAvailable(WifiP2pInfo p2pInfo) {
         Log.i(TAG,"onConnectionAvailable");
         Thread handler = null;
+
 
          /*
          * The group owner accepts connections using a server socket and then spawns a
@@ -305,9 +326,9 @@ public class ConnectAndDiscoverService extends Service
 
     }
 
-
+    ///IGNORE THIS RUBBISH
     @Override
-    public void chatWithFriend(WiFiP2pService friend){
+    public void chatWithFriend(Neighbor friend){
         startChatting();
     }
 
@@ -372,22 +393,7 @@ public class ConnectAndDiscoverService extends Service
     }
 
 
-    public static boolean addPeerAsFriend(WiFiP2pService peer){
-            //fetching device's IP address from cache
-            if(UDPpacketListner.doesAddressExist(peer.getDeviceAddress()))
-            {   peer.setIpAddress(UDPpacketListner.getPeerAddress(peer.getDeviceAddress()));
-                Log.i("Request","Requested IP: "+peer.getIpAddress());
-                postManager.setRequest(peer.getIpAddress());
-                postManager.execute();
-                //TODO possible illegalstateexception cause of .execute(), fix it later
-                return true;
-            }
-            else
-                Log.i("Request","No IP address found");
 
-        return false;
-
-    }
 
 
     /**
@@ -414,7 +420,8 @@ public class ConnectAndDiscoverService extends Service
 
 
     /**
-     *
+     * Converts an integer that indicates device status into
+     * a String,this method is mainly used for debugging reasons
      * @param deviceStatus int a WiFiP2pDevice status
      * @return A String that translates that status
      */
@@ -434,7 +441,27 @@ public class ConnectAndDiscoverService extends Service
                 return "Unknown = " + deviceStatus;
         }
     }
+    /**
+     * Converts an integer that indicates a reason code into
+     * a String, this method is mainly used for debugging reasons
+     * @param reasonCode int a failure reason code
+     * @return A String that translates that status
+     */
+    public static String getFailureReason(int reasonCode){
+        switch (reasonCode) {
+            case WifiP2pManager.ERROR:
+                return "Error";
+            case WifiP2pManager.BUSY:
+                return "Busy";
+            case WifiP2pManager.P2P_UNSUPPORTED:
+                return "P2P Unsupported";
+            case WifiP2pManager.NO_SERVICE_REQUESTS:
+                return "No Service Requests";
 
+            default:
+                return "Unknown = " + reasonCode;
+        }
+    }
     /**
      * Setters for neighbors and friends list adapters.
      */

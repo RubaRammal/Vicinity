@@ -23,18 +23,15 @@ import java.util.HashMap;
 
 /**
  * A Service that listens for incoming UDP broadcasts
+ * it listens to posts, comments and addresses broadcasts
  */
 public class UDPpacketListner extends Service {
 
     private static final String TAG = "UDPpacketListner";
-    //private DatagramSocket socket;
+    private Integer port = Globals.SERVER_PORT;    //Server port
+    private LocalBroadcastManager updateUIThread;     //To update timeline with posts
+    private static HashMap<String, InetAddress> addressHashMap;    //HashMap that stores received addresses pairs
 
-    //Server port
-    private Integer port = Globals.SERVER_PORT;
-    //To update timeline with posts
-    private LocalBroadcastManager updateUIThread;
-    //HashMap that stores received addresses pairs
-    private static HashMap<String, InetAddress> addressHashMap;
 
     /*---------Overridden Methods------------*/
     @Override
@@ -81,7 +78,7 @@ public class UDPpacketListner extends Service {
 
     /**
      * Listens to UDP broadcasts
-     * @param socket
+     * @param socket DatagramSocket
      * @throws IOException
      */
     public void lsnToBroadcast(DatagramSocket socket)throws IOException {
@@ -116,26 +113,23 @@ public class UDPpacketListner extends Service {
                 else if(obj instanceof HashMap){
                     Log.i(TAG,"Received addresses hashmap");
                     HashMap <String, InetAddress> receivedAddresses = (HashMap<String,InetAddress>) obj;
-                    //Update existing hashmap with new addresses if there is any
                     for (String key : receivedAddresses.keySet()) {
                         Log.i(TAG,"MAC: "+key+" IP: "+receivedAddresses.get(key));
 
-                        if (addressHashMap.isEmpty()){
-                            //Add it to the addresses cache if the addresses don't already exist.
-                            addressHashMap.put(key,receivedAddresses.get(key));
-                            Log.i(TAG,"Hashmap is empty.. MAC: "+key+" IP: "+addressHashMap.get(key));
-                        }
-                        else if (!addressHashMap.containsValue(receivedAddresses.get(key)))
+                        //Update current addresses cache (HashMap) with new addresses
+                        if (!addressHashMap.containsValue(receivedAddresses.get(key)) && !key.equals(Globals.MY_MAC))
                         {
                             addressHashMap.put(key,receivedAddresses.get(key));
                             Log.i(TAG,"Update hashmap... MAC: "+key+" IP: "+addressHashMap.get(key));
                         }
-                    }
-                    /*
-                    for(String key : Globals.peersAddresses.keySet()) {
-                        Log.i(TAG, "Peers addresses " + key + " " + Globals.peersAddresses.get(key));
-                    }*/
+                        //if it was my IP-MAC pair then update my IP address only
+                        else if(key.equals(Globals.MY_MAC)){
+                            Log.i(TAG,"This is my MAC address");
+                            if(Globals.MY_IP!=null)
+                                Globals.MY_IP= addressHashMap.get(Globals.MY_MAC);
+                        }
 
+                    }
                 }
 
 
@@ -160,6 +154,12 @@ public class UDPpacketListner extends Service {
         updateUIThread.sendBroadcast(intent);
     }
 
+
+    /**
+     * Retrieves the peer's IP from given key (MAC)
+     * @param MAC the peer's MAC address
+     * @return The mapped IP address of the peer
+     */
     public static InetAddress getPeerAddress(String MAC){
         if(addressHashMap.containsKey(MAC)){
             return addressHashMap.get(MAC);
@@ -167,14 +167,16 @@ public class UDPpacketListner extends Service {
         return null;
     }
 
+
+    /**
+     * Checks if the given MAC address is stored
+     * and mapped to the IP address of the peer in the addresses cache
+     * @param MAC String contains MAC address of the peer
+     * @return a boolean that is true if the address exists, false otherwise
+     */
     public static boolean doesAddressExist(String MAC){
         Log.i("Request","Received key= "+MAC);
-        if(addressHashMap.containsKey(MAC))
-            return true;
-
-
-        return false;
-
+        return addressHashMap.containsKey(MAC);
     }
 
 

@@ -18,16 +18,16 @@ import android.widget.Toast;
 import java.sql.SQLException;
 import java.util.ArrayList;
 
-import vicinity.model.WiFiP2pService;
+import vicinity.model.Neighbor;
 
 
 public class FriendListAdapter extends BaseAdapter {
     private LayoutInflater mInflater;
-    ArrayList<WiFiP2pService> services;
+    ArrayList<Neighbor> services;
     private ImageButton deleteFriend, editFriendName;
 
     private static final String TAG ="FriendsListAdpt";
-    public FriendListAdapter(Context context, ArrayList<WiFiP2pService> services){
+    public FriendListAdapter(Context context, ArrayList<Neighbor> services){
         this.services = services;
         mInflater = LayoutInflater.from(context);
 
@@ -73,7 +73,7 @@ public class FriendListAdapter extends BaseAdapter {
 
             @Override
             public void onClick(View arg0) {
-                final WiFiP2pService deleteFriend = (WiFiP2pService)getItem(position);
+                final Neighbor deleteFriend = (Neighbor)getItem(position);
                 Log.i("FriendsListAdpt","Clicked delete for: "+deleteFriend.getInstanceName());
                 new AlertDialog.Builder(TabsActivity.ctx)
                         .setTitle("Delete Friend")
@@ -108,7 +108,7 @@ public class FriendListAdapter extends BaseAdapter {
             final EditText input = new EditText(TabsActivity.ctx);
             @Override
             public void onClick(View arg0) {
-                final WiFiP2pService edit = (WiFiP2pService)getItem(position);
+                final Neighbor edit = (Neighbor)getItem(position);
                 Log.i("FriendsListAdpt","Clicked changeName for: "+edit.getInstanceName());
                 new AlertDialog.Builder(TabsActivity.ctx)
                         .setTitle("Edit Name")
@@ -124,8 +124,8 @@ public class FriendListAdapter extends BaseAdapter {
                                         int duration = Toast.LENGTH_LONG;
                                         Toast toast = Toast.makeText(TabsActivity.ctx, text, duration);
                                         toast.show();
-                                        ((WiFiP2pService) getItem(position)).setAliasName(value.toString());
-                                        ((WiFiP2pService) getItem(position)).setInstanceName(value.toString());
+                                        ((Neighbor) getItem(position)).setAliasName(value.toString());
+                                        ((Neighbor) getItem(position)).setInstanceName(value.toString());
 
 
                                     }

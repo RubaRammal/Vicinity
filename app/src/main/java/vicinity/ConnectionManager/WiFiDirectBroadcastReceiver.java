@@ -13,6 +13,7 @@ import android.net.wifi.p2p.WifiP2pManager.Channel;
 import android.net.wifi.p2p.WifiP2pManager.ConnectionInfoListener;
 import android.util.Log;
 import vicinity.model.Globals;
+import vicinity.model.Neighbor;
 
 /**
  * this class is a WiFi BroadcastReceiver
@@ -25,6 +26,7 @@ public class WiFiDirectBroadcastReceiver extends BroadcastReceiver {
     private WifiP2pManager manager;
     private Channel channel;
     private Context context;
+    private static Neighbor me;
 
     /**
      * @param manager WifiP2pManager system service
@@ -71,6 +73,7 @@ public class WiFiDirectBroadcastReceiver extends BroadcastReceiver {
             WifiP2pDevice device = (WifiP2pDevice) intent
                     .getParcelableExtra(WifiP2pManager.EXTRA_WIFI_P2P_DEVICE);
             //obtaining this device's mac address
+            me = new Neighbor(device.deviceName,device.deviceAddress,ConnectAndDiscoverService.getDeviceStatus(device.status));
             if(Globals.MY_MAC == null)
                 {
                     Globals.MY_MAC = device.deviceAddress;
@@ -100,5 +103,16 @@ public class WiFiDirectBroadcastReceiver extends BroadcastReceiver {
 
         }
 
+    }//end onReceive
+
+    /**
+     * Gets current device info, this method is
+     * used in sending friends requests
+     * @return a Neighbor object that
+     * contains current device's info
+     *
+     */
+    public static Neighbor getMyP2pInfo(){
+        return me;
     }
 }
