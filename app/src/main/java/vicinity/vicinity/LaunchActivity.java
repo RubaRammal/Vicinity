@@ -6,19 +6,18 @@ import android.os.Bundle;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.content.Context;
-import java.io.IOException;
 import java.sql.SQLException;
 import java.util.Timer;
 import java.util.TimerTask;
 
-import javax.net.ssl.SSLException;
 
 import vicinity.Controller.MainController;
 import vicinity.model.DBHandler;
 
 /**
  * Launch activity displays the app's logo
- * for several seconds.
+ * for several seconds then directs the user to the Timeline
+ * if she/he was already registered, if not then displays the username activity.
  */
 public class LaunchActivity extends Activity {
 

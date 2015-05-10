@@ -32,7 +32,9 @@ import vicinity.Controller.MainController;
 import vicinity.model.Globals;
 import vicinity.model.Post;
 
-
+/**
+ * An Activity to add a new post.
+ */
 public class NewPost extends ActionBarActivity {
 
     private static final String TAG = "NewPost";

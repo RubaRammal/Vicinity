@@ -1,6 +1,8 @@
 package vicinity.Controller;
 
 
+import vicinity.ConnectionManager.PostManager;
+import vicinity.ConnectionManager.UDPpacketListner;
 import vicinity.model.*;
 
 import android.content.ContentValues;
@@ -16,21 +18,28 @@ import org.json.JSONObject;
 import java.sql.SQLException;
 import java.util.ArrayList;
 
-
+/**
+ * This is the main class that integrates different components of the system
+ * it acts as the intermediary between model and view
+ */
 public class MainController {
 
     private static final String TAG = "Main Controller";
     private SQLiteDatabase database;
     private DBHandler dbH;
     private Context context;
-    private ArrayList<WiFiP2pService> friendsList;
+    private ArrayList<Neighbor> friendsList;
     private ArrayList<Post> postList;
     private ArrayList<VicinityMessage> allMessages;
     private ArrayList<VicinityMessage> allChatMessages;
+    private ArrayList<Neighbor> mutedUsers;
     public String query;
     public Cursor cursor;
     private ArrayList<Comment> commentsList;
     JSONArray mMessageArray = new JSONArray();		// limit to the latest 50 messages
+    private static final PostManager postManager = new PostManager();
+
+
 
 
 
@@ -45,7 +54,12 @@ public class MainController {
         this.context=context;
         allMessages = new ArrayList<VicinityMessage>();
 
+
     }
+
+
+
+    /*---------------------------------User methods---------------------------------------*/
 
     /**
      * Creates a new user, this method shall be used once only
@@ -101,20 +115,6 @@ public class MainController {
     }
 
     /**
-     * This method mutes user by searching for a peer with the given
-     * device address in the neighbours list and deleting the user
-     * It also deletes posts & comments by this specific user as well
-     * @param userAddress Device address of the to-be muted user
-     * @return isMuted true if the user was muted, false otherwise
-     */
-    public boolean muteUser(String userAddress){
-        boolean isMuted = false;
-        //TODO after fetching IP addresses
-        return isMuted;
-    }
-
-
-    /**
      * Validates an input string (username) that shall contain letters, numbers, "-" and "_" ONLY
      * @param username A string
      * @return true if username matches the criteria, false other wise
@@ -123,9 +123,73 @@ public class MainController {
         return !(username.isEmpty() || !username.matches("[a-zA-Z0-9_-]+"));
     }
 
+    /*--------------------------------------------------------------------------------------*/
+
+
+    /*--------------------------Neighbors Methods----------------------------------------------*/
 
     /**
-     * Adds a new Friend to the database.
+     * This method mutes user by searching for a peer with the given
+     * device address in the neighbours list and deleting the user
+     * It also deletes posts & comments by this specific user as well
+     * @param user the to-be muted user
+     * @return isMuted true if the user was muted, false otherwise
+     */
+    public boolean muteUser(Neighbor user){
+        boolean isMuted = false;
+        if(user.getIpAddress()!=null && UDPpacketListner.doesAddressExist(user.getDeviceAddress())){
+
+        }
+        return isMuted;
+    }
+
+    /**
+     * Checks if the given user exists in Muted users list
+     * or not
+     * @param user a Neighbor to check if muted or not.
+     * @return isMuted a boolean that is true if user exists in muted users list
+     * false otherwise
+     */
+    public boolean isUserMuted(Neighbor user){
+        boolean isMuted = false;
+
+
+        return isMuted;
+    }
+
+    /**
+     *
+     *
+     * @param peer
+     * @return
+     */
+    public static boolean addPeerAsFriend(Neighbor peer){
+        //fetching device's IP address from cache
+        if(UDPpacketListner.doesAddressExist(peer.getDeviceAddress()))
+        {   peer.setIpAddress(UDPpacketListner.getPeerAddress(peer.getDeviceAddress()));
+            Log.i("Request","Requested IP: "+peer.getIpAddress());
+            postManager.setRequest(peer.getIpAddress());
+            postManager.execute();
+
+            //TODO possible illegalstateexception cause of .execute(), fix it later
+            return true;
+        }
+        else
+            Log.i("Request","No IP address found");
+
+        return false;
+
+    }
+
+
+    /*--------------------------------------------------------------------------------------*/
+
+
+
+    /*---------------------------Friends Methods--------------------------------------------*/
+
+    /**
+     * Adds the newly added Friend to the database.
      * @param username a friend's instance name.
      * @param deviceAddress a friend's device address
      * @return isAdded true if the friend was added successfully, false otherwise.
@@ -222,6 +286,11 @@ public class MainController {
 
     }
 
+    /*--------------------------------------------------------------------------------------*/
+
+
+    /*-------------------------------Posts Methods------------------------------------------*/
+
 
     /**
      * Fetches posts from the database
@@ -256,6 +325,7 @@ public class MainController {
             {
                 Log.i(TAG, "There are no posts in the DB.");
             }
+            c.close();
             dbH.close();
         }
         catch (SQLException e)
@@ -310,7 +380,7 @@ public class MainController {
                 {
                            database = dbH.getReadableDatabase();
                    dbH.openDataBase();
-                    String query = "SELECT * FORM Post WHERE postID="+"'"+postID+"'";
+                    String query = "SELECT * FROM Post WHERE postID="+"'"+postID+"'";
                    Cursor c = database.rawQuery(query, null);
                     if (c.moveToFirst()) {
                             post = new Post();
@@ -347,11 +417,31 @@ public class MainController {
         return p;
     }
 
-                /**
-          * Fetches the comments on a specified post
-          * @param postID the integer id of the selected post
-          * @return an ArrayList containing all comments on the specified post
-          */
+    /**
+     * Deletes all records in Post table in database
+     * @return true if the operation is successful, false otherwise
+     */
+    public boolean deleteAllPosts () throws SQLException{
+        boolean areDeleted;
+        database = dbH.getReadableDatabase();
+        dbH.openDataBase();
+        areDeleted= database.delete("Post", null, null)>0;
+
+        dbH.close();
+        return areDeleted;
+
+    }
+
+    /*--------------------------------------------------------------------------------------*/
+
+
+    /*---------------------------Comments Methods-------------------------------------------*/
+
+    /**
+    * Fetches the comments on a specified post
+    * @param postID the integer id of the selected post
+    * @return an ArrayList containing all comments on the specified post
+    */
                 public ArrayList<Comment> getPostComments(int postID)
         {
                commentsList = new ArrayList<Comment>();
@@ -411,20 +501,25 @@ public class MainController {
                 return isAdded;
             } //END addAcomment
 
-                //still working on these methods - amjad
-                public boolean deleteAcomment () {
-                return true;
-            }
+    /**
+     * Deletes all records in Comment table in database
+     * @return true if the operation is successful
+     */
+    public boolean deleteAllcomments () throws SQLException{
+        boolean areDeleted;
+        database = dbH.getReadableDatabase();
+        dbH.openDataBase();
+        areDeleted= database.delete("Post", null, null)>0;
 
-                public boolean deleteAllcomments () {
-                return true;
-            }
-        public boolean deleteAllPosts () {
-                return true;
-            }
+        dbH.close();
+        return areDeleted;
+    }
+
+    /*--------------------------------------------------------------------------------------*/
 
 
-    /*------------------------------Works------------------------------*/
+    /*------------------------------Chat Methods--------------------------------------------*/
+
     /**
      * Fetches user's Chats from the database
      * @return allMessages
@@ -517,7 +612,6 @@ public class MainController {
     }
 
 
-    /*------------------------------Works------------------------------*/
     /**
      * Fetches all the chat IDs from the db
      * @return chatIds int array
@@ -583,7 +677,22 @@ public class MainController {
 
     }
 
-    /*------------------------------Works------------------------------*/
+    /**
+     * Deletes all records in table Message in the database
+     * @return true if the operation is successful, false otherwise
+     * @throws SQLException
+     */
+    public boolean deleteAllMessages() throws SQLException{
+        boolean areDeleted;
+        database = dbH.getReadableDatabase();
+        dbH.openDataBase();
+        areDeleted= database.delete("Message", null, null)>0;
+
+        dbH.close();
+        return areDeleted;
+
+    }
+
     /**
      * Adds a new Meesage to the database.
      * @param message An object of class VicinityMessage
@@ -617,7 +726,6 @@ public class MainController {
         return isAdded;}
 
 
-    /*------------------------------Works------------------------------*/
     /**
      * Returns an array of all messages for a chat id.
      * @param chatId and int that is an id of a chat
@@ -648,6 +756,7 @@ public class MainController {
         mMessageArray = JSONUtils.truncateJSONArray(mMessageArray, 10);  // truncate the oldest 10.
         return jsonobj.toString();
     }
+    /*--------------------------------------------------------------------------------------*/
 
 
 }

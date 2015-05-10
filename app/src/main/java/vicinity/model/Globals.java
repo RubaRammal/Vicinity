@@ -1,6 +1,8 @@
 package vicinity.model;
 
 
+import java.net.InetAddress;
+
 /**
  * This class contains the frequently used variables
  * and constants among classes, it reduces code redundancy
@@ -47,5 +49,7 @@ public class Globals {
     public static boolean isWifiEnabled = true;
     //Current device's P2P MAC address
     public static String MY_MAC = null;
+    //Current device's local IP
+    public static InetAddress MY_IP=null;
 
 }

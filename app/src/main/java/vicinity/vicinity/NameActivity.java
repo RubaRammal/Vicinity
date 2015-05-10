@@ -17,7 +17,10 @@ import android.widget.Toast;
 import vicinity.Controller.MainController;
 
 
-
+/**
+ * Registration activity
+ * prompts the user to enter a username for registration
+ */
 public class NameActivity extends Activity {
 
     private static final String TAG = "Username Activity";

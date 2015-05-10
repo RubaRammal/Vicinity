@@ -1,4 +1,5 @@
 package vicinity.ConnectionManager;
+import android.net.wifi.p2p.WifiP2pDevice;
 import android.os.AsyncTask;
 import android.util.Log;
 
@@ -15,6 +16,7 @@ import java.util.HashMap;
 
 import vicinity.model.Comment;
 import vicinity.model.Globals;
+import vicinity.model.Neighbor;
 import vicinity.model.Post;
 
 /**
@@ -40,34 +42,8 @@ public class PostManager extends AsyncTask <Void, Void, Void> {
 
 
 
-    /**
-     * Set requestIP from ConnectAndDiscoverService
-     * to send a friend request to a peer
-     * @param requestIP IP address of a peer
-     */
-    public void setRequest(InetAddress requestIP){
-        this.requestIP = requestIP;
-        requestFlag=true;
-    }
 
-    /**
-     * Set post from the NewPost class
-     * @param post a new post to be broadcasted
-     */
-    public void setPost(Post post){
-        this.post=post;
-        postFlag = true;
-
-    }
-
-    /**
-     * Sets comment from addComment class
-     * @param comment a new comment to be broadcasted
-     */
-    public void setComment(Comment comment){this.comment = comment;
-        commentFlag=true;}
-
-
+    /*----------Overridden Methods---------*/
     @Override
     protected void onPreExecute(){
 
@@ -111,6 +87,33 @@ public class PostManager extends AsyncTask <Void, Void, Void> {
     protected void onPostExecute (Void result){
 
     }
+
+    /**
+     * Set requestIP from ConnectAndDiscoverService
+     * to send a friend request to a peer
+     * @param requestIP IP address of a peer
+     */
+    public void setRequest(InetAddress requestIP){
+        this.requestIP = requestIP;
+        requestFlag=true;
+    }
+
+    /**
+     * Set post from the NewPost class
+     * @param post a new post to be broadcasted
+     */
+    public void setPost(Post post){
+        this.post=post;
+        postFlag = true;
+
+    }
+
+    /**
+     * Sets comment from addComment class
+     * @param comment a new comment to be broadcasted
+     */
+    public void setComment(Comment comment){this.comment = comment;
+        commentFlag=true;}
 
     /**
      * Broadcasts a new post to the broadcast address 192.168.49.255
@@ -172,7 +175,7 @@ public class PostManager extends AsyncTask <Void, Void, Void> {
      * Broadcast (MAC,IP) Addresses to peers in local network
      * @param addresses a HashMap containing addresses from group owner
      */
-    public void sendAdresses(HashMap addresses){
+    public void sendAddresses(HashMap addresses){
         try{
             if(!addresses.isEmpty()) {
                 Log.i(TAG, "Sending addresses");
@@ -181,8 +184,6 @@ public class PostManager extends AsyncTask <Void, Void, Void> {
                 ObjectOutputStream objectOutputStream = new ObjectOutputStream(outputStream);
                 objectOutputStream.writeObject(addresses);
                 byte[] data = outputStream.toByteArray();
-
-                Log.i(TAG, "socket.getInetAddress();: " + socket.getInetAddress());
                 InetAddress broadcastIP = InetAddress.getByName("192.168.49.255");
                 DatagramPacket datagramPacket = new DatagramPacket(data, data.length,
                         broadcastIP, Globals.SERVER_PORT);
@@ -203,11 +204,25 @@ public class PostManager extends AsyncTask <Void, Void, Void> {
      */
     public static void sendFriendRequest(InetAddress requestedIP){
         try{
+            //TODO this shoud take a service as a parameter
             Log.i("Request","Sending request to.."+requestedIP);
             Socket requestSocket = new Socket (requestedIP, Globals.REQUEST_PORT);
+
+            //Getting current device info to send it as an object of Neighbor in the request
+            Neighbor me = (Neighbor) WiFiDirectBroadcastReceiver.getMyP2pInfo();
+
+            ObjectOutputStream outToServer = new ObjectOutputStream(requestSocket.getOutputStream());
+            outToServer.writeObject(me);
+            outToServer.flush();
+            outToServer.close();
+
+
             requestSocket.close();
         }
         catch(IOException e){
+            e.printStackTrace();
+        }
+        catch(NullPointerException e){
             e.printStackTrace();
         }
 

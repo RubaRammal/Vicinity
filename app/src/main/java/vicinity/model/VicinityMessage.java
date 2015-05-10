@@ -15,7 +15,9 @@ import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 
-
+/**
+ * A structure that holds information about chat messages
+ */
 public class VicinityMessage implements Parcelable{
 
     private static final String TAG = "MessageClass";

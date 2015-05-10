@@ -14,6 +14,9 @@ import java.sql.SQLException;
 
 /**
  * This class handles database operations.
+ * It contains methods to copy the preloaded database from the assets
+ * and overwrite the one in the system
+ * This class also contains methods to open, close and delete the database
  */
 public class DBHandler extends SQLiteOpenHelper {
 
@@ -29,28 +32,23 @@ public class DBHandler extends SQLiteOpenHelper {
 
     /**
      * Public constructor
-     * @param context ,
+     * @param context a context of an activity
      */
     public DBHandler(Context context){
         super(context, DB_NAME , null, DATABASE_VERSION);
         myContext=context;
-
     }
 
     @Override
     public void onCreate(SQLiteDatabase db) {
-
-
     }
 
     @Override
     public void onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion) {
-
     }
 
     @Override
     public synchronized void close() {
-
         if(vicinityDB != null)
             vicinityDB.close();
         super.close();
@@ -58,7 +56,8 @@ public class DBHandler extends SQLiteOpenHelper {
 
 
     /**
-     * Creates an empty database on the system and rewrites it with your own database.
+     * Creates an empty database in the system and rewrites it with our own database
+     * the one preloaded in the assests folder
      */
     public void createDataBase() throws IOException{
 
@@ -87,14 +86,14 @@ public class DBHandler extends SQLiteOpenHelper {
     private boolean checkDataBase(){
         File dbFile = myContext.getDatabasePath(DB_NAME);
         Log.i(TAG,"Database exists? "+dbFile.exists());
-
         return dbFile.exists();
     }
+
 
     /**
      * Copies your database from your local assets-folder to the just created empty database in the
      * system folder, from where it can be accessed and handled.
-     * This is done by transfering bytestream.
+     * This is done by transferring bytestream.
      * */
     private void copyDataBase() throws IOException{
 

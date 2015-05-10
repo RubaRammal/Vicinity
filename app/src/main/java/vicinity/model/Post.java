@@ -8,7 +8,7 @@ import java.util.ArrayList;
 import java.util.Date;
 
 /**
- * Class that holds the struture of the post
+ * Class that holds the structure of timeline posts
  */
 public class Post  implements Serializable {
 
