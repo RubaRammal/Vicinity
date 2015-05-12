@@ -58,10 +58,10 @@ public class WiFiDirectBroadcastReceiver extends BroadcastReceiver {
                     .getParcelableExtra(WifiP2pManager.EXTRA_NETWORK_INFO);
 
             if (networkInfo.isConnected()) {
-
                 Globals.isConnectedToANetwork=true;
                 Log.i(TAG,"Network info: "+Globals.isConnectedToANetwork);
                 manager.requestConnectionInfo(channel,(ConnectionInfoListener) context);
+
             } else {
                 Globals.isConnectedToANetwork=false;
                 Log.d(TAG,"NOT Connected to P2P network!");
@@ -70,10 +70,17 @@ public class WiFiDirectBroadcastReceiver extends BroadcastReceiver {
         }
         else if (WifiP2pManager.WIFI_P2P_THIS_DEVICE_CHANGED_ACTION
                 .equals(action)) {
+            //Getting information of this current device
+
             WifiP2pDevice device = (WifiP2pDevice) intent
                     .getParcelableExtra(WifiP2pManager.EXTRA_WIFI_P2P_DEVICE);
+
             //obtaining this device's mac address
             me = new Neighbor(device.deviceName,device.deviceAddress,ConnectAndDiscoverService.getDeviceStatus(device.status));
+            if(Globals.MY_IP!=null)
+            {
+                me.setIpAddress(Globals.MY_IP);
+            }
             if(Globals.MY_MAC == null)
                 {
                     Globals.MY_MAC = device.deviceAddress;
@@ -110,7 +117,6 @@ public class WiFiDirectBroadcastReceiver extends BroadcastReceiver {
      * used in sending friends requests
      * @return a Neighbor object that
      * contains current device's info
-     *
      */
     public static Neighbor getMyP2pInfo(){
         return me;

@@ -32,9 +32,8 @@ public class Globals {
 
 
     /*-----Request protocol code messages----*/
-    public static final String REQUEST = "REQ";//sent as a key for friendship request
-    public static final String ACCEPT = "YES";
-    public static final String DENY = "NO";
+    public static boolean isRequestAccepted=false;
+
 
     /**
      * Global Variables

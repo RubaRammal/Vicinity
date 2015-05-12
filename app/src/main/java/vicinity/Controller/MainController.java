@@ -1,9 +1,13 @@
 package vicinity.Controller;
 
 
+import vicinity.ConnectionManager.ConnectAndDiscoverService;
 import vicinity.ConnectionManager.PostManager;
 import vicinity.ConnectionManager.UDPpacketListner;
 import vicinity.model.*;
+import vicinity.vicinity.NeighborListAdapter;
+import vicinity.vicinity.NeighborSectionFragment;
+import vicinity.vicinity.TabsActivity;
 
 import android.content.ContentValues;
 import android.content.Context;
@@ -11,10 +15,12 @@ import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteException;
 import android.util.Log;
+import android.widget.Toast;
 
 import org.json.JSONArray;
 import org.json.JSONObject;
 
+import java.io.IOException;
 import java.sql.SQLException;
 import java.util.ArrayList;
 
@@ -37,7 +43,6 @@ public class MainController {
     public Cursor cursor;
     private ArrayList<Comment> commentsList;
     JSONArray mMessageArray = new JSONArray();		// limit to the latest 50 messages
-    private static final PostManager postManager = new PostManager();
 
 
 
@@ -53,6 +58,15 @@ public class MainController {
         dbH=new DBHandler(context);
         this.context=context;
         allMessages = new ArrayList<VicinityMessage>();
+        try{
+        dbH.createDataBase();
+        dbH.openDataBase();}
+        catch(SQLException e){
+
+        }
+        catch(IOException e){
+
+        }
 
 
     }
@@ -96,22 +110,22 @@ public class MainController {
     public String retrieveCurrentUsername()throws SQLException{
         String username2=null;
 
-        try {
-            database = dbH.getReadableDatabase();
-            dbH.openDataBase();
+        //try {
+            //dbH.openDataBase();
+            database = dbH.getWritableDatabase();
             query="SELECT Username FROM CurrentUser";
             cursor = database.rawQuery(query,null);
 
             if(cursor.moveToFirst())
-            username2=cursor.getString(cursor.getColumnIndex("Username"));
+                username2=cursor.getString(cursor.getColumnIndex("Username"));
             cursor.close();
             dbH.close();
             return username2;
-        }
+       /* }
         catch (SQLException e){
             Log.i(TAG,"SQLException IN retrieveCurrentUser > currentUser");
-        }
-        return username2;
+        }*/
+        //return username2;
     }
 
     /**
@@ -123,6 +137,12 @@ public class MainController {
         return !(username.isEmpty() || !username.matches("[a-zA-Z0-9_-]+"));
     }
 
+    /**
+     * Deletes system's database
+     */
+    public void deleteAccount(){
+        dbH.deleteDatabase();
+    }
     /*--------------------------------------------------------------------------------------*/
 
 
@@ -157,29 +177,7 @@ public class MainController {
         return isMuted;
     }
 
-    /**
-     *
-     *
-     * @param peer
-     * @return
-     */
-    public static boolean addPeerAsFriend(Neighbor peer){
-        //fetching device's IP address from cache
-        if(UDPpacketListner.doesAddressExist(peer.getDeviceAddress()))
-        {   peer.setIpAddress(UDPpacketListner.getPeerAddress(peer.getDeviceAddress()));
-            Log.i("Request","Requested IP: "+peer.getIpAddress());
-            postManager.setRequest(peer.getIpAddress());
-            postManager.execute();
 
-            //TODO possible illegalstateexception cause of .execute(), fix it later
-            return true;
-        }
-        else
-            Log.i("Request","No IP address found");
-
-        return false;
-
-    }
 
 
     /*--------------------------------------------------------------------------------------*/
@@ -190,27 +188,44 @@ public class MainController {
 
     /**
      * Adds the newly added Friend to the database.
-     * @param username a friend's instance name.
-     * @param deviceAddress a friend's device address
+     * @param requestedTo a Neighbor object to be added as a friend
      * @return isAdded true if the friend was added successfully, false otherwise.
-     * @throws SQLException
      */
-    public boolean addFriend(String username, String deviceAddress)throws SQLException{
+    public boolean addFriend(Neighbor requestedTo){
         boolean isAdded=false;
         try{
             database = dbH.getReadableDatabase();
             dbH.openDataBase();
             ContentValues values = new ContentValues();
-            values.put("Username", username);
-            values.put("deviceID", deviceAddress);
-            Log.i(TAG,"Adding.. "+deviceAddress);
+            values.put("Username", requestedTo.getInstanceName());
+            values.put("deviceID", requestedTo.getDeviceAddress());
+            Log.i(TAG,"Adding.. "+requestedTo.getDeviceAddress());
             isAdded=database.insert("Friend", null, values)>0;
             dbH.close();
+
         }
         catch(SQLException e){
             e.printStackTrace();
         }
         return isAdded;
+    }
+
+    /**
+     *
+     */
+    public void alertUserOfRequestReply(boolean reply, Neighbor neighbor) throws SQLException{
+        CharSequence text;
+        int duration = Toast.LENGTH_LONG;
+        if(reply){
+            addFriend(neighbor);
+            NeighborListAdapter.updateNeighborsList(neighbor);
+            text = neighbor.getInstanceName()+" is now your friend!";
+        }
+        else{
+            text = neighbor.getInstanceName()+" has rejected your request...";
+        }
+        Toast toast = Toast.makeText(ConnectAndDiscoverService.ctx,text,duration);
+        toast.show();
     }
 
 
@@ -373,36 +388,36 @@ public class MainController {
      +     * @param postID The integer id of the selected post.
      +     * @return returns the post.
      +     */
-        public Post getPost(int postID)
+    public Post getPost(int postID)
+    {
+        Post post = null;
+        try
         {
-               Post post = null;
-                try
-                {
-                           database = dbH.getReadableDatabase();
-                   dbH.openDataBase();
-                    String query = "SELECT * FROM Post WHERE postID="+"'"+postID+"'";
-                   Cursor c = database.rawQuery(query, null);
-                    if (c.moveToFirst()) {
-                            post = new Post();
-                            post.setPostID(c.getColumnIndex("_id"));
-                            post.setPostBody(c.getString(c.getColumnIndex("postBody")));
-                            post.setPostedBy(c.getString(c.getColumnIndex("postedBy")));
-                                                    //contact.setPicture(c.getBlob(3));
-                               }
-                    else
-                    {
-                                Log.i(TAG, "This postID doesn't exist in the DB.");
-                    }
-                   dbH.close();
-               }
-               catch (SQLException e)
-                {
-                            e.printStackTrace();
-                    Log.i(TAG, "Error in getting post from DB.");
+            database = dbH.getReadableDatabase();
+            dbH.openDataBase();
+            String query = "SELECT * FROM Post WHERE postID="+"'"+postID+"'";
+            Cursor c = database.rawQuery(query, null);
+            if (c.moveToFirst()) {
+                post = new Post();
+                post.setPostID(c.getColumnIndex("_id"));
+                post.setPostBody(c.getString(c.getColumnIndex("postBody")));
+                post.setPostedBy(c.getString(c.getColumnIndex("postedBy")));
+                //contact.setPicture(c.getBlob(3));
+            }
+            else
+            {
+                Log.i(TAG, "This postID doesn't exist in the DB.");
+            }
+            dbH.close();
+        }
+        catch (SQLException e)
+        {
+            e.printStackTrace();
+            Log.i(TAG, "Error in getting post from DB.");
 
-                        }
-                return post;
-            } //END getPost
+        }
+        return post;
+    } //END getPost
 
 
     public Post getPost2(int id){
@@ -438,68 +453,68 @@ public class MainController {
     /*---------------------------Comments Methods-------------------------------------------*/
 
     /**
-    * Fetches the comments on a specified post
-    * @param postID the integer id of the selected post
-    * @return an ArrayList containing all comments on the specified post
-    */
-                public ArrayList<Comment> getPostComments(int postID)
+     * Fetches the comments on a specified post
+     * @param postID the integer id of the selected post
+     * @return an ArrayList containing all comments on the specified post
+     */
+    public ArrayList<Comment> getPostComments(int postID)
+    {
+        commentsList = new ArrayList<Comment>();
+        try
         {
-               commentsList = new ArrayList<Comment>();
-                try
+            database = dbH.getReadableDatabase();
+            dbH.openDataBase();
+            String query = "SELECT * FROM Comment WHERE postID="+"'"+postID+"'";
+            Cursor c = database.rawQuery(query, null);
+            if (c.moveToFirst())
+            {
+                do
                 {
-                           database = dbH.getReadableDatabase();
-                   dbH.openDataBase();
-                   String query = "SELECT * FROM Comment WHERE postID="+"'"+postID+"'";
-                   Cursor c = database.rawQuery(query, null);
-                   if (c.moveToFirst())
-                        {
-                                    do
-                            {
-                                        Comment comment = new Comment ();
-                           comment.setCommentBody(c.getString(c.getColumnIndex("commentBody")));
-                           comment.setCommentedBy(c.getString(c.getColumnIndex("commentedBy")));
-                           comment.setCommentID(c.getColumnIndex("commentID"));
+                    Comment comment = new Comment ();
+                    comment.setCommentBody(c.getString(c.getColumnIndex("commentBody")));
+                    comment.setCommentedBy(c.getString(c.getColumnIndex("commentedBy")));
+                    comment.setCommentID(c.getColumnIndex("commentID"));
 
-                                    // Adding comment to commentsList
-                                           commentsList.add(comment);
-                        } while (c.moveToNext());
-                    }
-                    else
-                    {
-                                Log.i(TAG, "There are no comments on the specified post.");
-                   }
-                   dbH.close();
-               }
-               catch (SQLException e)
-               {
-                           e.printStackTrace();
-                   Log.i(TAG, "Error in getting comments from DB.");
+                    // Adding comment to commentsList
+                    commentsList.add(comment);
+                } while (c.moveToNext());
+            }
+            else
+            {
+                Log.i(TAG, "There are no comments on the specified post.");
+            }
+            dbH.close();
+        }
+        catch (SQLException e)
+        {
+            e.printStackTrace();
+            Log.i(TAG, "Error in getting comments from DB.");
 
-                       }
+        }
 
-                       return commentsList;
-           } //END getPostComments
+        return commentsList;
+    } //END getPostComments
 
-                public boolean addAcomment(Comment comment) {
-                boolean isAdded = false;
-                try
-                {
-                            database = dbH.getReadableDatabase();
-                    dbH.openDataBase();
-                    ContentValues values = new ContentValues();
-                   values.put("commentBody", comment.getCommentBody());
-                    values.put("commentedBy", comment.getCommentedBy());
-                    values.put("postID", comment.getCommentID());
-                    isAdded=database.insert("Comment", null, values)>0;
-                    dbH.close();
-                }
-                catch(SQLException e)
-                {
-                            e.printStackTrace();
-                    Log.i(TAG, "Error in adding comments to DB.");
-                }
-                return isAdded;
-            } //END addAcomment
+    public boolean addAcomment(Comment comment) {
+        boolean isAdded = false;
+        try
+        {
+            database = dbH.getReadableDatabase();
+            dbH.openDataBase();
+            ContentValues values = new ContentValues();
+            values.put("commentBody", comment.getCommentBody());
+            values.put("commentedBy", comment.getCommentedBy());
+            values.put("postID", comment.getCommentID());
+            isAdded=database.insert("Comment", null, values)>0;
+            dbH.close();
+        }
+        catch(SQLException e)
+        {
+            e.printStackTrace();
+            Log.i(TAG, "Error in adding comments to DB.");
+        }
+        return isAdded;
+    } //END addAcomment
 
     /**
      * Deletes all records in Comment table in database

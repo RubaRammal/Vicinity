@@ -12,7 +12,6 @@ import java.util.TimerTask;
 
 
 import vicinity.Controller.MainController;
-import vicinity.model.DBHandler;
 
 /**
  * Launch activity displays the app's logo
@@ -22,20 +21,25 @@ import vicinity.model.DBHandler;
 public class LaunchActivity extends Activity {
 
     Context context = this;
-    MainController controller = new MainController(context);
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_launch);
-
+        final MainController controller = new MainController(context);
+        /*
         DBHandler dbH=new DBHandler(context);
         try{
-            dbH.createDataBase();}
+            dbH.createDataBase();
+            dbH.openDataBase();
+        }
+
+
         catch (Exception e){
             e.printStackTrace();
             }
-
+        */
 
         int secondsDelay = 3;
         Timer timer = new Timer();

@@ -13,22 +13,29 @@ import android.widget.Button;
 import android.widget.CompoundButton;
 import android.widget.Switch;
 import android.widget.Toast;
+
+import java.sql.SQLException;
 import java.util.Timer;
 import java.util.TimerTask;
-import vicinity.model.DBHandler;
+
+import vicinity.ConnectionManager.ConnectAndDiscoverService;
+import vicinity.ConnectionManager.UDPpacketListner;
+import vicinity.Controller.MainController;
 import vicinity.model.Globals;
 
-
+/**
+ * Settings tab
+ */
 public class SettingsSectionFragment extends Fragment {
 
-    Button deleteAccount, clearChat, clearComments, clearPosts;
+    private Button deleteAccount, clearChat, clearComments, clearPosts;
     Switch notificationSwitch;
     public final String TAG = "Settings";
+    private MainController controller;
     @Override
     public void onAttach(Activity activity) {
         super.onAttach(activity);
         try {
-            Log.i(TAG, "OnAttach");
         } catch (ClassCastException e) {
             throw new ClassCastException(activity.toString()
                     + " must implement TimelineInterface");
@@ -38,13 +45,11 @@ public class SettingsSectionFragment extends Fragment {
     @Override
     public void onDetach() {
         super.onDetach();
-        Log.i(TAG, "OnDetach");
     }
 
     @Override
     public void onSaveInstanceState(final Bundle outState) {
         super.onSaveInstanceState(outState);
-        Log.i(TAG,"onSaveInstanceState");
 
     }
     @Override
@@ -58,10 +63,10 @@ public class SettingsSectionFragment extends Fragment {
 
     }
     @Override
-    public View onCreateView(LayoutInflater inflater, ViewGroup container,
+    public View onCreateView(LayoutInflater inflater, final ViewGroup container,
                              Bundle savedInstanceState) {
         View rootView = inflater.inflate(R.layout.fragment_settings, container, false);
-
+        controller= new MainController(getActivity());
         /*
          * Delete account:
          * Displays an alert dialog
@@ -79,18 +84,22 @@ public class SettingsSectionFragment extends Fragment {
                         .setPositiveButton(android.R.string.yes, new DialogInterface.OnClickListener() {
                             public void onClick(DialogInterface dialog, int which) {
                                Log.i(TAG,"YES");
-                                DBHandler.deleteDatabase();
                                 CharSequence text = "Sad to see you leave the vicinity!";
                                 int duration = Toast.LENGTH_LONG;
                                 Toast toast = Toast.makeText(getActivity(), text, duration);
                                 toast.show();
+
+
+
                                 int secondsDelay = 2;
                                 Timer timer = new Timer();
                                 timer.schedule(new TimerTask() {
 
                                     public void run() {
-                                                Intent intent = new Intent(getActivity(), LaunchActivity.class);
-                                                startActivity(intent);
+                                        controller.deleteAccount();
+                                        getActivity().finish();
+                                        Intent intent = new Intent(getActivity(), LaunchActivity.class);
+                                        startActivity(intent);
                                     }
 
 
@@ -142,13 +151,20 @@ public class SettingsSectionFragment extends Fragment {
                         .setMessage("Are you sure you want to delete all your chat history?")
                         .setPositiveButton(android.R.string.yes, new DialogInterface.OnClickListener() {
                             public void onClick(DialogInterface dialog, int which) {
+
                                 Log.i(TAG,"YES");
+                                try{
+                                if(controller.deleteAllMessages()){
+
                                 CharSequence text = "Deleted chat history";
                                 int duration = Toast.LENGTH_LONG;
                                 Toast toast = Toast.makeText(getActivity(), text, duration);
-                                toast.show();
+                                toast.show();}
 
                             }
+                            catch(SQLException e){
+                                e.printStackTrace();
+                            }}
                         })
                         .setNegativeButton(android.R.string.no, new DialogInterface.OnClickListener() {
                             public void onClick(DialogInterface dialog, int which) {
@@ -176,10 +192,18 @@ public class SettingsSectionFragment extends Fragment {
                         .setPositiveButton(android.R.string.yes, new DialogInterface.OnClickListener() {
                             public void onClick(DialogInterface dialog, int which) {
                                 Log.i(TAG,"YES");
-                                CharSequence text = "Cleared Timeline comments";
-                                int duration = Toast.LENGTH_LONG;
-                                Toast toast = Toast.makeText(getActivity(), text, duration);
-                                toast.show();
+                                try{
+                                    if(controller.deleteAllcomments()){
+
+                                        CharSequence text = "Timeline comments were cleared successfully";
+                                        int duration = Toast.LENGTH_LONG;
+                                        Toast toast = Toast.makeText(getActivity(), text, duration);
+                                        toast.show();}
+
+                                }
+                                catch(SQLException e){
+                                    e.printStackTrace();
+                                }
 
                             }
                         })
@@ -208,11 +232,20 @@ public class SettingsSectionFragment extends Fragment {
                         .setMessage("Are you sure you want to clear your Timeline?")
                         .setPositiveButton(android.R.string.yes, new DialogInterface.OnClickListener() {
                             public void onClick(DialogInterface dialog, int which) {
+
                                 Log.i(TAG,"YES");
-                                CharSequence text = "Cleared Timeline posts";
-                                int duration = Toast.LENGTH_LONG;
-                                Toast toast = Toast.makeText(getActivity(), text, duration);
-                                toast.show();
+                                try{
+                                    if(controller.deleteAllPosts()){
+
+                                        CharSequence text = "Timeline was cleared successfully";
+                                        int duration = Toast.LENGTH_LONG;
+                                        Toast toast = Toast.makeText(getActivity(), text, duration);
+                                        toast.show();}
+
+                                }
+                                catch(SQLException e){
+                                    e.printStackTrace();
+                                }
 
                             }
                         })

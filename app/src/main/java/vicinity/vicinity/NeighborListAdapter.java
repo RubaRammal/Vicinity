@@ -17,6 +17,8 @@ import java.sql.SQLException;
 import java.util.ArrayList;
 
 import vicinity.ConnectionManager.ConnectAndDiscoverService;
+import vicinity.ConnectionManager.RequestServer;
+import vicinity.ConnectionManager.RequestsManager;
 import vicinity.Controller.MainController;
 import vicinity.model.Neighbor;
 
@@ -39,10 +41,7 @@ public class NeighborListAdapter extends BaseAdapter {
 
 
 
-    public void setPB(ProgressBar pb){
-        progressbar = pb;
 
-    }
 
     @Override
     public int getCount() {
@@ -81,6 +80,7 @@ public class NeighborListAdapter extends BaseAdapter {
         /*----Mute user button-----*/
         mute = (ImageButton) convertView.findViewById(R.id.muteButton);
 
+
         /*----Add neighbor as a friend  button-----*/
         addFriend = (ImageButton)convertView.findViewById(R.id.addAsFriend);
         addFriend.setOnClickListener(new View.OnClickListener() {
@@ -88,25 +88,13 @@ public class NeighborListAdapter extends BaseAdapter {
             public void onClick(View v) {
                 final Neighbor neighbor = (Neighbor) getItem(position+1);
                 new AlertDialog.Builder(TabsActivity.ctx)
-                        .setTitle("Friendship Request")
+                        .setTitle("Add a friend")
                         .setMessage("Do you want to add "+neighbor.getInstanceName()+" as a friend?")
                         .setPositiveButton(android.R.string.yes, new DialogInterface.OnClickListener() {
                             public void onClick(DialogInterface dialog, int which) {
-                                try{
-                                    //TODO this button shall be disabled if the user is not connected
-                                    //cause it causes an exception
-
-                                    controller.addPeerAsFriend(neighbor);
-                                    boolean isAdded = controller.addFriend(neighbor.getInstanceName(),neighbor.getDeviceAddress());
-                                    if(isAdded){
-
-                                        NeighborSectionFragment.updateAddedFriend(neighbor);
-                                    }
-                                }
-                                catch(SQLException e){
-                                    e.printStackTrace();
-                                }
-
+                                    Log.i(TAG,"Neighbor status: "+neighbor.getStatus());
+                                    //Sending the request through RequestsManager AsyncTask
+                                    new RequestsManager().execute(neighbor);
                             }
                         })
                         .setNegativeButton(android.R.string.no, new DialogInterface.OnClickListener() {
@@ -127,7 +115,8 @@ public class NeighborListAdapter extends BaseAdapter {
         TextView textName;
     }
 
-    public void clear(){
-        services.clear();
+    public static void updateNeighborsList(Neighbor neighbor){
+        NeighborSectionFragment.updateAddedFriend(neighbor);
     }
+
 }

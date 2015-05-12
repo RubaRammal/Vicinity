@@ -47,13 +47,11 @@ public class TimelineSectionFragment extends Fragment {
     @Override
     public void onDetach() {
         super.onDetach();
-         Log.i(TAG, "OnDetach");
     }
 
     @Override
     public void onSaveInstanceState(final Bundle outState) {
         super.onSaveInstanceState(outState);
-        Log.i(TAG,"onSaveInstanceState");
 
     }
     @Override
@@ -104,7 +102,6 @@ public class TimelineSectionFragment extends Fragment {
         updatePostList = new BroadcastReceiver() {
             @Override
             public void onReceive(Context context, Intent intent) {
-                Log.i(TAG,"onReceive");
                 final Bundle bundle = intent.getExtras();
                 Post receivedPost = (Post) bundle.getSerializable("NEW_POST");
                 Log.i(TAG,"Received in timeline: "+receivedPost.toString());
