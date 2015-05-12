@@ -107,6 +107,20 @@ public class ConnectAndDiscoverService extends Service
         disconnectPeers();
         DBHandler.deleteDatabase();
 
+        //Remove advertised service request
+        if (serviceRequest != null)
+            manager.removeServiceRequest(channel, serviceRequest,
+                    new WifiP2pManager.ActionListener() {
+
+                        @Override
+                        public void onSuccess() {
+                        }
+
+                        @Override
+                        public void onFailure(int arg0) {
+                        }
+                    });
+
     }
 
     /*-----------------------------------------*/
@@ -140,8 +154,9 @@ public class ConnectAndDiscoverService extends Service
      * afterwards, it finds peers with WiFi direct in the area
      * filters them according to their services, then filters them into two lists
      * friends and neighbor.
+     * @throws java.lang.NullPointerException
      */
-    private void discoverService() {
+    private void discoverService() throws NullPointerException{
         Log.i(TAG,"discoverService");
         manager.setDnsSdResponseListeners(channel,
                 new WifiP2pManager.DnsSdServiceResponseListener() {
@@ -153,14 +168,16 @@ public class ConnectAndDiscoverService extends Service
 
                                 Neighbor service = new Neighbor(srcDevice.deviceName,srcDevice.deviceAddress,getDeviceStatus(srcDevice.status));
                                 Log.i(TAG,"Neighbor: "+service.toString());
-                                //Check if he/she is a friend
+
+                            //Check if whether the peer is a friend or not
                                 if(controller.isThisMyFriend(srcDevice.deviceAddress))
                                 {
                                     NeighborSectionFragment.addToFriendsList(service);
                                 }
                                 else{
-                                    NeighborSectionFragment.addToNeighborssList(service);
+                                    NeighborSectionFragment.addToNeighborsList(service);
                                 }
+
 
                         }
                     }
@@ -247,7 +264,7 @@ public class ConnectAndDiscoverService extends Service
 
             @Override
             public void onSuccess() {
-                Log.i(TAG,"Connecting to "+ name);
+                Log.i(TAG,"Connected to "+ name);
 
             }
 
@@ -363,8 +380,6 @@ public class ConnectAndDiscoverService extends Service
     public void changeDeviceName(final String username){
 
         try{
-            Log.i(TAG,"Changing name!!");
-
             Method m = manager.getClass().getMethod("setDeviceName",new Class[] { WifiP2pManager.Channel.class, String.class,
                             WifiP2pManager.ActionListener.class });
 
@@ -441,6 +456,8 @@ public class ConnectAndDiscoverService extends Service
                 return "Unknown = " + deviceStatus;
         }
     }
+
+
     /**
      * Converts an integer that indicates a reason code into
      * a String, this method is mainly used for debugging reasons
@@ -462,6 +479,7 @@ public class ConnectAndDiscoverService extends Service
                 return "Unknown = " + reasonCode;
         }
     }
+
     /**
      * Setters for neighbors and friends list adapters.
      */

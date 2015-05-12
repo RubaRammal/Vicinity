@@ -13,15 +13,19 @@ import android.widget.ListView;
 import android.support.v4.app.Fragment;
 import android.widget.ProgressBar;
 import android.widget.TextView;
+import android.widget.Toast;
 
 
 import java.util.ArrayList;
+import java.util.Iterator;
 
 import vicinity.ConnectionManager.ConnectAndDiscoverService;
 import vicinity.model.Neighbor;
 import vicinity.Controller.MainController;
 
-
+/**
+ * Neighbors tab
+ */
 public class NeighborSectionFragment extends Fragment {
 
     public final String TAG = "Neighbors";
@@ -34,9 +38,7 @@ public class NeighborSectionFragment extends Fragment {
     private ListView lvf;
     private static NeighborListAdapter neighborListAdapter;
     private static FriendListAdapter friendListAdapter;
-    private ProgressBar progress;
-    private TextView header;
-    private Button deleteFriend;
+
 
 
     public interface DeviceClickListener {
@@ -103,15 +105,12 @@ public class NeighborSectionFragment extends Fragment {
         friendServices = new ArrayList<Neighbor>();
         ctx = this.getActivity();
 
-        //progress = (ProgressBar) rootView.findViewById(R.id.temp);
         lvn = (ListView) rootView.findViewById(R.id.listNeighbors);
         lvf = (ListView) rootView.findViewById(R.id.listFriends);
 
         neighborListAdapter = new NeighborListAdapter(ctx, listOfServices);
         friendListAdapter = new FriendListAdapter(ctx, friendServices);
 
-        //progress.setVisibility(View.VISIBLE);
-        //mRelativeLayout.setVisibility(View.GONE);
 
         ConnectAndDiscoverService.setNAdapter(neighborListAdapter);
         ConnectAndDiscoverService.setFAdapter(friendListAdapter);
@@ -123,22 +122,13 @@ public class NeighborSectionFragment extends Fragment {
 
         lvn.setAdapter(neighborListAdapter);
         lvf.setAdapter(friendListAdapter);
-
-        //Utility.setListViewHeightBasedOnChildren(lvn);
-        //Utility.setListViewHeightBasedOnChildren(lvf);
-        //neighborListAdapter.notifyDataSetChanged();
-
-        TextView neighborText = (TextView) rootView.findViewById(R.id.request);
-
         lvn.setOnItemClickListener(new AdapterView.OnItemClickListener() {
 
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
                 Log.i(TAG,"Clicked: "+neighborListAdapter.getItem(position).toString()) ;
                 final Neighbor neighbor = (Neighbor) neighborListAdapter.getItem(position);
-                final int p = position;
-                ((DeviceClickListener) ConnectAndDiscoverService.ctx).connectP2p((Neighbor) neighborListAdapter
-                        .getItem(p));
+                ((DeviceClickListener) ConnectAndDiscoverService.ctx).connectP2p(neighbor);
             }
         });
 
@@ -147,24 +137,48 @@ public class NeighborSectionFragment extends Fragment {
         return rootView;
     }
 
-        public static void updateDeletedFriend(Neighbor deletedFriend){
+    public static void updateDeletedFriend(Neighbor deletedFriend){
                 friendServices.remove(deletedFriend);
                 listOfServices.add(deletedFriend);
                 friendListAdapter.notifyDataSetChanged();
                 neighborListAdapter.notifyDataSetChanged();
             }
-        public static void updateAddedFriend(Neighbor neighbor){
+
+    /**
+     * This method is used after sending/accepting a friend request
+     * it updates friends list with the new friend
+     * and removes the peer from the neighbors list
+     * @param neighbor A Neighbor object
+     */
+    public static void updateAddedFriend(Neighbor neighbor){
             friendServices.add(neighbor);
             friendListAdapter.notifyDataSetChanged();
-            listOfServices.remove(neighbor);
+             Iterator<Neighbor> it = listOfServices.iterator();
+             while (it.hasNext()) {
+             Neighbor user = it.next();
+             if (user.getDeviceAddress().equals(neighbor.getDeviceAddress())) {
+                it.remove();
+             }
+             }
             neighborListAdapter.notifyDataSetChanged();
         }
 
+    /**
+     * This method is used to update friends list
+     * from the service dynamically
+     * @param friend A Neighbor object that contains an online friend
+     */
     public static void addToFriendsList(Neighbor friend){
         friendServices.add(friend);
         friendListAdapter.notifyDataSetChanged();
     }
-    public static void addToNeighborssList(Neighbor neighbor){
+
+    /**
+     * This method is used to update neighbors list
+     * from the service dynamically
+     * @param neighbor A Neighbor object that contains an online peer
+     */
+    public static void addToNeighborsList(Neighbor neighbor){
         listOfServices.add(neighbor);
         neighborListAdapter.notifyDataSetChanged();
     }

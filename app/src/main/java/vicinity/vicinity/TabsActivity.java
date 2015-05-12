@@ -1,29 +1,40 @@
 package vicinity.vicinity;
 
 import android.app.ActionBar;
+import android.app.AlertDialog;
 import android.app.FragmentTransaction;
+import android.content.BroadcastReceiver;
+import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.IntentFilter;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentActivity;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentPagerAdapter;
+import android.support.v4.content.LocalBroadcastManager;
 import android.support.v4.view.ViewPager;
 import android.util.Log;
 import android.view.View;
 import android.view.Window;
 import android.widget.ImageButton;
 import android.content.Context;
+import android.widget.Toast;
+
+import java.util.Timer;
+import java.util.TimerTask;
+
 import vicinity.ConnectionManager.UDPpacketListner;
 import vicinity.ConnectionManager.ConnectAndDiscoverService;
 import vicinity.Controller.MainController;
+import vicinity.model.Neighbor;
 
 /**
  * Implements the ActionBar to create a tabbed view.
  */
 public class TabsActivity extends FragmentActivity implements ActionBar.TabListener {
 
-    private final String TAG ="TabsActivity";
+    private final String TAG ="Tabs";
     AppSectionsPagerAdapter mAppSectionsPagerAdapter;
     ViewPager mViewPager;
     private ImageButton muteButton;
@@ -33,22 +44,77 @@ public class TabsActivity extends FragmentActivity implements ActionBar.TabListe
             , neighbors = new NeighborSectionFragment(), chat = new MessagesSectionFragment(),
             settings= new SettingsSectionFragment();
 
-
     Fragment neghbors = new Fragment();
     public void onCreate(Bundle savedInstanceState) {
 
         super.onCreate(savedInstanceState);
 
-        /*------saving instance-----*/
+        /*------saving instance-----
         if(savedInstanceState!=null){
             neghbors =  getSupportFragmentManager().getFragment(
                     savedInstanceState, "NeighborsFragment");
-        }
+        }*/
 
 
         ctx=TabsActivity.this;
         controller = new MainController(ctx);
 
+        final LocalBroadcastManager replyToRequest = LocalBroadcastManager.getInstance(this);
+
+
+        //BroadcastReceiver to receive friends requests
+        BroadcastReceiver requestsReceiver = new BroadcastReceiver() {
+            @Override
+            public void onReceive(Context context, final Intent intent) {
+                final Bundle bundle = intent.getExtras();
+                final Neighbor receivedRequest = (Neighbor) bundle.getSerializable("NEW_REQUEST");
+                Log.i(TAG, "Received a new request: " + receivedRequest.toString());
+                //Display a dialog to the user
+                final Intent intent1 = new Intent("REPLY");
+                new AlertDialog.Builder(ctx)
+                        .setTitle("Friend's Request")
+                        .setMessage(receivedRequest.getInstanceName() + " wants to add you as a friend")
+                        .setPositiveButton(android.R.string.yes, new DialogInterface.OnClickListener() {
+                            public void onClick(DialogInterface dialog, int which) {
+                                Log.i(TAG, "YES");
+
+                                //Send BC to RequestServer
+                                intent1.putExtra("REPLY_REQUEST",true);
+                                replyToRequest.sendBroadcast(intent1);
+
+
+                                CharSequence text = receivedRequest.getInstanceName() + " is now your friend!";
+                                int duration = Toast.LENGTH_LONG;
+                                Toast toast = Toast.makeText(ctx, text, duration);
+                                toast.show();
+                                //Add new friend to database
+                                controller.addFriend(receivedRequest);
+                                NeighborListAdapter.updateNeighborsList(receivedRequest);
+
+
+                            }
+                        })
+                        .setNegativeButton(android.R.string.no, new DialogInterface.OnClickListener() {
+                            public void onClick(DialogInterface dialog, int which) {
+                                Log.i(TAG, "no");
+                                CharSequence text = "Why!!";
+                                int duration = Toast.LENGTH_LONG;
+                                Toast toast = Toast.makeText(ctx, text, duration);
+                                toast.show();
+                                intent1.putExtra("REPLY_REQUEST",false);
+                                replyToRequest.sendBroadcast(intent1);
+
+                            }
+                        })
+                        .setIcon(android.R.drawable.ic_dialog_alert)
+                        .show();
+
+
+            }
+        };
+        LocalBroadcastManager.getInstance(this).registerReceiver((requestsReceiver),
+                new IntentFilter("REQUEST")
+        );
 
         //Starting the service
         startService(new Intent(this, ConnectAndDiscoverService.class));
@@ -187,20 +253,20 @@ public class TabsActivity extends FragmentActivity implements ActionBar.TabListe
         public Fragment getItem(int i) {
             switch (i) {
                 case 0:
-                    return timeline;
+                    return new TimelineSectionFragment();
 
                 case 1:
-                    return neighbors;
+                    return new NeighborSectionFragment();
 
                 case 2:
-                    return chat;
+                    return new MessagesSectionFragment();
 
                 case 3:
-                    return settings;
+                    return new SettingsSectionFragment();
 
                 default:
                     // The other sections of the app are dummy placeholders.
-                    return timeline;
+                    return new TimelineSectionFragment();
             }
         }
 
@@ -215,13 +281,13 @@ public class TabsActivity extends FragmentActivity implements ActionBar.TabListe
         }
     }
 
-    /**
-     * Mute button
-     */
-    public void muteUser(View v){
-        muteButton.setImageResource(R.drawable.muteicon);
 
+    public void deleteAccount(){
+        this.stopService(new Intent(this, ConnectAndDiscoverService.class));
+        this.stopService(new Intent(this, UDPpacketListner.class));
+        this.finish();
     }
+
 
 
 }

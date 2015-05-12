@@ -8,7 +8,9 @@ import vicinity.model.VicinityMessage;
 import vicinity.vicinity.ChatActivity;
 import vicinity.vicinity.R;
 
-
+/**
+ * This class handles user notifications
+ */
 public class VicinityNotifications {
 
 
@@ -16,7 +18,7 @@ public class VicinityNotifications {
 
     /**
      * Notifies receiver about new messages.
-     * @param newMsg a message that has arrived
+     * @param newMsg a VicinityMessage object that has arrived
      */
     public static void newMessageNotification(VicinityMessage newMsg) {
 
@@ -33,6 +35,10 @@ public class VicinityNotifications {
         notification.setLatestEventInfo(ChatActivity.ctx, title, text, contentIntent);
         notificationManager.notify(1, notification);
         Log.d(TAG, "Notification: " + newMsg.getMessageBody());
+    }
+
+    public static void newFriendRequestNotification(String friendName){
+
     }
 
 }

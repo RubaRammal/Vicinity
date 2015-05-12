@@ -1,9 +1,13 @@
 package vicinity.Controller;
 
 
+import vicinity.ConnectionManager.ConnectAndDiscoverService;
 import vicinity.ConnectionManager.PostManager;
 import vicinity.ConnectionManager.UDPpacketListner;
 import vicinity.model.*;
+import vicinity.vicinity.NeighborListAdapter;
+import vicinity.vicinity.NeighborSectionFragment;
+import vicinity.vicinity.TabsActivity;
 
 import android.content.ContentValues;
 import android.content.Context;
@@ -11,6 +15,7 @@ import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteException;
 import android.util.Log;
+import android.widget.Toast;
 
 import org.json.JSONArray;
 import org.json.JSONObject;
@@ -123,6 +128,12 @@ public class MainController {
         return !(username.isEmpty() || !username.matches("[a-zA-Z0-9_-]+"));
     }
 
+    /**
+     * Deletes system's database
+     */
+    public void deleteAccount(){
+        DBHandler.deleteDatabase();
+    }
     /*--------------------------------------------------------------------------------------*/
 
 
@@ -157,29 +168,7 @@ public class MainController {
         return isMuted;
     }
 
-    /**
-     *
-     *
-     * @param peer
-     * @return
-     */
-    public static boolean addPeerAsFriend(Neighbor peer){
-        //fetching device's IP address from cache
-        if(UDPpacketListner.doesAddressExist(peer.getDeviceAddress()))
-        {   peer.setIpAddress(UDPpacketListner.getPeerAddress(peer.getDeviceAddress()));
-            Log.i("Request","Requested IP: "+peer.getIpAddress());
-            postManager.setRequest(peer.getIpAddress());
-            postManager.execute();
 
-            //TODO possible illegalstateexception cause of .execute(), fix it later
-            return true;
-        }
-        else
-            Log.i("Request","No IP address found");
-
-        return false;
-
-    }
 
 
     /*--------------------------------------------------------------------------------------*/
@@ -190,27 +179,44 @@ public class MainController {
 
     /**
      * Adds the newly added Friend to the database.
-     * @param username a friend's instance name.
-     * @param deviceAddress a friend's device address
+     * @param requestedTo a Neighbor object to be added as a friend
      * @return isAdded true if the friend was added successfully, false otherwise.
-     * @throws SQLException
      */
-    public boolean addFriend(String username, String deviceAddress)throws SQLException{
+    public boolean addFriend(Neighbor requestedTo){
         boolean isAdded=false;
         try{
             database = dbH.getReadableDatabase();
             dbH.openDataBase();
             ContentValues values = new ContentValues();
-            values.put("Username", username);
-            values.put("deviceID", deviceAddress);
-            Log.i(TAG,"Adding.. "+deviceAddress);
+            values.put("Username", requestedTo.getInstanceName());
+            values.put("deviceID", requestedTo.getDeviceAddress());
+            Log.i(TAG,"Adding.. "+requestedTo.getDeviceAddress());
             isAdded=database.insert("Friend", null, values)>0;
             dbH.close();
+
         }
         catch(SQLException e){
             e.printStackTrace();
         }
         return isAdded;
+    }
+
+    /**
+     *
+     */
+    public void alertUserOfRequestReply(boolean reply, Neighbor neighbor) throws SQLException{
+        CharSequence text;
+        int duration = Toast.LENGTH_LONG;
+        if(reply){
+            addFriend(neighbor);
+            NeighborListAdapter.updateNeighborsList(neighbor);
+            text = neighbor.getInstanceName()+" is now your friend!";
+        }
+        else{
+            text = neighbor.getInstanceName()+" has rejected your request...";
+        }
+        Toast toast = Toast.makeText(ConnectAndDiscoverService.ctx,text,duration);
+        toast.show();
     }
 
 

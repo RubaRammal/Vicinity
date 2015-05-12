@@ -37,6 +37,7 @@ public class DBHandler extends SQLiteOpenHelper {
     public DBHandler(Context context){
         super(context, DB_NAME , null, DATABASE_VERSION);
         myContext=context;
+
     }
 
     @Override

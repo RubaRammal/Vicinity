@@ -1,5 +1,4 @@
 package vicinity.ConnectionManager;
-import android.net.wifi.p2p.WifiP2pDevice;
 import android.os.AsyncTask;
 import android.util.Log;
 
@@ -10,19 +9,18 @@ import java.net.DatagramPacket;
 import java.net.DatagramSocket;
 import java.net.InetAddress;
 import java.net.InetSocketAddress;
-import java.net.Socket;
 import java.net.SocketAddress;
 import java.util.HashMap;
 
 import vicinity.model.Comment;
 import vicinity.model.Globals;
-import vicinity.model.Neighbor;
 import vicinity.model.Post;
 
 /**
- * This class extends AsyncTask and performs broadcasting a post operation in the
+ * This class extends AsyncTask and performs broadcasting a UDP packet operation in the
  * background, this was implemented as a solution for NetworkOnMainThreadException
  * that occurs when performing network operations on main thread.
+ * It sends a comment, post or addresses hashMap to peers in the group
  */
 public class PostManager extends AsyncTask <Void, Void, Void> {
 
@@ -31,14 +29,11 @@ public class PostManager extends AsyncTask <Void, Void, Void> {
     private static final String TAG = "PostManager";
     private Post post;
     private Comment comment;
-    //private boolean flag;//to determine if it's a comment or a post
     private static final int TIMEOUT_MS = 500;
     DatagramSocket socket;
 
-    private boolean requestFlag = false;//request
     private boolean commentFlag = false;
     private boolean postFlag = false;
-    InetAddress requestIP;
 
 
 
@@ -52,7 +47,6 @@ public class PostManager extends AsyncTask <Void, Void, Void> {
 
     @Override
     protected Void doInBackground(Void... param){
-        Log.i(TAG,"doInBackground() -> Post: "+post);
 
         try{
 
@@ -63,12 +57,11 @@ public class PostManager extends AsyncTask <Void, Void, Void> {
             socket.bind(socketAddr);
             socket.setSoTimeout(TIMEOUT_MS);
 
-            if(requestFlag){
-                sendFriendRequest(requestIP);
-            }
-            else if(postFlag) {
+
+            if(postFlag) {
                 Log.i(TAG,"inside if, flag= "+postFlag);
                 sendPost(post, socket);
+
             }
             else if (commentFlag){
                 Log.i(TAG,"inside else, flag= "+commentFlag);
@@ -88,15 +81,6 @@ public class PostManager extends AsyncTask <Void, Void, Void> {
 
     }
 
-    /**
-     * Set requestIP from ConnectAndDiscoverService
-     * to send a friend request to a peer
-     * @param requestIP IP address of a peer
-     */
-    public void setRequest(InetAddress requestIP){
-        this.requestIP = requestIP;
-        requestFlag=true;
-    }
 
     /**
      * Set post from the NewPost class
@@ -197,36 +181,6 @@ public class PostManager extends AsyncTask <Void, Void, Void> {
     }
 
 
-    /**
-     * Opens a socket directly to a request server
-     * at another peer to send a friend's request
-     * @param requestedIP IP address of a peer
-     */
-    public static void sendFriendRequest(InetAddress requestedIP){
-        try{
-            //TODO this shoud take a service as a parameter
-            Log.i("Request","Sending request to.."+requestedIP);
-            Socket requestSocket = new Socket (requestedIP, Globals.REQUEST_PORT);
-
-            //Getting current device info to send it as an object of Neighbor in the request
-            Neighbor me = (Neighbor) WiFiDirectBroadcastReceiver.getMyP2pInfo();
-
-            ObjectOutputStream outToServer = new ObjectOutputStream(requestSocket.getOutputStream());
-            outToServer.writeObject(me);
-            outToServer.flush();
-            outToServer.close();
-
-
-            requestSocket.close();
-        }
-        catch(IOException e){
-            e.printStackTrace();
-        }
-        catch(NullPointerException e){
-            e.printStackTrace();
-        }
-
-    }
 
 }
 
