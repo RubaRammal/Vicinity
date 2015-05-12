@@ -169,8 +169,10 @@ public class NeighborSectionFragment extends Fragment {
      * @param friend A Neighbor object that contains an online friend
      */
     public static void addToFriendsList(Neighbor friend){
-        friendServices.add(friend);
-        friendListAdapter.notifyDataSetChanged();
+        if(!friendServices.contains(friend)){
+            friendServices.add(friend);
+            friendListAdapter.notifyDataSetChanged();
+        }
     }
 
     /**
@@ -178,9 +180,11 @@ public class NeighborSectionFragment extends Fragment {
      * from the service dynamically
      * @param neighbor A Neighbor object that contains an online peer
      */
-    public static void addToNeighborsList(Neighbor neighbor){
-        listOfServices.add(neighbor);
-        neighborListAdapter.notifyDataSetChanged();
+    public static void addToNeighborsList (Neighbor neighbor)throws NullPointerException{
+        if(!listOfServices.contains(neighbor)){
+            listOfServices.add(neighbor);
+            neighborListAdapter.notifyDataSetChanged();
+        }
     }
 
 }

@@ -105,9 +105,9 @@ public class ConnectAndDiscoverService extends Service
 
         //TODO delete those lines later
         disconnectPeers();
-        DBHandler.deleteDatabase();
+        //.deleteDatabase();
 
-        //Remove advertised service request
+        /*Remove advertised service request
         if (serviceRequest != null)
             manager.removeServiceRequest(channel, serviceRequest,
                     new WifiP2pManager.ActionListener() {
@@ -119,7 +119,7 @@ public class ConnectAndDiscoverService extends Service
                         @Override
                         public void onFailure(int arg0) {
                         }
-                    });
+                    });*/
 
     }
 

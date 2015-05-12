@@ -84,20 +84,21 @@ public class SettingsSectionFragment extends Fragment {
                         .setPositiveButton(android.R.string.yes, new DialogInterface.OnClickListener() {
                             public void onClick(DialogInterface dialog, int which) {
                                Log.i(TAG,"YES");
-                                controller.deleteAccount();
                                 CharSequence text = "Sad to see you leave the vicinity!";
                                 int duration = Toast.LENGTH_LONG;
                                 Toast toast = Toast.makeText(getActivity(), text, duration);
                                 toast.show();
+
+
 
                                 int secondsDelay = 2;
                                 Timer timer = new Timer();
                                 timer.schedule(new TimerTask() {
 
                                     public void run() {
-
-                                        Intent intent = new Intent(getActivity(), LaunchActivity.class);
+                                        controller.deleteAccount();
                                         getActivity().finish();
+                                        Intent intent = new Intent(getActivity(), LaunchActivity.class);
                                         startActivity(intent);
                                     }
 

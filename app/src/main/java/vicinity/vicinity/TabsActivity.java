@@ -210,11 +210,12 @@ public class TabsActivity extends FragmentActivity implements ActionBar.TabListe
     @Override
     protected void onDestroy(){
         Log.i(TAG,"TabsActivity are destroyed");
+        super.onDestroy();
         //Destroying ConnectAndDiscover service
         //This means the service is only stopped when the user shuts down the app completely
         stopService(new Intent(this, ConnectAndDiscoverService.class));
         stopService(new Intent(this, UDPpacketListner.class));
-        super.onDestroy();
+
 
     }
     /************************************************/
@@ -282,11 +283,7 @@ public class TabsActivity extends FragmentActivity implements ActionBar.TabListe
     }
 
 
-    public void deleteAccount(){
-        this.stopService(new Intent(this, ConnectAndDiscoverService.class));
-        this.stopService(new Intent(this, UDPpacketListner.class));
-        this.finish();
-    }
+
 
 
 

@@ -20,6 +20,7 @@ import android.widget.Toast;
 import org.json.JSONArray;
 import org.json.JSONObject;
 
+import java.io.IOException;
 import java.sql.SQLException;
 import java.util.ArrayList;
 
@@ -42,7 +43,6 @@ public class MainController {
     public Cursor cursor;
     private ArrayList<Comment> commentsList;
     JSONArray mMessageArray = new JSONArray();		// limit to the latest 50 messages
-    private static final PostManager postManager = new PostManager();
 
 
 
@@ -58,6 +58,15 @@ public class MainController {
         dbH=new DBHandler(context);
         this.context=context;
         allMessages = new ArrayList<VicinityMessage>();
+        try{
+        dbH.createDataBase();
+        dbH.openDataBase();}
+        catch(SQLException e){
+
+        }
+        catch(IOException e){
+
+        }
 
 
     }
@@ -101,22 +110,22 @@ public class MainController {
     public String retrieveCurrentUsername()throws SQLException{
         String username2=null;
 
-        try {
-            database = dbH.getReadableDatabase();
-            dbH.openDataBase();
+        //try {
+            //dbH.openDataBase();
+            database = dbH.getWritableDatabase();
             query="SELECT Username FROM CurrentUser";
             cursor = database.rawQuery(query,null);
 
             if(cursor.moveToFirst())
-            username2=cursor.getString(cursor.getColumnIndex("Username"));
+                username2=cursor.getString(cursor.getColumnIndex("Username"));
             cursor.close();
             dbH.close();
             return username2;
-        }
+       /* }
         catch (SQLException e){
             Log.i(TAG,"SQLException IN retrieveCurrentUser > currentUser");
-        }
-        return username2;
+        }*/
+        //return username2;
     }
 
     /**
@@ -132,7 +141,7 @@ public class MainController {
      * Deletes system's database
      */
     public void deleteAccount(){
-        DBHandler.deleteDatabase();
+        dbH.deleteDatabase();
     }
     /*--------------------------------------------------------------------------------------*/
 
@@ -379,36 +388,36 @@ public class MainController {
      +     * @param postID The integer id of the selected post.
      +     * @return returns the post.
      +     */
-        public Post getPost(int postID)
+    public Post getPost(int postID)
+    {
+        Post post = null;
+        try
         {
-               Post post = null;
-                try
-                {
-                           database = dbH.getReadableDatabase();
-                   dbH.openDataBase();
-                    String query = "SELECT * FROM Post WHERE postID="+"'"+postID+"'";
-                   Cursor c = database.rawQuery(query, null);
-                    if (c.moveToFirst()) {
-                            post = new Post();
-                            post.setPostID(c.getColumnIndex("_id"));
-                            post.setPostBody(c.getString(c.getColumnIndex("postBody")));
-                            post.setPostedBy(c.getString(c.getColumnIndex("postedBy")));
-                                                    //contact.setPicture(c.getBlob(3));
-                               }
-                    else
-                    {
-                                Log.i(TAG, "This postID doesn't exist in the DB.");
-                    }
-                   dbH.close();
-               }
-               catch (SQLException e)
-                {
-                            e.printStackTrace();
-                    Log.i(TAG, "Error in getting post from DB.");
+            database = dbH.getReadableDatabase();
+            dbH.openDataBase();
+            String query = "SELECT * FROM Post WHERE postID="+"'"+postID+"'";
+            Cursor c = database.rawQuery(query, null);
+            if (c.moveToFirst()) {
+                post = new Post();
+                post.setPostID(c.getColumnIndex("_id"));
+                post.setPostBody(c.getString(c.getColumnIndex("postBody")));
+                post.setPostedBy(c.getString(c.getColumnIndex("postedBy")));
+                //contact.setPicture(c.getBlob(3));
+            }
+            else
+            {
+                Log.i(TAG, "This postID doesn't exist in the DB.");
+            }
+            dbH.close();
+        }
+        catch (SQLException e)
+        {
+            e.printStackTrace();
+            Log.i(TAG, "Error in getting post from DB.");
 
-                        }
-                return post;
-            } //END getPost
+        }
+        return post;
+    } //END getPost
 
 
     public Post getPost2(int id){
@@ -444,68 +453,68 @@ public class MainController {
     /*---------------------------Comments Methods-------------------------------------------*/
 
     /**
-    * Fetches the comments on a specified post
-    * @param postID the integer id of the selected post
-    * @return an ArrayList containing all comments on the specified post
-    */
-                public ArrayList<Comment> getPostComments(int postID)
+     * Fetches the comments on a specified post
+     * @param postID the integer id of the selected post
+     * @return an ArrayList containing all comments on the specified post
+     */
+    public ArrayList<Comment> getPostComments(int postID)
+    {
+        commentsList = new ArrayList<Comment>();
+        try
         {
-               commentsList = new ArrayList<Comment>();
-                try
+            database = dbH.getReadableDatabase();
+            dbH.openDataBase();
+            String query = "SELECT * FROM Comment WHERE postID="+"'"+postID+"'";
+            Cursor c = database.rawQuery(query, null);
+            if (c.moveToFirst())
+            {
+                do
                 {
-                           database = dbH.getReadableDatabase();
-                   dbH.openDataBase();
-                   String query = "SELECT * FROM Comment WHERE postID="+"'"+postID+"'";
-                   Cursor c = database.rawQuery(query, null);
-                   if (c.moveToFirst())
-                        {
-                                    do
-                            {
-                                        Comment comment = new Comment ();
-                           comment.setCommentBody(c.getString(c.getColumnIndex("commentBody")));
-                           comment.setCommentedBy(c.getString(c.getColumnIndex("commentedBy")));
-                           comment.setCommentID(c.getColumnIndex("commentID"));
+                    Comment comment = new Comment ();
+                    comment.setCommentBody(c.getString(c.getColumnIndex("commentBody")));
+                    comment.setCommentedBy(c.getString(c.getColumnIndex("commentedBy")));
+                    comment.setCommentID(c.getColumnIndex("commentID"));
 
-                                    // Adding comment to commentsList
-                                           commentsList.add(comment);
-                        } while (c.moveToNext());
-                    }
-                    else
-                    {
-                                Log.i(TAG, "There are no comments on the specified post.");
-                   }
-                   dbH.close();
-               }
-               catch (SQLException e)
-               {
-                           e.printStackTrace();
-                   Log.i(TAG, "Error in getting comments from DB.");
+                    // Adding comment to commentsList
+                    commentsList.add(comment);
+                } while (c.moveToNext());
+            }
+            else
+            {
+                Log.i(TAG, "There are no comments on the specified post.");
+            }
+            dbH.close();
+        }
+        catch (SQLException e)
+        {
+            e.printStackTrace();
+            Log.i(TAG, "Error in getting comments from DB.");
 
-                       }
+        }
 
-                       return commentsList;
-           } //END getPostComments
+        return commentsList;
+    } //END getPostComments
 
-                public boolean addAcomment(Comment comment) {
-                boolean isAdded = false;
-                try
-                {
-                            database = dbH.getReadableDatabase();
-                    dbH.openDataBase();
-                    ContentValues values = new ContentValues();
-                   values.put("commentBody", comment.getCommentBody());
-                    values.put("commentedBy", comment.getCommentedBy());
-                    values.put("postID", comment.getCommentID());
-                    isAdded=database.insert("Comment", null, values)>0;
-                    dbH.close();
-                }
-                catch(SQLException e)
-                {
-                            e.printStackTrace();
-                    Log.i(TAG, "Error in adding comments to DB.");
-                }
-                return isAdded;
-            } //END addAcomment
+    public boolean addAcomment(Comment comment) {
+        boolean isAdded = false;
+        try
+        {
+            database = dbH.getReadableDatabase();
+            dbH.openDataBase();
+            ContentValues values = new ContentValues();
+            values.put("commentBody", comment.getCommentBody());
+            values.put("commentedBy", comment.getCommentedBy());
+            values.put("postID", comment.getCommentID());
+            isAdded=database.insert("Comment", null, values)>0;
+            dbH.close();
+        }
+        catch(SQLException e)
+        {
+            e.printStackTrace();
+            Log.i(TAG, "Error in adding comments to DB.");
+        }
+        return isAdded;
+    } //END addAcomment
 
     /**
      * Deletes all records in Comment table in database
