@@ -76,24 +76,8 @@ public class PostComment extends ActionBarActivity {
         Bundle extras = getIntent().getExtras();
         postID = extras.getInt("POST_ID");
 
-        commentedOn = controller.getPost2(postID);
+        commentedOn = controller.getPost(postID);
 
-        /*if (savedInstanceState == null) {
-            Bundle extras = getIntent().getExtras();
-            if (extras == null) {
-                postID = 0;
-            } else {
-                postID = extras.getInt("POST_ID");
-            }
-        } else {
-            postID = (int) savedInstanceState.getSerializable("POST_ID");
-        }
-
-        comment = new Comment(commentedOn.getPostBody(), commentedOn.getPostedBy().getUsername());
-        commentsList.add(comment);
-        commentsList.add(new Comment("", "Comments"));
-        commentsList.addAll(controller.getPostComments(postID));
-        */
 
         commentsList = controller.getPostComments(postID);
         commentCount = commentsList.size();
@@ -147,14 +131,10 @@ public class PostComment extends ActionBarActivity {
 
                             comment.setCommentBody(commentText);
                             comment.setCommentedBy(controller.retrieveCurrentUsername());
+                            comment.setPostID(postID);
                             postManager.setComment(comment);
-                        /*
-                            if (controller.addAcomment(comment)){
-                                commentCount++;
-                                Log.i(TAG, "Comment is added to DB");}
-                            else
-                                Log.i(TAG, "Comment is NOT added to DB");
-                        */
+
+
                         } catch (SQLException e) {
                             Log.i(TAG, "A problem in adding comment to DB");
                         }
@@ -163,7 +143,7 @@ public class PostComment extends ActionBarActivity {
                         commentTextField.setText("");
                         commentedOn.setCommentCount(commentCount);
                         postManager.execute();
-                        finish();
+                        //finish();
 
 
                     }

@@ -19,7 +19,7 @@ public class Globals {
     /*-----Port numbers---------*/
     public static final int SERVER_PORT = 4142;
     public static final int ADDRESSES_PORT = 4143;
-    public static final int REQUEST_PORT=4144; //for friend requests among peers
+    public static final int REQUEST_PORT= 4144; //for friend requests among peers
     public static final int CHAT_PORT= 4145;
 
     public static final int MESSAGE_READ = 0x400 + 1;
@@ -29,6 +29,8 @@ public class Globals {
     public static final String MSG_CONTENT = "body";
     public static final String MSG_ID = "id";
     public static final String MSG_MINE = "isMyMsg";
+    public static final String MSG_IMG = "img";
+
 
 
     /*-----Request protocol code messages----*/
@@ -50,5 +52,9 @@ public class Globals {
     public static String MY_MAC = null;
     //Current device's local IP
     public static InetAddress MY_IP=null;
+
+    public static int KRYO_TCP_PORT = 54555;
+    public static int KRYO_UDP_PORT = 54777;
+
 
 }

@@ -62,6 +62,12 @@ public class PostListAdapter  extends BaseAdapter {
     public void addPost(Post p){
         posts.add(p);
         notifyDataSetChanged();
+        try {
+            controller.addPost(p);
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+
     }
 
     @Override

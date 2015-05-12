@@ -34,7 +34,7 @@ public class ChatManager implements Runnable {
 
             iStream = socket.getInputStream();
             oStream = socket.getOutputStream();
-            byte[] buffer = new byte[1024];
+            byte[] buffer = new byte[6900000];
             int bytes;
 
             handler.obtainMessage(Globals.MY_HANDLE, this)

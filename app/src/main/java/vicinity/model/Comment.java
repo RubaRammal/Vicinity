@@ -10,6 +10,7 @@ public class Comment implements Serializable{
 
     //Comment Atts
     private int commentID;
+    private int postID;
     private String commentBody;
     private String commentedBy;
     private String commentedAt; //returns the date as a string
@@ -68,6 +69,14 @@ public class Comment implements Serializable{
     public void setCommentID(int commentID) {
                this.commentID = commentID;
             }
+
+    public int getPostID(){
+        return postID;
+    }
+    public void setPostID(int pid) {
+        postID = pid;
+    }
+
 
 
     //Methods

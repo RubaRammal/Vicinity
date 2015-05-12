@@ -108,6 +108,7 @@ public class UDPpacketListner extends Service {
                 else if (obj instanceof Comment){
                     Comment c = (Comment) obj;
                     Log.i(TAG,"received Comment object: "+c.getCommentBody()+" from: "+senderIP+" "+c.getCommentedBy());
+                    updateUIComments(c);
 
                 }
                 else if(obj instanceof HashMap){
@@ -154,6 +155,17 @@ public class UDPpacketListner extends Service {
         updateUIThread.sendBroadcast(intent);
     }
 
+    /**
+     * Sends intent to the broadcast receiver in Timeline
+     * and it set comments to post
+     * @param c a new comment to update UI (Timeline) thread
+     */
+    private void updateUIComments(Comment c) {
+        Log.i(TAG,"update comments");
+        Intent intent = new Intent("COMMENT");
+        intent.putExtra("NEW_COMMENT", c);
+        updateUIThread.sendBroadcast(intent);
+    }
 
     /**
      * Retrieves the peer's IP from given key (MAC)

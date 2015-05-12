@@ -26,6 +26,7 @@ import android.widget.Toast;
 
 import java.io.ByteArrayOutputStream;
 import java.sql.SQLException;
+import java.util.Random;
 
 import vicinity.ConnectionManager.PostManager;
 import vicinity.Controller.MainController;
@@ -128,6 +129,7 @@ public class NewPost extends ActionBarActivity {
     }
 
     public void sendPost(){
+        Random r = new Random();
         String postText = postTextField.getText().toString();
         try {
             //Can send post only if connected to a network
@@ -135,6 +137,7 @@ public class NewPost extends ActionBarActivity {
                 aPost.setPostBody(postText);
                 aPost.setPostedBy(mc.retrieveCurrentUsername());
                 aPost.setPostDate();
+                aPost.setPostID(r.nextInt((1000 - 1) + 1) + 1);
                 postManager.setPost(aPost);
                 postManager.execute();
                 finish();

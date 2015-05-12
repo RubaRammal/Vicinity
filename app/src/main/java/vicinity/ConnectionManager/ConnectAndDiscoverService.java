@@ -17,6 +17,8 @@ import android.content.BroadcastReceiver;
 import android.util.Log;
 import android.net.wifi.p2p.WifiP2pManager.Channel;
 
+import com.esotericsoftware.kryonet.Server;
+
 import java.io.IOException;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
@@ -92,6 +94,7 @@ public class ConnectAndDiscoverService extends Service
             e.printStackTrace();
         }
         startRegistrationAndDiscovery();
+
     }
 
     @Override
@@ -297,7 +300,7 @@ public class ConnectAndDiscoverService extends Service
      */
     @Override
     public void onConnectionInfoAvailable(WifiP2pInfo p2pInfo) {
-        Log.i(TAG,"onConnectionAvailable");
+        Log.i(TAG, "onConnectionAvailable");
         Thread handler = null;
 
 
@@ -317,6 +320,7 @@ public class ConnectAndDiscoverService extends Service
                 handler.start();
                 Thread requestServer = new RequestServer();
                 requestServer.start();
+
         }
 
         else {
@@ -489,6 +493,7 @@ public class ConnectAndDiscoverService extends Service
     static public void setFAdapter(FriendListAdapter fAdapter){
         friendListAdapter = fAdapter;
     }
+
 
 
 

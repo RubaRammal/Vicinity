@@ -68,6 +68,7 @@ public class PostManager extends AsyncTask <Void, Void, Void> {
                 sendComment(comment, socket);
             }
 
+
         }
         catch (IOException e){
             e.printStackTrace();

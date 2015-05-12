@@ -1,11 +1,15 @@
 package vicinity.vicinity;
 
 import android.content.Context;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
+import android.util.Base64;
 import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
+import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.view.ViewGroup.LayoutParams;
@@ -60,17 +64,32 @@ public class ChatAdapter extends ArrayAdapter<VicinityMessage> {
             convertView = mInflater.inflate(R.layout.chat_box_layout, null);
 
             holder = new ViewHolder();
-            holder.chat_text = (TextView) convertView.findViewById(R.id.chatBox);
+            holder.chat_text = (TextView) convertView.findViewById(R.id.chatText);
             holder.name_text = (TextView) convertView.findViewById(R.id.nameOfFriend);
+            holder.chat_image = (ImageView) convertView.findViewById(R.id.chatImage);
+
+            holder.chat_text.setVisibility(View.GONE);
+            holder.chat_image.setVisibility(View.GONE);
+
 
             convertView.setTag(holder);
         } else {
             holder = (ViewHolder) convertView.getTag();
         }
 
-        holder.chat_text.setText(vicinityMessages.get(position).getMessageBody());
+        if(vicinityMessages.get(position).getImageString().equals("")){
+            holder.chat_text.setVisibility(View.VISIBLE);
+            holder.chat_text.setText(vicinityMessages.get(position).getMessageBody());
+        }
+        else{
+            holder.chat_image.setVisibility(View.VISIBLE);
+            String imageBitmap = vicinityMessages.get(position).getImageString();
+            byte[] decodedString = Base64.decode(imageBitmap, Base64.DEFAULT);
+            Bitmap decodedByte = BitmapFactory.decodeByteArray(decodedString, 0, decodedString.length);
+            holder.chat_image.setImageBitmap(decodedByte);
+        }
 
-            holder.chat_text.setBackgroundDrawable(vicinityMessages.get(position).isMyMsg() ?
+        holder.chat_text.setBackgroundDrawable(vicinityMessages.get(position).isMyMsg() ?
                     ctx.getResources().getDrawable(R.drawable.chatboxright) : ctx.getResources().getDrawable(R.drawable.chatboxleft));
 
         holder.name_text.setText(vicinityMessages.get(position).isMyMsg() ? "" : vicinityMessages.get(position).getFriendID());
@@ -86,10 +105,13 @@ public class ChatAdapter extends ArrayAdapter<VicinityMessage> {
 
         holder.chat_text.setLayoutParams(params);
 
+
         return convertView;
     }
 
     static class ViewHolder{
-         TextView chat_text, name_text;    }
+         TextView chat_text, name_text;
+            ImageView chat_image;
+    }
 }
 

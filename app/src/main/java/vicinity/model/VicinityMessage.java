@@ -34,6 +34,7 @@ public class VicinityMessage implements Parcelable{
     private boolean isMyMsg;
     private String messageBody;
     private int chatId;
+    private String imageString;
 
     public VicinityMessage(){}
     /**
@@ -58,6 +59,24 @@ public class VicinityMessage implements Parcelable{
         sentAt = dF.format(msgSentAt);
         //VicinityMessage's timestamp: Messages for each friend shall be ordered according to this attribute.
         msgTimestamp = msgSentAt.getTime();
+        imageString = "";
+
+    }
+
+    public VicinityMessage(Context context, String friendId, int chatId , boolean isMyMsg){
+
+        getApplicationContext = context;
+        this.friendID = friendId;
+        this.isMyMsg = isMyMsg;
+        this.chatId = chatId;
+        //The following lines will create a string of the time & date the message was sent at
+        //in order to be displayed with the message
+        Date msgSentAt = new Date();
+        DateFormat dF = new SimpleDateFormat("yyyy/MM/dd");
+        sentAt = dF.format(msgSentAt);
+        //VicinityMessage's timestamp: Messages for each friend shall be ordered according to this attribute.
+        msgTimestamp = msgSentAt.getTime();
+        imageString = "";
 
     }
 
@@ -109,6 +128,14 @@ public class VicinityMessage implements Parcelable{
         chatId = cid;
     }
 
+    public void setImageString( String img){
+        imageString = img;
+    }
+
+    public String getImageString(){
+        return imageString;
+    }
+
     public static JSONObject getAsJSONObject(VicinityMessage msgrow) {
         JSONObject jsonobj = new JSONObject();
         try{
@@ -116,6 +143,8 @@ public class VicinityMessage implements Parcelable{
             jsonobj.put(Globals.MSG_ID, msgrow.getChatId());
             jsonobj.put(Globals.MSG_CONTENT, msgrow.getMessageBody());
             jsonobj.put(Globals.MSG_MINE, msgrow.isMyMsg());
+            jsonobj.put(Globals.MSG_IMG, msgrow.getImageString());
+
 
         }catch(JSONException e){
            Log.i(TAG, "getAsJSONObject : " + e.toString());
@@ -136,6 +165,7 @@ public class VicinityMessage implements Parcelable{
                         Integer.parseInt(jsonobj.getString(Globals.MSG_ID)),
                         Boolean.parseBoolean(jsonobj.getString(Globals.MSG_MINE)),
                         jsonobj.getString(Globals.MSG_CONTENT));
+
             }catch(JSONException e){
                 Log.i(TAG, "parseMessageRow: " + e.toString());
             }

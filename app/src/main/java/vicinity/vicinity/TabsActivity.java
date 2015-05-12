@@ -40,9 +40,10 @@ public class TabsActivity extends FragmentActivity implements ActionBar.TabListe
     private ImageButton muteButton;
     public static Context ctx;
     public static MainController controller;
-    private static Fragment timeline = new TimelineSectionFragment()
-            , neighbors = new NeighborSectionFragment(), chat = new MessagesSectionFragment(),
-            settings= new SettingsSectionFragment();
+    private static Fragment timeline = new TimelineSectionFragment(),
+                            neighbors = new NeighborSectionFragment(),
+                            chat = new MessagesSectionFragment(),
+                            settings= new SettingsSectionFragment();
 
     Fragment neghbors = new Fragment();
     public void onCreate(Bundle savedInstanceState) {
@@ -150,7 +151,8 @@ public class TabsActivity extends FragmentActivity implements ActionBar.TabListe
                 actionBar.setSelectedNavigationItem(position);
             }
         });
-        mViewPager.setOffscreenPageLimit(4);
+
+        mViewPager.setOffscreenPageLimit(3); //
 
         //TabsActivity layout (icons + text)
         final int[] LAYOUTS = new int[] {
