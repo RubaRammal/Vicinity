@@ -17,6 +17,7 @@ import android.widget.Button;
 import android.widget.ListView;
 import java.sql.SQLException;
 import vicinity.Controller.MainController;
+import vicinity.model.Comment;
 import vicinity.model.Post;
 
 
@@ -31,7 +32,7 @@ public class TimelineSectionFragment extends Fragment {
     private static String TAG = "Timeline";
     private MainController controller;
     //private static ArrayList<Post> posts ;
-    BroadcastReceiver updatePostList;
+    BroadcastReceiver updateUI;
 
     @Override
     public void onAttach(Activity activity) {
@@ -57,7 +58,7 @@ public class TimelineSectionFragment extends Fragment {
     @Override
     public void onActivityCreated(Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
-        Log.i(TAG,"onActivityCreated");
+        Log.i(TAG, "onActivityCreated");
         setRetainInstance(true);
         if (savedInstanceState != null) {
             // Restore last state for checked position.
@@ -99,27 +100,46 @@ public class TimelineSectionFragment extends Fragment {
                 }
         ); //END setOnItemClickListener
 
-        updatePostList = new BroadcastReceiver() {
+        updateUI = new BroadcastReceiver() {
             @Override
             public void onReceive(Context context, Intent intent) {
-                final Bundle bundle = intent.getExtras();
-                Post receivedPost = (Post) bundle.getSerializable("NEW_POST");
-                Log.i(TAG,"Received in timeline: "+receivedPost.toString());
-                adapter.addPost(receivedPost);
+                try {
+                    final Bundle bundle = intent.getExtras();
 
-                try{
-                    controller.addPost(receivedPost);}
-                catch (SQLException e){
+                    if(intent.getAction().equals("POST")) {
+                        Log.i(TAG,"onReceive");
+                        Post receivedPost = (Post) bundle.getSerializable("NEW_POST");
+                        Log.i(TAG,"Received in timeline: "+receivedPost.toString());
+                        adapter.addPost(receivedPost);
+
+                    } else if (intent.getAction().equals("COMMENT")){
+
+                        Comment receivedComment = (Comment) bundle.getSerializable("NEW_COMMENT");
+                        Log.i(TAG,"Received in timeline: "+receivedComment.getCommentBody());
+
+                        controller.addAcomment(receivedComment);
+
+                    }
+
+
+
+                }
+                catch (NullPointerException e){
                     e.printStackTrace();
                 }
 
 
 
+
             }
         };
-        LocalBroadcastManager.getInstance(getActivity()).registerReceiver((updatePostList),
-                new IntentFilter("POST")
+        IntentFilter filter = new IntentFilter();
+        filter.addAction("POST");
+        filter.addAction("COMMENT");
+        LocalBroadcastManager.getInstance(getActivity()).registerReceiver((updateUI),
+                filter
         );
+
 
         //When Post is clicked
         addPost.setOnClickListener(

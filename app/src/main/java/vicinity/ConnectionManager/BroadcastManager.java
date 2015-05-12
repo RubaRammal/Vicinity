@@ -22,7 +22,7 @@ import vicinity.model.Post;
  * that occurs when performing network operations on main thread.
  * It sends a comment, post or addresses hashMap to peers in the group
  */
-public class PostManager extends AsyncTask <Void, Void, Void> {
+public class BroadcastManager extends AsyncTask <Void, Void, Void> {
 
     //TODO this class shall be named UDPBroadcastManager
 

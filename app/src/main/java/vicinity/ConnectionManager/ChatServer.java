@@ -22,14 +22,11 @@ public class ChatServer extends Thread{
     Socket clientSocket;
 
 
-    public ChatServer(){
+    public ChatServer() throws IOException{
 
-        try {
             Log.i(TAG,"Chat thread has started...");
             chatSocket = new ServerSocket(Globals.CHAT_PORT);
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
+
 
     }
 

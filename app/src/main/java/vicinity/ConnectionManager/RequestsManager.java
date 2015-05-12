@@ -61,6 +61,13 @@ public class RequestsManager extends AsyncTask<Neighbor,Void,Boolean>{
             reply= inputStream.readBoolean();
             Log.i(TAG,"isAccepted: "+reply);
 
+            if(reply){
+                Thread chatServerSocket = new ChatServer();
+                chatServerSocket.start();
+            }
+
+
+
 
             //Closing sockets and streams
             outToServer.close();

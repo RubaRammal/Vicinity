@@ -1,15 +1,7 @@
 package vicinity.Controller;
 
 
-import vicinity.ConnectionManager.ConnectAndDiscoverService;
-import vicinity.ConnectionManager.PostManager;
-import vicinity.ConnectionManager.UDPpacketListner;
-import vicinity.model.*;
-import vicinity.vicinity.NeighborListAdapter;
-import vicinity.vicinity.NeighborSectionFragment;
-import vicinity.vicinity.TabsActivity;
-
-import android.content.ContentValues;
+        import android.content.ContentValues;
 import android.content.Context;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
@@ -23,6 +15,17 @@ import org.json.JSONObject;
 import java.io.IOException;
 import java.sql.SQLException;
 import java.util.ArrayList;
+
+import vicinity.ConnectionManager.ConnectAndDiscoverService;
+import vicinity.ConnectionManager.UDPpacketListner;
+import vicinity.model.Comment;
+import vicinity.model.CurrentUser;
+import vicinity.model.DBHandler;
+import vicinity.model.JSONUtils;
+import vicinity.model.Neighbor;
+import vicinity.model.Post;
+import vicinity.model.VicinityMessage;
+import vicinity.vicinity.NeighborListAdapter;
 
 /**
  * This is the main class that integrates different components of the system
@@ -59,8 +62,8 @@ public class MainController {
         this.context=context;
         allMessages = new ArrayList<VicinityMessage>();
         try{
-        dbH.createDataBase();
-        dbH.openDataBase();}
+            dbH.createDataBase();
+            dbH.openDataBase();}
         catch(SQLException e){
 
         }
@@ -111,16 +114,16 @@ public class MainController {
         String username2=null;
 
         //try {
-            //dbH.openDataBase();
-            database = dbH.getWritableDatabase();
-            query="SELECT Username FROM CurrentUser";
-            cursor = database.rawQuery(query,null);
+        //dbH.openDataBase();
+        database = dbH.getWritableDatabase();
+        query="SELECT Username FROM CurrentUser";
+        cursor = database.rawQuery(query,null);
 
-            if(cursor.moveToFirst())
-                username2=cursor.getString(cursor.getColumnIndex("Username"));
-            cursor.close();
-            dbH.close();
-            return username2;
+        if(cursor.moveToFirst())
+            username2=cursor.getString(cursor.getColumnIndex("Username"));
+        cursor.close();
+        dbH.close();
+        return username2;
        /* }
         catch (SQLException e){
             Log.i(TAG,"SQLException IN retrieveCurrentUser > currentUser");
@@ -330,7 +333,7 @@ public class MainController {
                     post.setPostBody(c.getString(c.getColumnIndex("postBody")));
                     post.setPostedBy(c.getString(c.getColumnIndex("postedBy")));
                     post.setPostedAt(c.getString(c.getColumnIndex("postedAt")));
-                    post.setPostID(Integer.valueOf(c.getString(c.getColumnIndex("_id"))));
+                    post.setPostID(Integer.valueOf(c.getString(c.getColumnIndex("postID"))));
                     //contact.setPicture(c.getBlob(3));
                     postList.add(post);
                 } while (c.moveToNext());
@@ -368,6 +371,8 @@ public class MainController {
             values.put("postBody", post.getPostBody());
             values.put("postedBy", post.getPostedBy());
             values.put("postedAt", post.getPostedAt());
+            values.put("postID", post.getPostID());
+
             isAdded=database.insert("Post", null, values)>0;
 
         }
@@ -399,7 +404,7 @@ public class MainController {
             Cursor c = database.rawQuery(query, null);
             if (c.moveToFirst()) {
                 post = new Post();
-                post.setPostID(c.getColumnIndex("_id"));
+                post.setPostID(c.getColumnIndex("postID"));
                 post.setPostBody(c.getString(c.getColumnIndex("postBody")));
                 post.setPostedBy(c.getString(c.getColumnIndex("postedBy")));
                 //contact.setPicture(c.getBlob(3));
@@ -504,7 +509,7 @@ public class MainController {
             ContentValues values = new ContentValues();
             values.put("commentBody", comment.getCommentBody());
             values.put("commentedBy", comment.getCommentedBy());
-            values.put("postID", comment.getCommentID());
+            values.put("postID", comment.getPostID());
             isAdded=database.insert("Comment", null, values)>0;
             dbH.close();
         }
@@ -775,3 +780,4 @@ public class MainController {
 
 
 }
+
