@@ -536,7 +536,7 @@ public class MainController {
      * Fetches user's Chats from the database
      * @return allMessages
      */
-    public ArrayList<VicinityMessage> viewAllChatMessages(InetAddress ip)
+    public ArrayList<VicinityMessage> viewAllChatMessages(String ip)
 
     {
 
@@ -544,8 +544,7 @@ public class MainController {
         {
             database=dbH.getReadableDatabase();
             dbH.openDataBase();
-            String stringIP = ip.toString();
-            String query="SELECT * FROM Message WHERE fromIP="+"\""+stringIP+"\";";
+            String query="SELECT * FROM Message WHERE fromIP="+"\""+ip+"\";";
             Cursor c = database.rawQuery(query,null);
 
             VicinityMessage msg = null;
@@ -557,6 +556,8 @@ public class MainController {
                     msg.setMessageBody(c.getString(3));
                     msg.setFriendID(c.getString(2));
                     msg.setChatId(c.getInt(c.getColumnIndex("chatId")));
+                    msg.setFrom(c.getString(c.getColumnIndex("fromIP")));
+
 
                     msg.setDate(c.getString(1));
                     //contact.setPicture(c.getBlob(3));
@@ -602,8 +603,9 @@ public class MainController {
                     msg = new VicinityMessage();
                     msg.setMessageBody(c.getString(3));
                     msg.setFriendID(c.getString(2));
+                    msg.setIsMyMsg(c.getInt(c.getColumnIndex("isMyMsg"))>0);
                     msg.setChatId(c.getInt(c.getColumnIndex("chatId")));
-                    msg.setFrom(InetAddress.getByName(c.getString(c.getColumnIndex("fromIP"))));
+                    msg.setFrom(c.getString(c.getColumnIndex("fromIP")));
 
 
                     msg.setDate(c.getString(1));
@@ -617,7 +619,7 @@ public class MainController {
             }
             dbH.close();
         }
-        catch(SQLException | UnknownHostException e)
+        catch(SQLException e)
         {
             e.printStackTrace();
         }
@@ -630,10 +632,10 @@ public class MainController {
      * Fetches all the chat IDs from the db
      * @return chatIds InetAddress array
      */
-    public InetAddress[] viewChatIps()
+    public ArrayList<String> viewChatIps()
 
     {
-        InetAddress[] chatIps = new InetAddress[30];
+        ArrayList<String> chatIps = new ArrayList<String>();
 
         try
         {
@@ -646,7 +648,8 @@ public class MainController {
 
                 do {
 
-                    chatIps[count++] = InetAddress.getByName(c.getString(c.getColumnIndex("fromIP")));
+                    chatIps.add(c.getString(c.getColumnIndex("fromIP")));
+                    Log.i(TAG, chatIps.get(count));
 
                 } while (c.moveToNext());
             }else{
@@ -654,7 +657,7 @@ public class MainController {
             }
             dbH.close();
         }
-        catch(SQLException | UnknownHostException e)
+        catch(SQLException e)
         {
             e.printStackTrace();
         }
@@ -746,7 +749,7 @@ public class MainController {
      * @param fromIp an InetAddress that is the id of a chat
      * @return an ArrayLis of VicinityMessages of all the messages for the specified chat id.
      */
-    public ArrayList<VicinityMessage> getChatMessages(InetAddress fromIp){
+    public ArrayList<VicinityMessage> getChatMessages(String fromIp){
 
         ArrayList<VicinityMessage> chat = new ArrayList<VicinityMessage>();
 

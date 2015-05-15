@@ -77,7 +77,7 @@ public class ChatAdapter extends ArrayAdapter<VicinityMessage> {
             holder = (ViewHolder) convertView.getTag();
         }
 
-        if(vicinityMessages.get(position).getImageString().equals("")){
+        if(!vicinityMessages.get(position).getMessageBody().equals("")){
             holder.chat_text.setVisibility(View.VISIBLE);
             holder.chat_text.setText(vicinityMessages.get(position).getMessageBody());
         }

@@ -8,6 +8,8 @@ import java.io.ObjectOutputStream;
 import java.net.InetAddress;
 import java.net.InetSocketAddress;
 import java.net.Socket;
+import com.google.common.net.InetAddresses;
+
 
 import vicinity.model.Globals;
 import vicinity.model.VicinityMessage;
@@ -27,9 +29,11 @@ public class ChatClient implements Runnable {
     private ObjectOutputStream out;
 
 
-    public ChatClient(Context c, InetAddress ip) {
-        this.ip = ip;
+    public ChatClient(Context c, String ip) {
         ctx = c;
+        this.ip = InetAddresses.forString(ip);
+
+
     }
 
 
@@ -37,7 +41,8 @@ public class ChatClient implements Runnable {
         try {
 
             Socket clientSocket = new Socket();
-            Log.i(TAG, "Client socket started...");
+
+            Log.i(TAG, "Client socket started..." + ip);
             clientSocket.connect(new InetSocketAddress(ip,
                     Globals.CHAT_PORT), 5000);
 

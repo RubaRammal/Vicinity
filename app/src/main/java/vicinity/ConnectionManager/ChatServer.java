@@ -10,7 +10,9 @@ import java.io.ObjectInputStream;
 import java.net.InetAddress;
 import java.net.ServerSocket;
 import java.net.Socket;
+import java.sql.SQLException;
 
+import vicinity.Controller.MainController;
 import vicinity.model.Globals;
 import vicinity.model.VicinityMessage;
 import vicinity.vicinity.ChatActivity;
@@ -24,6 +26,7 @@ public class ChatServer extends Thread{
     private LocalBroadcastManager toChat;
     private ObjectInputStream inputStream;
     private Intent intent;
+    private MainController controller;
 
 
 
@@ -34,8 +37,7 @@ public class ChatServer extends Thread{
         chatSocket = new ServerSocket(Globals.CHAT_PORT);
         toChat = LocalBroadcastManager.getInstance(ConnectAndDiscoverService.ctx);
         intent = new Intent();
-
-
+        controller = new MainController(ConnectAndDiscoverService.ctx);
 
     }
 
@@ -55,10 +57,14 @@ public class ChatServer extends Thread{
             try {
 
                 VicinityMessage msg = (VicinityMessage)inputStream.readObject();
-                msg.setFrom(clientSocket.getInetAddress());
+                msg.setFrom(clientSocket.getInetAddress().getHostAddress());
+                msg.setIsMyMsg(false);
                 Log.i(TAG, "Received a message from: " + msg.getFriendID());
                 Log.i(TAG,"Message content: "+msg.getMessageBody());
                 Log.i(TAG,"Message IP: "+msg.getFrom());
+                controller.addMessage(msg);
+
+
                 //VicinityNotifications.newMessageNotification(msg);
 
 
@@ -84,6 +90,8 @@ public class ChatServer extends Thread{
             catch (ClassNotFoundException e){
                 e.printStackTrace();
                 break;
+            } catch (SQLException e) {
+                e.printStackTrace();
             }
         }
     }

@@ -1,9 +1,11 @@
 package vicinity.model;
 
 import android.content.Context;
+import android.os.StrictMode;
 
 import java.io.Serializable;
 import java.net.InetAddress;
+import java.net.UnknownHostException;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.Date;
@@ -20,11 +22,12 @@ public class VicinityMessage implements Serializable{
     private long msgTimestamp;
     private String sentAt;
     private String friendID;
-    private InetAddress from;
+    private String from;
     private boolean isMyMsg;
     private String messageBody;
     private int chatId;
     private String imageString;
+
 
     public VicinityMessage(){}
     /**
@@ -121,11 +124,12 @@ public class VicinityMessage implements Serializable{
         return imageString;
     }
 
-    public void setFrom(InetAddress from){
+    public void setFrom(String from)  {
         this.from = from;
     }
 
-    public InetAddress getFrom(){
+
+    public String getFrom(){
         return from;
     }
 

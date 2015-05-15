@@ -59,7 +59,7 @@ public class ChatActivity extends ActionBarActivity {
     private static VicinityMessage message;
     BroadcastReceiver newMessage;
     ChatClient chatClient;
-    InetAddress friendsIp;
+    String friendsIp;
     Neighbor friendChat;
 
 
@@ -94,6 +94,8 @@ public class ChatActivity extends ActionBarActivity {
         controller = new MainController(ctx);
 
 
+        ArrayList<VicinityMessage> vicinityMessages = controller.viewAllMessages();
+
 
         imgMsg = new VicinityMessage();
         try {
@@ -110,25 +112,25 @@ public class ChatActivity extends ActionBarActivity {
             if(savedInstanceState.getSerializable("FRIEND") instanceof Neighbor)
             {
                 friendChat = (Neighbor) savedInstanceState.getSerializable("FRIEND");
-                chatClient = new ChatClient(ctx,friendChat.getIpAddress());
-                friendsIp = friendChat.getIpAddress();
+                chatClient = new ChatClient(ctx,friendChat.getIpAddress().getHostAddress());
+                friendsIp = friendChat.getIpAddress().getHostAddress();
                 textviewTitle.setText(friendChat.getInstanceName());
             }
             else if(savedInstanceState.getSerializable("MSG") instanceof VicinityMessage){
                 message = (VicinityMessage) savedInstanceState.getSerializable("MSG");
                 chatClient = new ChatClient(ctx,message.getFrom());
                 textviewTitle.setText(message.getFriendID());
-                message.setIsMyMsg(false);
                 friendsIp = message.getFrom();
-                pushMessage(message);
-                controller.addMessage(message);
 
             }
 
+
         }
-        catch (NullPointerException | SQLException e){
+        catch (NullPointerException e){
             e.printStackTrace();
         }
+
+        getHistory();
 
 
         new Thread(chatClient).start();
@@ -195,13 +197,11 @@ public class ChatActivity extends ActionBarActivity {
                         Log.i(TAG,"onReceive");
                         VicinityMessage vMessage = (VicinityMessage) bundle.getSerializable("NEW_MESSAGE");
                         Log.i(TAG,"Received new message: "+vMessage.getMessageBody());
-                        vMessage.setIsMyMsg(false);
                         friendsIp = vMessage.getFrom();
                         pushMessage(vMessage);
 
-                    controller.addMessage(vMessage);
                 }
-                catch (NullPointerException | SQLException e){
+                catch (NullPointerException e){
                     e.printStackTrace();
                 }
 
@@ -225,16 +225,15 @@ public class ChatActivity extends ActionBarActivity {
 
     private void getHistory() {
         try {
-            Log.i(TAG, chatID + "");
+            Log.i(TAG, "History: "+ friendsIp);
 
-            ArrayList<VicinityMessage> m = new ArrayList<VicinityMessage>();
-            m = controller.getChatMessages(message.getFrom());
+            ArrayList<VicinityMessage> m = controller.getChatMessages(friendsIp);
 
             for (int i = 0; i < m.size(); i++) {
-                friendsIp = m.get(i).getFrom();
                 pushMessage(m.get(i));
-                Log.i(TAG, m.get(i).getMessageBody());
+                Log.i(TAG, "History: "+ m.get(i).getMessageBody());
             }
+
         } catch (IndexOutOfBoundsException e) {
             e.printStackTrace();
         }
@@ -280,7 +279,6 @@ public class ChatActivity extends ActionBarActivity {
         friendsIp = imgMsg.getFrom();
         pushMessage(imgMsg);
 
-        controller.addMessage(imgMsg);
 
         chatText.setText("Photo is attached, click send");
     }

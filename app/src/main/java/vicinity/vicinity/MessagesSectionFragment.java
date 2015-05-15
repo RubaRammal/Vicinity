@@ -13,6 +13,7 @@ import android.widget.AdapterView;
 import android.widget.ListView;
 
 import java.net.InetAddress;
+import java.net.UnknownHostException;
 import java.util.ArrayList;
 
 import vicinity.Controller.MainController;
@@ -29,7 +30,10 @@ public class MessagesSectionFragment extends Fragment {
     private MainController controller;
     private MessageListAdapter adapter;
     private ArrayList<VicinityMessage> history;
+    private ArrayList<VicinityMessage> chatMsgs;
+    private Bundle state;
     public MessagesSectionFragment(){}
+
 
     @Override
     public void onAttach(Activity activity) {
@@ -50,8 +54,12 @@ public class MessagesSectionFragment extends Fragment {
 
     @Override
     public void onSaveInstanceState(final Bundle outState) {
+
         super.onSaveInstanceState(outState);
-        Log.i(TAG,"onSaveInstanceState");
+        outState.putSerializable("MESSAGES_LIST", chatMsgs);
+        state = outState;
+
+        Log.i(TAG,"onSaveInstanceState MESSAGES_LIST");
 
     }
     @Override
@@ -60,7 +68,10 @@ public class MessagesSectionFragment extends Fragment {
         Log.i(TAG,"onActivityCreated");
         setRetainInstance(true);
         if (savedInstanceState != null) {
-            // Restore last state for checked position.
+            state = savedInstanceState;
+            chatMsgs = (ArrayList<VicinityMessage>) savedInstanceState.getSerializable("MESSAGES_LIST");
+            adapter = new MessageListAdapter(this.getActivity(), chatMsgs);
+
         }
 
     }
@@ -73,28 +84,25 @@ public class MessagesSectionFragment extends Fragment {
 
         controller = new MainController(ctx);
 
-        ArrayList<VicinityMessage> vicinityMessages = controller.viewAllMessages();
-        ArrayList<VicinityMessage> chatMsgs = new ArrayList<>();
+        chatMsgs = new ArrayList<>();
 
         //Returns the chat IDs of all messages
-        InetAddress[] ips = controller.viewChatIps();
+        ArrayList<VicinityMessage> vicinityMessages = controller.viewAllMessages();
+        ArrayList<String> stringIPs = controller.viewChatIps();
+
 
         ArrayList<VicinityMessage> temp;
-        //Make a case for 1 later
         try{
         //Fills an ArrayList with the last message of every chat to send it to the adapter for display
-        for (int i=0; i<ips.length; i++){
-            temp = controller.getChatMessages(ips[i]);
+        for (int i=0; i<stringIPs.size(); i++){
+            temp = controller.getChatMessages(stringIPs.get(i));
+            Log.i(TAG, temp.get(i).toString());
 
             if(temp.size()==0)
                 break;
-            if(temp.size()==1)
-                chatMsgs.add(temp.get(0));
-            else {
+
                 chatMsgs.add(temp.get(temp.size() - 1));
-                if (ips[i].equals(null))
-                    break;
-            }
+
         }
         }
         catch (ArrayIndexOutOfBoundsException e){
@@ -131,6 +139,7 @@ public class MessagesSectionFragment extends Fragment {
                 }
         );
 
+
         return rootView;
     }
 
@@ -140,8 +149,22 @@ public class MessagesSectionFragment extends Fragment {
         return history;
     }
 
-    public void setMsgs(InetAddress id){
+    public void setMsgs(String id){
         history = controller.getChatMessages(id);
     }
 
+    @Override
+    public void setUserVisibleHint(boolean isVisibleToUser) {
+        super.setUserVisibleHint(isVisibleToUser);
+        if(isVisibleToUser){
+            Log.i(TAG, "Message fragment is visible");
+            if(state!=null) {
+                chatMsgs = (ArrayList<VicinityMessage>) state.getSerializable("MESSAGES_LIST");
+                adapter = new MessageListAdapter(this.getActivity(), chatMsgs);
+            }
+        }
+    }
 }
+
+
+
