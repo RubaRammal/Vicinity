@@ -24,12 +24,8 @@ public class Globals {
 
     public static final int MESSAGE_READ = 0x400 + 1;
     public static final int MY_HANDLE = 0x400 + 2;
-    public static final int MSG_SIZE = 50;    // the lastest 50 messages
-    public static final String MSG_SENDER = "sender";
-    public static final String MSG_CONTENT = "body";
-    public static final String MSG_ID = "id";
-    public static final String MSG_MINE = "isMyMsg";
-    public static final String MSG_IMG = "img";
+
+
 
 
 
@@ -51,10 +47,10 @@ public class Globals {
     //Current device's P2P MAC address
     public static String MY_MAC = null;
     //Current device's local IP
-    public static InetAddress MY_IP=null;
+    public static InetAddress MY_IP = null;
+    //To check if ChatActivty is active
+    public static boolean chaActive = false;
 
-    public static int KRYO_TCP_PORT = 54555;
-    public static int KRYO_UDP_PORT = 54777;
 
 
 }

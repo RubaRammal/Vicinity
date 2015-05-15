@@ -29,7 +29,6 @@ public class GroupOwnerSocketHandler extends Thread {
     ServerSocket socket = null;
     Socket clientSocket = null;
     private final int THREAD_COUNT = 10;
-    private Handler handler;
     private static final String TAG = "GroupOwner";
     BroadcastManager broadcastManager = new BroadcastManager();
     private HashMap<String, InetAddress> clientsaddresses = new HashMap<>();
@@ -37,12 +36,10 @@ public class GroupOwnerSocketHandler extends Thread {
 
     /**
      * Public constructor
-     * @param handler/
      * @throws IOException
      */
-    public GroupOwnerSocketHandler(Handler handler) throws IOException {
+    public GroupOwnerSocketHandler() throws IOException {
         broadcastManager.execute();
-        this.handler = handler;
 
         try {
           socket = new ServerSocket(Globals.SERVER_PORT);
@@ -75,7 +72,7 @@ public class GroupOwnerSocketHandler extends Thread {
 
 
                 getClientAddress();
-                pool.execute(new ChatManager(socket.accept(), handler));
+                pool.execute(new ChatManager(socket.accept()));
 
 
             } catch (IOException e) {

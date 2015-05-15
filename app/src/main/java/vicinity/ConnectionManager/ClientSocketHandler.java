@@ -20,8 +20,7 @@ public class ClientSocketHandler extends Thread {
     private ChatManager chat;
     private InetAddress mAddress;
 
-    public ClientSocketHandler(Handler handler, InetAddress groupOwnerAddress) {
-        this.handler = handler;
+    public ClientSocketHandler(InetAddress groupOwnerAddress) {
         this.mAddress = groupOwnerAddress;
     }
 
@@ -36,7 +35,7 @@ public class ClientSocketHandler extends Thread {
             socket.bind(null);
             socket.connect(new InetSocketAddress(mAddress.getHostAddress(),
                     Globals.SERVER_PORT), 5000);
-            chat = new ChatManager(socket, handler);
+            chat = new ChatManager(socket);
 
             new Thread(chat).start();
 

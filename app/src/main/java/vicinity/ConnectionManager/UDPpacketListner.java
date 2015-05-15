@@ -127,7 +127,7 @@ public class UDPpacketListner extends Service {
                         else if(key.equals(Globals.MY_MAC)){
                             Log.i(TAG,"This is my MAC address");
                             if(Globals.MY_IP!=null)
-                                Globals.MY_IP= addressHashMap.get(Globals.MY_MAC);
+                                Globals.MY_IP= receivedAddresses.get(Globals.MY_MAC);
                         }
 
                     }

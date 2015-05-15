@@ -1,25 +1,24 @@
-
 package vicinity.ConnectionManager;
 
 import android.os.Handler;
 import android.util.Log;
+
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.net.Socket;
+
 import vicinity.model.Globals;
 
-
 /**
- * This class handles reading and writing of vicinityMessages with socket buffers.
- * Uses a Handler to post vicinityMessages to UI thread for UI updates.
+ * Created by macproretina on 5/14/15.
  */
 public class ChatManager implements Runnable {
 
     private Socket socket = null;
     private Handler handler;
 
-    public ChatManager(Socket socket, Handler handler) {
+    public ChatManager(Socket socket) {
         this.socket = socket;
         this.handler = handler;
     }
@@ -34,11 +33,9 @@ public class ChatManager implements Runnable {
 
             iStream = socket.getInputStream();
             oStream = socket.getOutputStream();
-            byte[] buffer = new byte[6900000];
+            byte[] buffer = new byte[1024];
             int bytes;
 
-            handler.obtainMessage(Globals.MY_HANDLE, this)
-                    .sendToTarget();
 
             while (true) {
                 try {
@@ -49,11 +46,6 @@ public class ChatManager implements Runnable {
                         break;
                     }
 
-                    // Send the obtained bytes to the UI Activity
-                    // VicinityMessage is sent to WiFiServiceDiscovery to be sent to all users
-                    Log.d(TAG, "Rec:" + String.valueOf(buffer));
-                    handler.obtainMessage(Globals.MESSAGE_READ,
-                            bytes, -1, buffer).sendToTarget();
                 } catch (IOException e) {
                     Log.e(TAG, "disconnected", e);
                 }

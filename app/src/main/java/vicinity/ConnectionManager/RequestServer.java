@@ -76,10 +76,18 @@ public class RequestServer extends Thread{
                     alertUser(requestFrom);
                     BroadcastReceiver requestsReceiver = new BroadcastReceiver() {
                         @Override
-                        public void onReceive(Context context, final Intent intent) {
+                        public void onReceive(Context context, final Intent intent)  {
                             final Bundle bundle = intent.getExtras();
                             boolean reply = bundle.getBoolean("REPLY_REQUEST");
                             Log.i("REQUEST"," "+reply);
+                            if(reply){
+                                try {
+                                    Thread chatSocket = new ChatServer();
+                                    chatSocket.start();
+                                } catch (IOException e) {
+                                    e.printStackTrace();
+                                }
+                            }
                             try {
                                 outputStream.writeBoolean(reply);
                                 outputStream.flush();

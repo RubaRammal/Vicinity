@@ -3,6 +3,7 @@ package vicinity.ConnectionManager;
 import android.app.Service;
 import android.content.ComponentName;
 import android.content.Intent;
+import android.os.Handler;
 import android.os.IBinder;
 import android.content.Context;
 import android.content.IntentFilter;
@@ -14,6 +15,7 @@ import android.net.wifi.p2p.nsd.WifiP2pDnsSdServiceInfo;
 import android.net.wifi.p2p.nsd.WifiP2pDnsSdServiceRequest;
 import android.net.wifi.p2p.WifiP2pManager;
 import android.content.BroadcastReceiver;
+import android.os.Message;
 import android.util.Log;
 import android.net.wifi.p2p.WifiP2pManager.Channel;
 
@@ -27,9 +29,11 @@ import java.sql.SQLException;
 import java.util.HashMap;
 import java.util.Map;
 import vicinity.Controller.MainController;
+import vicinity.Controller.VicinityNotifications;
 import vicinity.model.DBHandler;
 import vicinity.model.Globals;
 import vicinity.model.Neighbor;
+import vicinity.model.VicinityMessage;
 import vicinity.vicinity.ChatActivity;
 import vicinity.vicinity.FriendListAdapter;
 import vicinity.vicinity.NeighborListAdapter;
@@ -57,6 +61,8 @@ public class ConnectAndDiscoverService extends Service
     public static FriendListAdapter friendListAdapter;
     private MainController controller;
     private static InetAddress GOIP;
+    private Handler handler;
+    private DBHandler db;
 
 
 
@@ -94,7 +100,7 @@ public class ConnectAndDiscoverService extends Service
             e.printStackTrace();
         }
         startRegistrationAndDiscovery();
-
+        db = new DBHandler(this);
     }
 
     @Override
@@ -108,7 +114,7 @@ public class ConnectAndDiscoverService extends Service
 
         //TODO delete those lines later
         disconnectPeers();
-        //.deleteDatabase();
+        db.deleteDatabase();
 
         /*Remove advertised service request
         if (serviceRequest != null)
@@ -267,7 +273,7 @@ public class ConnectAndDiscoverService extends Service
 
             @Override
             public void onSuccess() {
-                Log.i(TAG,"Connected to "+ name);
+                Log.i(TAG, "Connected to " + name);
 
             }
 
@@ -315,8 +321,7 @@ public class ConnectAndDiscoverService extends Service
         if (p2pInfo.isGroupOwner) {
             Log.i(TAG, "Connected as group owner");
 
-                handler = new GroupOwnerSocketHandler(
-                       ChatActivity.handler);
+                handler = new GroupOwnerSocketHandler();
                 handler.start();
                 Thread requestServer = new RequestServer();
                 requestServer.start();
@@ -327,9 +332,7 @@ public class ConnectAndDiscoverService extends Service
             Log.d(TAG, "Connected as peer");
 
             Thread.sleep(1000);
-            handler = new ClientSocketHandler(
-                    ChatActivity.handler,
-                    p2pInfo.groupOwnerAddress);
+            handler = new ClientSocketHandler(p2pInfo.groupOwnerAddress);
             handler.start();
             Thread requestServer = new RequestServer();
             requestServer.start();
@@ -342,8 +345,6 @@ public class ConnectAndDiscoverService extends Service
             e.printStackTrace();
         }
 
-        //Starting a new chat activity with a connected peer.
-        startChatting();
 
     }
 
@@ -352,6 +353,7 @@ public class ConnectAndDiscoverService extends Service
     public void chatWithFriend(Neighbor friend){
         startChatting();
     }
+
 
 
     public void startChatting(){
@@ -396,17 +398,9 @@ public class ConnectAndDiscoverService extends Service
                     //Code to be done while name change Fails
                 }
             });}
-        catch(IllegalAccessException e){
+        catch(IllegalAccessException | InvocationTargetException | NoSuchMethodException e){
             e.printStackTrace();
         }
-        catch(InvocationTargetException e){
-            e.printStackTrace();
-
-        }
-        catch (NoSuchMethodException e){
-            e.printStackTrace();
-        }
-
 
 
     }
@@ -493,7 +487,6 @@ public class ConnectAndDiscoverService extends Service
     static public void setFAdapter(FriendListAdapter fAdapter){
         friendListAdapter = fAdapter;
     }
-
 
 
 

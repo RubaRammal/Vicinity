@@ -1,16 +1,9 @@
 package vicinity.model;
 
-import android.content.ContentResolver;
 import android.content.Context;
-import android.content.ContextWrapper;
-import android.database.sqlite.SQLiteDatabase;
-import android.os.Parcel;
-import android.os.Parcelable;
-import android.util.Log;
 
-import org.json.JSONException;
-import org.json.JSONObject;
-
+import java.io.Serializable;
+import java.net.InetAddress;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.Date;
@@ -18,19 +11,16 @@ import java.util.Date;
 /**
  * A structure that holds information about chat messages
  */
-public class VicinityMessage implements Parcelable{
+public class VicinityMessage implements Serializable{
 
     private static final String TAG = "MessageClass";
     private static Context getApplicationContext;
-    DBHandler dbh;
-    SQLiteDatabase db;
-    ContentResolver contentResolver = getContentResolver();
-    CapturePhotoUtils capturePhotoUtils;
-    ContextWrapper cw = new ContextWrapper(getApplicationContext);
+
 
     private long msgTimestamp;
     private String sentAt;
     private String friendID;
+    private InetAddress from;
     private boolean isMyMsg;
     private String messageBody;
     private int chatId;
@@ -80,17 +70,12 @@ public class VicinityMessage implements Parcelable{
 
     }
 
-    public VicinityMessage(Parcel in) {
-        readFromParcel(in);
-    }
 
 
     /**
      * setters/getters
      */
-    public ContentResolver getContentResolver() {
-        return contentResolver;
-    }
+
     public void setFriendID(String friendID){
         this.friendID = friendID;
     }
@@ -136,81 +121,16 @@ public class VicinityMessage implements Parcelable{
         return imageString;
     }
 
-    public static JSONObject getAsJSONObject(VicinityMessage msgrow) {
-        JSONObject jsonobj = new JSONObject();
-        try{
-            jsonobj.put(Globals.MSG_SENDER, msgrow.getFriendID());
-            jsonobj.put(Globals.MSG_ID, msgrow.getChatId());
-            jsonobj.put(Globals.MSG_CONTENT, msgrow.getMessageBody());
-            jsonobj.put(Globals.MSG_MINE, msgrow.isMyMsg());
-            jsonobj.put(Globals.MSG_IMG, msgrow.getImageString());
+    public void setFrom(InetAddress from){
+        this.from = from;
+    }
 
-
-        }catch(JSONException e){
-           Log.i(TAG, "getAsJSONObject : " + e.toString());
-        }
-        return jsonobj;
+    public InetAddress getFrom(){
+        return from;
     }
 
 
-    /**
-     * convert json object to message row.
-     */
-    public static VicinityMessage parseMessageRow(JSONObject jsonobj) {
-        VicinityMessage row = null;
-        if( jsonobj != null ){
-            try{
-                row = new VicinityMessage(getApplicationContext,
-                        jsonobj.getString(Globals.MSG_SENDER),
-                        Integer.parseInt(jsonobj.getString(Globals.MSG_ID)),
-                        Boolean.parseBoolean(jsonobj.getString(Globals.MSG_MINE)),
-                        jsonobj.getString(Globals.MSG_CONTENT));
 
-            }catch(JSONException e){
-                Log.i(TAG, "parseMessageRow: " + e.toString());
-            }
-        }
-        return row;
-    }
 
-    /**
-     * convert a json string representation of messagerow into messageRow object.
-     */
-    public static VicinityMessage parseMessageRow(String jsonMsg){
-        JSONObject jsonobj = JSONUtils.getJsonObject(jsonMsg);
-        Log.i(TAG, "parseMessageRow : " + jsonobj.toString());
-        return parseMessageRow(jsonobj);
-    }
 
-    public static final Parcelable.Creator<VicinityMessage> CREATOR = new Parcelable.Creator<VicinityMessage>() {
-        public VicinityMessage createFromParcel(Parcel in) {
-            return new VicinityMessage(in);
-        }
-
-        public VicinityMessage[] newArray(int size) {
-            return new VicinityMessage[size];
-        }
-    };
-
-    @Override
-    public int describeContents() {
-        return 0;
-    }
-
-    @Override
-    public void writeToParcel(Parcel dest, int flags) {
-        dest.writeString(friendID);
-        dest.writeString(messageBody);
-        dest.writeString(String.valueOf(isMyMsg));
-        dest.writeString(String.valueOf(chatId));
-
-    }
-
-    public void readFromParcel(Parcel in) {
-        friendID = in.readString();
-        messageBody = in.readString();
-        isMyMsg = Boolean.parseBoolean(in.readString());
-        chatId = Integer.parseInt(in.readString());
-
-    }
 }

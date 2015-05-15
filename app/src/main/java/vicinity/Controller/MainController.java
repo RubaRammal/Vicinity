@@ -1,7 +1,7 @@
 package vicinity.Controller;
 
 
-        import android.content.ContentValues;
+import android.content.ContentValues;
 import android.content.Context;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
@@ -9,19 +9,19 @@ import android.database.sqlite.SQLiteException;
 import android.util.Log;
 import android.widget.Toast;
 
-import org.json.JSONArray;
-import org.json.JSONObject;
 
 import java.io.IOException;
+import java.net.InetAddress;
+import java.net.UnknownHostException;
 import java.sql.SQLException;
 import java.util.ArrayList;
 
+import vicinity.ConnectionManager.ChatClient;
 import vicinity.ConnectionManager.ConnectAndDiscoverService;
 import vicinity.ConnectionManager.UDPpacketListner;
 import vicinity.model.Comment;
 import vicinity.model.CurrentUser;
 import vicinity.model.DBHandler;
-import vicinity.model.JSONUtils;
 import vicinity.model.Neighbor;
 import vicinity.model.Post;
 import vicinity.model.VicinityMessage;
@@ -45,7 +45,8 @@ public class MainController {
     public String query;
     public Cursor cursor;
     private ArrayList<Comment> commentsList;
-    JSONArray mMessageArray = new JSONArray();		// limit to the latest 50 messages
+    private ArrayList<ChatClient> clientThreads;
+
 
 
 
@@ -61,6 +62,8 @@ public class MainController {
         dbH=new DBHandler(context);
         this.context=context;
         allMessages = new ArrayList<VicinityMessage>();
+        clientThreads = new ArrayList<>();
+
         try{
             dbH.createDataBase();
             dbH.openDataBase();}
@@ -425,17 +428,6 @@ public class MainController {
     } //END getPost
 
 
-    public Post getPost2(int id){
-        Post p = new Post();
-        ArrayList<Post> allPosts = viewAllPosts();
-
-
-        for (int i=0; i<allPosts.size(); i++){
-            if(allPosts.get(i).getPostID()==id)
-                p =  allPosts.get(i);
-        }
-        return p;
-    }
 
     /**
      * Deletes all records in Post table in database
@@ -544,7 +536,7 @@ public class MainController {
      * Fetches user's Chats from the database
      * @return allMessages
      */
-    public ArrayList<VicinityMessage> viewAllChatMessages(int cId)
+    public ArrayList<VicinityMessage> viewAllChatMessages(InetAddress ip)
 
     {
 
@@ -552,7 +544,8 @@ public class MainController {
         {
             database=dbH.getReadableDatabase();
             dbH.openDataBase();
-            String query="SELECT * FROM Message WHERE chatId ="+cId;
+            String stringIP = ip.toString();
+            String query="SELECT * FROM Message WHERE fromIP="+"\""+stringIP+"\";";
             Cursor c = database.rawQuery(query,null);
 
             VicinityMessage msg = null;
@@ -610,6 +603,8 @@ public class MainController {
                     msg.setMessageBody(c.getString(3));
                     msg.setFriendID(c.getString(2));
                     msg.setChatId(c.getInt(c.getColumnIndex("chatId")));
+                    msg.setFrom(InetAddress.getByName(c.getString(c.getColumnIndex("fromIP"))));
+
 
                     msg.setDate(c.getString(1));
                     //contact.setPicture(c.getBlob(3));
@@ -622,11 +617,10 @@ public class MainController {
             }
             dbH.close();
         }
-        catch(SQLException e)
+        catch(SQLException | UnknownHostException e)
         {
             e.printStackTrace();
         }
-
 
         return allMessages;
     }
@@ -634,40 +628,40 @@ public class MainController {
 
     /**
      * Fetches all the chat IDs from the db
-     * @return chatIds int array
+     * @return chatIds InetAddress array
      */
-    public int[] viewChatIds()
+    public InetAddress[] viewChatIps()
 
     {
-        int[] chatIds = new int[30];
+        InetAddress[] chatIps = new InetAddress[30];
 
         try
         {
             database=dbH.getReadableDatabase();
             dbH.openDataBase();
-            String query="SELECT DISTINCT chatId FROM Message";
+            String query="SELECT DISTINCT fromIP FROM Message";
             Cursor c = database.rawQuery(query,null);
             int count = 0;
             if (c.moveToFirst()) {
 
                 do {
 
-                    chatIds[count++] = c.getInt(c.getColumnIndex("chatId"));
+                    chatIps[count++] = InetAddress.getByName(c.getString(c.getColumnIndex("fromIP")));
 
                 } while (c.moveToNext());
             }else{
-                Log.i(TAG, "There are no chat ids in the DB.");
+                Log.i(TAG, "There are no IPs in the DB.");
             }
             dbH.close();
         }
-        catch(SQLException e)
+        catch(SQLException | UnknownHostException e)
         {
             e.printStackTrace();
         }
 
-        Log.i(TAG, "Successfully returned ids");
+        Log.i(TAG, "Successfully returned IPs");
 
-        return chatIds;
+        return chatIps;
     }
 
 
@@ -732,6 +726,7 @@ public class MainController {
             values.put("chatId", message.getChatId());
             values.put("sentBy", message.getFriendID());
             values.put("msgTimestamp", message.getDate());
+            values.put("fromIP", message.getFrom().toString());
 
 
             isAdded=database.insert("Message", null, values)>0;
@@ -748,19 +743,18 @@ public class MainController {
 
     /**
      * Returns an array of all messages for a chat id.
-     * @param chatId and int that is an id of a chat
+     * @param fromIp an InetAddress that is the id of a chat
      * @return an ArrayLis of VicinityMessages of all the messages for the specified chat id.
      */
-    public ArrayList<VicinityMessage> getChatMessages(int chatId){
+    public ArrayList<VicinityMessage> getChatMessages(InetAddress fromIp){
 
         ArrayList<VicinityMessage> chat = new ArrayList<VicinityMessage>();
 
         for(int i=0; i<this.allMessages.size(); i++){
 
-            if(this.allMessages.get(i).getChatId()==chatId){
+            if(this.allMessages.get(i).getFrom().equals(fromIp)){
                 chat.add(allMessages.get(i));
                 Log.i(TAG, allMessages.get(i).getMessageBody());
-                Log.i(TAG, allMessages.get(i).getChatId()+"");
 
             }
         }
@@ -768,16 +762,16 @@ public class MainController {
         return chat;
     }
 
-    public String shiftInsertMessage(VicinityMessage row) {
-        JSONObject jsonobj = VicinityMessage.getAsJSONObject(row);
-        if( jsonobj != null ){
-            mMessageArray.put(jsonobj);
-        }
-        mMessageArray = JSONUtils.truncateJSONArray(mMessageArray, 10);  // truncate the oldest 10.
-        return jsonobj.toString();
-    }
+
     /*--------------------------------------------------------------------------------------*/
 
+    public void addClientThread(ChatClient c){
+        clientThreads.add(c);
+    }
+
+    public ArrayList<ChatClient> getClientThreads(){
+        return clientThreads;
+    }
 
 }
 

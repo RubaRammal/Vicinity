@@ -12,6 +12,7 @@ import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.ListView;
 
+import java.net.InetAddress;
 import java.util.ArrayList;
 
 import vicinity.Controller.MainController;
@@ -76,14 +77,14 @@ public class MessagesSectionFragment extends Fragment {
         ArrayList<VicinityMessage> chatMsgs = new ArrayList<>();
 
         //Returns the chat IDs of all messages
-        int[] ids = controller.viewChatIds();
+        InetAddress[] ips = controller.viewChatIps();
 
         ArrayList<VicinityMessage> temp;
         //Make a case for 1 later
         try{
         //Fills an ArrayList with the last message of every chat to send it to the adapter for display
-        for (int i=0; i<ids.length; i++){
-            temp = controller.getChatMessages(ids[i]);
+        for (int i=0; i<ips.length; i++){
+            temp = controller.getChatMessages(ips[i]);
 
             if(temp.size()==0)
                 break;
@@ -91,7 +92,7 @@ public class MessagesSectionFragment extends Fragment {
                 chatMsgs.add(temp.get(0));
             else {
                 chatMsgs.add(temp.get(temp.size() - 1));
-                if (ids[i] == 0)
+                if (ips[i].equals(null))
                     break;
             }
         }
@@ -102,7 +103,7 @@ public class MessagesSectionFragment extends Fragment {
 
         for (int i=0; i<chatMsgs.size() ;i++){
         Log.i(TAG, "last msg: "+chatMsgs.get(i).getMessageBody());
-            Log.i(TAG, "last id: "+chatMsgs.get(i).getChatId());
+        Log.i(TAG, "last ip: "+chatMsgs.get(i).getFrom());
         }
 
         adapter = new MessageListAdapter(this.getActivity(), chatMsgs);
@@ -119,11 +120,11 @@ public class MessagesSectionFragment extends Fragment {
                 new AdapterView.OnItemClickListener(){
                     @Override
                     public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-                        int msgId = ((VicinityMessage) adapter.getItem(position)).getChatId();
+                        VicinityMessage msg = ((VicinityMessage) adapter.getItem(position));
                         Log.i(TAG, ((VicinityMessage) adapter.getItem(position)).getMessageBody());
-                        setMsgs(msgId);
+                        setMsgs(msg.getFrom());
                         Intent intent = new Intent(ctx, ChatActivity.class);
-                        intent.putExtra("MSG_ID", msgId);
+                        intent.putExtra("MSG", msg);
                         startActivity(intent);
                         Log.i(TAG, "ItemClicked");
                     }
@@ -139,7 +140,7 @@ public class MessagesSectionFragment extends Fragment {
         return history;
     }
 
-    public void setMsgs(int id){
+    public void setMsgs(InetAddress id){
         history = controller.getChatMessages(id);
     }
 
