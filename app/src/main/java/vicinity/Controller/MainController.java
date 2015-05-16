@@ -9,10 +9,7 @@ import android.database.sqlite.SQLiteException;
 import android.util.Log;
 import android.widget.Toast;
 
-
 import java.io.IOException;
-import java.net.InetAddress;
-import java.net.UnknownHostException;
 import java.sql.SQLException;
 import java.util.ArrayList;
 
@@ -337,7 +334,8 @@ public class MainController {
                     post.setPostedBy(c.getString(c.getColumnIndex("postedBy")));
                     post.setPostedAt(c.getString(c.getColumnIndex("postedAt")));
                     post.setPostID(Integer.valueOf(c.getString(c.getColumnIndex("postID"))));
-                    //contact.setPicture(c.getBlob(3));
+                    post.setBitmap(c.getString(c.getColumnIndex("image")));
+
                     postList.add(post);
                 } while (c.moveToNext());
             }
@@ -375,6 +373,7 @@ public class MainController {
             values.put("postedBy", post.getPostedBy());
             values.put("postedAt", post.getPostedAt());
             values.put("postID", post.getPostID());
+            values.put("image" , post.getBitmap());
 
             isAdded=database.insert("Post", null, values)>0;
 
@@ -410,7 +409,8 @@ public class MainController {
                 post.setPostID(c.getColumnIndex("postID"));
                 post.setPostBody(c.getString(c.getColumnIndex("postBody")));
                 post.setPostedBy(c.getString(c.getColumnIndex("postedBy")));
-                //contact.setPicture(c.getBlob(3));
+                post.setBitmap(c.getString(c.getColumnIndex("image")));
+
             }
             else
             {
