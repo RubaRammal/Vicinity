@@ -28,7 +28,7 @@ import java.io.ByteArrayOutputStream;
 import java.sql.SQLException;
 import java.util.Random;
 
-import vicinity.ConnectionManager.BroadcastManager;
+import vicinity.ConnectionManager.UdpBroadcastManager;
 import vicinity.Controller.MainController;
 import vicinity.model.Globals;
 import vicinity.model.Post;
@@ -42,7 +42,7 @@ public class NewPost extends ActionBarActivity {
     private EditText postTextField ;
     private Button sendImgButton;
     private MainController mc ;
-    private BroadcastManager broadcastManager;
+    private UdpBroadcastManager udpBroadcastManager;
     private static final int SELECT_PICTURE_ACTIVITY_REQUEST_CODE = 0;
     Post aPost;
 
@@ -73,7 +73,7 @@ public class NewPost extends ActionBarActivity {
 
         mc = new MainController(this);
 
-        broadcastManager = new BroadcastManager();
+        udpBroadcastManager = new UdpBroadcastManager();
         postTextField = (EditText) findViewById(R.id.postTextField);
         sendImgButton = (Button) findViewById(R.id.sendImageButton);
         sendImgButton.setEnabled(true);
@@ -138,8 +138,8 @@ public class NewPost extends ActionBarActivity {
                 aPost.setPostedBy(mc.retrieveCurrentUsername());
                 aPost.setPostDate();
                 aPost.setPostID(r.nextInt((1000 - 1) + 1) + 1);
-                broadcastManager.setPost(aPost);
-                broadcastManager.execute();
+                udpBroadcastManager.setPost(aPost);
+                udpBroadcastManager.execute();
                 finish();
 
             }

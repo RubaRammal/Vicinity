@@ -19,7 +19,6 @@ import android.os.Message;
 import android.util.Log;
 import android.net.wifi.p2p.WifiP2pManager.Channel;
 
-import com.esotericsoftware.kryonet.Server;
 
 import java.io.IOException;
 import java.lang.reflect.InvocationTargetException;

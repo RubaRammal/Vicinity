@@ -27,7 +27,6 @@ import android.widget.ListView;
 import android.widget.TextView;
 
 import java.io.ByteArrayOutputStream;
-import java.net.InetAddress;
 import java.sql.SQLException;
 import java.util.ArrayList;
 
@@ -45,22 +44,21 @@ public class ChatActivity extends ActionBarActivity {
     private EditText chatText;
     private Button send;
     private Button sendImgButton;
-    private Boolean position;
     private VicinityMessage vicinityMessage;
     private static ChatAdapter adapter;
     public static Context ctx;
     private MainController controller;
     private int chatID;
-    ArrayList<VicinityMessage> history;
     private static final int SELECT_PICTURE_ACTIVITY_REQUEST_CODE = 0;
     private VicinityMessage imgMsg;
     private static String TAG = "ChatActivity";
 
     private static VicinityMessage message;
-    BroadcastReceiver newMessage;
-    ChatClient chatClient;
-    String friendsIp;
-    Neighbor friendChat;
+    private BroadcastReceiver newMessage;
+    private ChatClient chatClient;
+    private String friendsIp;
+    private Neighbor friendChat;
+    private Thread chatThread;
 
 
 
@@ -98,12 +96,7 @@ public class ChatActivity extends ActionBarActivity {
 
 
         imgMsg = new VicinityMessage();
-        try {
-            new VicinityMessage(ctx, controller.retrieveCurrentUsername(),
-                    5, true);
-        } catch (SQLException e) {
-            e.printStackTrace();
-        }
+
         chatListView.setAdapter(adapter);
         chatListView.setTranscriptMode(AbsListView.TRANSCRIPT_MODE_ALWAYS_SCROLL);
 
@@ -133,7 +126,8 @@ public class ChatActivity extends ActionBarActivity {
         getHistory();
 
 
-        new Thread(chatClient).start();
+        chatThread = new Thread(chatClient);
+        chatThread.start();
         controller.addClientThread(chatClient);
 
 
@@ -155,7 +149,6 @@ public class ChatActivity extends ActionBarActivity {
                         //Message
                         vicinityMessage = new VicinityMessage(ctx, controller.retrieveCurrentUsername(),
                                     5, true, chatText.getText().toString());
-
 
                         vicinityMessage.setFrom(friendsIp);
                         //Display Message to user
@@ -279,7 +272,6 @@ public class ChatActivity extends ActionBarActivity {
         friendsIp = imgMsg.getFrom();
         pushMessage(imgMsg);
 
-
         chatText.setText("Photo is attached, click send");
     }
 
@@ -294,15 +286,19 @@ public class ChatActivity extends ActionBarActivity {
     @Override
     public void onStart() {
         super.onStart();
-        Globals.chaActive = true;
+        Globals.chatActive = true;
     }
 
     @Override
     public void onStop() {
         super.onStop();
-        Globals.chaActive = false;
+        Globals.chatActive = false;
     }
 
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        chatThread.stop();
 
-
+    }
 }

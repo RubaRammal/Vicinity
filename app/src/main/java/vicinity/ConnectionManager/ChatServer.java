@@ -53,7 +53,7 @@ public class ChatServer extends Thread{
         } catch (IOException e) {
             e.printStackTrace();
         }
-        while (true) {
+        while (Globals.stopServer) {
             try {
 
                 VicinityMessage msg = (VicinityMessage)inputStream.readObject();
@@ -68,7 +68,7 @@ public class ChatServer extends Thread{
                 //VicinityNotifications.newMessageNotification(msg);
 
 
-                if(!Globals.chaActive){
+                if(!Globals.chatActive){
                 intent.putExtra("MSG", msg);
                 intent.setAction(Intent.ACTION_MAIN);
                 intent.addCategory(Intent.CATEGORY_LAUNCHER);

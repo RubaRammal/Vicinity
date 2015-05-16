@@ -23,7 +23,7 @@ import android.text.Editable;
 import android.text.TextUtils;
 import android.text.TextWatcher;
 import java.sql.SQLException;
-import vicinity.ConnectionManager.BroadcastManager;
+import vicinity.ConnectionManager.UdpBroadcastManager;
 
 /* this class is supposed to implement the method sendClickedPost from TimelineInterface
 * still working on it
@@ -46,7 +46,7 @@ public class PostComment extends ActionBarActivity {
     private String TAG = "PostComment";
     private MainController controller;
     private int commentCount;
-    private BroadcastManager broadcastManager;//-Lama
+    private UdpBroadcastManager udpBroadcastManager;//-Lama
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -72,7 +72,7 @@ public class PostComment extends ActionBarActivity {
         ctx = this;
         controller = new MainController(ctx);
         comment = new Comment();//-Lama
-        broadcastManager = new BroadcastManager();//-Lama
+        udpBroadcastManager = new UdpBroadcastManager();//-Lama
         Bundle extras = getIntent().getExtras();
         postID = extras.getInt("POST_ID");
 
@@ -132,7 +132,7 @@ public class PostComment extends ActionBarActivity {
                             comment.setCommentBody(commentText);
                             comment.setCommentedBy(controller.retrieveCurrentUsername());
                             comment.setPostID(postID);
-                            broadcastManager.setComment(comment);
+                            udpBroadcastManager.setComment(comment);
 
 
                         } catch (SQLException e) {
@@ -142,7 +142,7 @@ public class PostComment extends ActionBarActivity {
                         adapter.notifyDataSetChanged();
                         commentTextField.setText("");
                         commentedOn.setCommentCount(commentCount);
-                        broadcastManager.execute();
+                        udpBroadcastManager.execute();
                         //finish();
 
 

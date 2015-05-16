@@ -1,7 +1,6 @@
 
 package vicinity.ConnectionManager;
 
-import android.os.Handler;
 import android.util.Log;
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -30,7 +29,7 @@ public class GroupOwnerSocketHandler extends Thread {
     Socket clientSocket = null;
     private final int THREAD_COUNT = 10;
     private static final String TAG = "GroupOwner";
-    BroadcastManager broadcastManager = new BroadcastManager();
+    UdpBroadcastManager udpBroadcastManager = new UdpBroadcastManager();
     private HashMap<String, InetAddress> clientsaddresses = new HashMap<>();
 
 
@@ -39,7 +38,7 @@ public class GroupOwnerSocketHandler extends Thread {
      * @throws IOException
      */
     public GroupOwnerSocketHandler() throws IOException {
-        broadcastManager.execute();
+        udpBroadcastManager.execute();
 
         try {
           socket = new ServerSocket(Globals.SERVER_PORT);
@@ -111,7 +110,7 @@ public class GroupOwnerSocketHandler extends Thread {
         clientsaddresses.put(Globals.MY_MAC,ConnectAndDiscoverService.getGOAddress());
         //Broadcast all addresses evey time the group owner receives a new address
         //so new peers can have the whole list of other connected peers
-        broadcastManager.sendAddresses(clientsaddresses);
+        udpBroadcastManager.sendAddresses(clientsaddresses);
 
         bufferedReader.close();
         clientSocket.close();

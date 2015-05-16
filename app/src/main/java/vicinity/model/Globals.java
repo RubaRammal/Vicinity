@@ -49,7 +49,9 @@ public class Globals {
     //Current device's local IP
     public static InetAddress MY_IP = null;
     //To check if ChatActivty is active
-    public static boolean chaActive = false;
+    public static boolean chatActive = false;
+    
+    public static boolean stopServer = true;
 
 
 
