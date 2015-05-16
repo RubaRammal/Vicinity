@@ -40,10 +40,9 @@ public class TabsActivity extends FragmentActivity implements ActionBar.TabListe
     private ImageButton muteButton;
     public static Context ctx;
     public static MainController controller;
-    private static Fragment timeline = new TimelineSectionFragment(),
-                            neighbors = new NeighborSectionFragment(),
-                            chat = new MessagesSectionFragment(),
-                            settings= new SettingsSectionFragment();
+    private static Fragment timeline = new TimelineSectionFragment()
+            , neighbors = new NeighborSectionFragment(), chat = new MessagesSectionFragment(),
+            settings= new SettingsSectionFragment();
 
     Fragment neghbors = new Fragment();
     public void onCreate(Bundle savedInstanceState) {
@@ -64,54 +63,61 @@ public class TabsActivity extends FragmentActivity implements ActionBar.TabListe
 
 
         //BroadcastReceiver to receive friends requests
-        BroadcastReceiver requestsReceiver = new BroadcastReceiver() {
+        final BroadcastReceiver requestsReceiver = new BroadcastReceiver() {
             @Override
             public void onReceive(Context context, final Intent intent) {
                 final Bundle bundle = intent.getExtras();
                 final Neighbor receivedRequest = (Neighbor) bundle.getSerializable("NEW_REQUEST");
                 Log.i(TAG, "Received a new request: " + receivedRequest.toString());
-                //Display a dialog to the user
                 final Intent intent1 = new Intent("REPLY");
-                new AlertDialog.Builder(ctx)
-                        .setTitle("Friend's Request")
-                        .setMessage(receivedRequest.getInstanceName() + " wants to add you as a friend")
-                        .setPositiveButton(android.R.string.yes, new DialogInterface.OnClickListener() {
-                            public void onClick(DialogInterface dialog, int which) {
-                                Log.i(TAG, "YES");
+                //Check if the request came from a blocked user
+                if(MainController.isThisIPMuted(receivedRequest.getIpAddress()))
+                {
+                    intent1.putExtra("REPLY_REQUEST",false);
+                    replyToRequest.sendBroadcast(intent1);
+                }
+                //Display a dialog to the user
+                else{
+                    new AlertDialog.Builder(ctx)
+                            .setTitle("Friend's Request")
+                            .setMessage(receivedRequest.getInstanceName() + " wants to add you as a friend")
+                            .setPositiveButton(android.R.string.yes, new DialogInterface.OnClickListener() {
+                                public void onClick(DialogInterface dialog, int which) {
+                                    Log.i(TAG, "YES");
 
-                                //Send BC to RequestServer
-                                intent1.putExtra("REPLY_REQUEST",true);
-                                replyToRequest.sendBroadcast(intent1);
-
-
-                                CharSequence text = receivedRequest.getInstanceName() + " is now your friend!";
-                                int duration = Toast.LENGTH_LONG;
-                                Toast toast = Toast.makeText(ctx, text, duration);
-                                toast.show();
-                                //Add new friend to database
-                                controller.addFriend(receivedRequest);
-                                NeighborListAdapter.updateNeighborsList(receivedRequest);
-
-
-                            }
-                        })
-                        .setNegativeButton(android.R.string.no, new DialogInterface.OnClickListener() {
-                            public void onClick(DialogInterface dialog, int which) {
-                                Log.i(TAG, "no");
-                                CharSequence text = "Why!!";
-                                int duration = Toast.LENGTH_LONG;
-                                Toast toast = Toast.makeText(ctx, text, duration);
-                                toast.show();
-                                intent1.putExtra("REPLY_REQUEST",false);
-                                replyToRequest.sendBroadcast(intent1);
-
-                            }
-                        })
-                        .setIcon(android.R.drawable.ic_dialog_alert)
-                        .show();
+                                    //Send BC to RequestServer
+                                    intent1.putExtra("REPLY_REQUEST",true);
+                                    replyToRequest.sendBroadcast(intent1);
 
 
-            }
+                                    CharSequence text = receivedRequest.getInstanceName() + " is now your friend!";
+                                    int duration = Toast.LENGTH_LONG;
+                                    Toast toast = Toast.makeText(ctx, text, duration);
+                                    toast.show();
+                                    //Add new friend to database
+                                    controller.addFriend(receivedRequest);
+                                    NeighborListAdapter.updateNeighborsList(receivedRequest);
+
+
+                                }
+                            })
+                            .setNegativeButton(android.R.string.no, new DialogInterface.OnClickListener() {
+                                public void onClick(DialogInterface dialog, int which) {
+                                    Log.i(TAG, "no");
+                                    CharSequence text = "Why!!";
+                                    int duration = Toast.LENGTH_LONG;
+                                    Toast toast = Toast.makeText(ctx, text, duration);
+                                    toast.show();
+                                    intent1.putExtra("REPLY_REQUEST",false);
+                                    replyToRequest.sendBroadcast(intent1);
+
+                                }
+                            })
+                            .setIcon(android.R.drawable.ic_dialog_alert)
+                            .show();
+
+
+                }}
         };
         LocalBroadcastManager.getInstance(this).registerReceiver((requestsReceiver),
                 new IntentFilter("REQUEST")
@@ -151,8 +157,7 @@ public class TabsActivity extends FragmentActivity implements ActionBar.TabListe
                 actionBar.setSelectedNavigationItem(position);
             }
         });
-
-        mViewPager.setOffscreenPageLimit(3); //
+        mViewPager.setOffscreenPageLimit(4);
 
         //TabsActivity layout (icons + text)
         final int[] LAYOUTS = new int[] {
@@ -164,7 +169,7 @@ public class TabsActivity extends FragmentActivity implements ActionBar.TabListe
 
 
         // For each of the sections in the app, add a tab to the action bar.
-       for (int i = 0; i < mAppSectionsPagerAdapter.getCount(); i++) {
+        for (int i = 0; i < mAppSectionsPagerAdapter.getCount(); i++) {
             // Create a tab with text corresponding to the page title defined by the adapter.
             // Also specify this Activity object, which implements the TabListener interface, as the
             // listener for when this tab is selected.

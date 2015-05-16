@@ -83,7 +83,7 @@ public class SettingsSectionFragment extends Fragment {
                         .setMessage("Are you sure you want to delete your account?")
                         .setPositiveButton(android.R.string.yes, new DialogInterface.OnClickListener() {
                             public void onClick(DialogInterface dialog, int which) {
-                               Log.i(TAG,"YES");
+                                Log.i(TAG,"YES");
                                 CharSequence text = "Sad to see you leave the vicinity!";
                                 int duration = Toast.LENGTH_LONG;
                                 Toast toast = Toast.makeText(getActivity(), text, duration);
@@ -126,15 +126,15 @@ public class SettingsSectionFragment extends Fragment {
         notificationSwitch = (Switch) rootView.findViewById(R.id.notificationSwitch);
         notificationSwitch.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
             public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
-               if(isChecked){
-                   Globals.Notification=true;
-                   Log.i(TAG,"Switch is on");
-               }
+                if(isChecked){
+                    Globals.Notification=true;
+                    Log.i(TAG,"Switch is on");
+                }
                 else{
-                   Globals.Notification=false;
-                   Log.i(TAG,"Switch is off");
+                    Globals.Notification=false;
+                    Log.i(TAG,"Switch is off");
 
-               }
+                }
             }
         });
         /*
@@ -154,17 +154,17 @@ public class SettingsSectionFragment extends Fragment {
 
                                 Log.i(TAG,"YES");
                                 try{
-                                if(controller.deleteAllMessages()){
+                                    if(controller.deleteAllMessages()){
 
-                                CharSequence text = "Deleted chat history";
-                                int duration = Toast.LENGTH_LONG;
-                                Toast toast = Toast.makeText(getActivity(), text, duration);
-                                toast.show();}
+                                        CharSequence text = "Deleted chat history";
+                                        int duration = Toast.LENGTH_LONG;
+                                        Toast toast = Toast.makeText(getActivity(), text, duration);
+                                        toast.show();}
 
-                            }
-                            catch(SQLException e){
-                                e.printStackTrace();
-                            }}
+                                }
+                                catch(SQLException e){
+                                    e.printStackTrace();
+                                }}
                         })
                         .setNegativeButton(android.R.string.no, new DialogInterface.OnClickListener() {
                             public void onClick(DialogInterface dialog, int which) {

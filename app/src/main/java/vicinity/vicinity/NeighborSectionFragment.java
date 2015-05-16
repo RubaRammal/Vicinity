@@ -138,8 +138,8 @@ public class NeighborSectionFragment extends Fragment {
         lvf.setOnItemClickListener(new AdapterView.OnItemClickListener(){
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-                Log.i(TAG,"Clicked: "+friendListAdapter.getItem(position).toString()) ;
-                final Neighbor friend = (Neighbor) friendListAdapter.getItem(position);
+                Log.i(TAG,"Clicked: "+friendListAdapter.getItem(position-1).toString()) ;
+                final Neighbor friend = (Neighbor) friendListAdapter.getItem(position-1);
 
                     Intent intent = new Intent(ctx, ChatActivity.class);
                     intent.putExtra("FRIEND", friend);

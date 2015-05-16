@@ -6,6 +6,8 @@ import android.database.sqlite.SQLiteException;
 import android.database.sqlite.SQLiteOpenHelper;
 import android.content.Context;
 import android.util.Log;
+
+import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.FileOutputStream;
@@ -47,8 +49,8 @@ public class DBHandler extends SQLiteOpenHelper {
     @Override
     public void onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion) {
         try{
-        if(newVersion>oldVersion)
-            copyDatabase();}
+            if(newVersion>oldVersion)
+                copyDatabase();}
         catch(IOException e){
             e.printStackTrace();
         }
@@ -78,7 +80,7 @@ public class DBHandler extends SQLiteOpenHelper {
                 copyDatabase();
             }
             catch (IOException e) {
-                    throw new Error("Error copying database");
+                throw new Error("Error copying database");
             }
         }
 
@@ -95,7 +97,9 @@ public class DBHandler extends SQLiteOpenHelper {
 
         try{
             String myPath = DB_PATH + DB_NAME;
-            checkDB = SQLiteDatabase.openDatabase(myPath, null, SQLiteDatabase.OPEN_READONLY);
+            File file = new File(myPath);
+            if (file.exists() && !file.isDirectory()){
+                checkDB = SQLiteDatabase.openDatabase(myPath, null, SQLiteDatabase.OPEN_READONLY);}
         }catch(SQLiteException e){
             e.printStackTrace();
         }
