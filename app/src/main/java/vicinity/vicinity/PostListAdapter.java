@@ -11,13 +11,11 @@ import android.widget.BaseAdapter;
 import android.widget.ImageView;
 import android.widget.TextView;
 
-import java.io.ByteArrayOutputStream;
 import java.sql.SQLException;
 import java.util.ArrayList;
 
 import vicinity.Controller.MainController;
 import vicinity.model.Post;
-import vicinity.vicinity.R;
 
 /**
  * An adapter that takes a list of posts and displays it in a ListView
@@ -111,12 +109,16 @@ public class PostListAdapter  extends BaseAdapter {
             holder.txtComments.setText("0 comments");
             holder.txtDate.setText(posts.get(position).getPostedAt());
 
-        if(!posts.get(position).getBitmap().equals("")){
-            String imageBitmap = posts.get(position).getBitmap();
-            byte[] decodedString = Base64.decode(imageBitmap, Base64.DEFAULT);
-            Bitmap decodedByte = BitmapFactory.decodeByteArray(decodedString, 0, decodedString.length);
-            holder.imageView.setImageBitmap(decodedByte);
+        try {
+            if(!posts.get(position).getBitmap().equals("")){
+                String imageBitmap = posts.get(position).getBitmap();
+                byte[] decodedString = Base64.decode(imageBitmap, Base64.DEFAULT);
+                Bitmap decodedByte = BitmapFactory.decodeByteArray(decodedString, 0, decodedString.length);
+                holder.imageView.setImageBitmap(decodedByte);
 
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
         }
 
 
