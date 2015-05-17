@@ -128,8 +128,8 @@ public class NeighborSectionFragment extends Fragment {
 
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-                Log.i(TAG,"Clicked: "+neighborListAdapter.getItem(position).toString()) ;
-                final Neighbor neighbor = (Neighbor) neighborListAdapter.getItem(position);
+                Log.i(TAG,"Clicked: "+neighborListAdapter.getItem(position-1).toString()) ;
+                final Neighbor neighbor = (Neighbor) neighborListAdapter.getItem(position-1);
                 ((DeviceClickListener) ConnectAndDiscoverService.ctx).connectP2p(neighbor);
             }
         });
@@ -155,9 +155,15 @@ public class NeighborSectionFragment extends Fragment {
     }
 
     public static void updateDeletedFriend(Neighbor deletedFriend){
-                friendServices.remove(deletedFriend);
-                listOfServices.add(deletedFriend);
+            Iterator<Neighbor> it = friendServices.iterator();
+            while (it.hasNext()) {
+            Neighbor user = it.next();
+            if (user.getDeviceAddress().equals(deletedFriend.getDeviceAddress())) {
+                it.remove();
                 friendListAdapter.notifyDataSetChanged();
+            }
+        }
+                listOfServices.add(deletedFriend);
                 neighborListAdapter.notifyDataSetChanged();
             }
 
@@ -203,5 +209,7 @@ public class NeighborSectionFragment extends Fragment {
             neighborListAdapter.notifyDataSetChanged();
         }
     }
+
+
 
 }

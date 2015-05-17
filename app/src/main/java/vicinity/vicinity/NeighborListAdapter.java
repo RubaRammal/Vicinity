@@ -14,8 +14,8 @@ import android.widget.BaseAdapter;
 import android.widget.Toast;
 
 
-import java.net.InetAddress;
 import java.util.ArrayList;
+import java.util.concurrent.Executor;
 
 
 import vicinity.ConnectionManager.RequestsManager;
@@ -35,8 +35,6 @@ public class NeighborListAdapter extends BaseAdapter {
         services = services2;
         controller = new MainController(context);
         mInflater = LayoutInflater.from(context);
-
-
     }
 
 
@@ -50,7 +48,7 @@ public class NeighborListAdapter extends BaseAdapter {
 
     @Override
     public Object getItem(int position) {
-        return services.get(position-1);
+        return services.get(position);
     }
 
     @Override
@@ -83,7 +81,7 @@ public class NeighborListAdapter extends BaseAdapter {
         mute.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Neighbor neighbor = (Neighbor) getItem(position+1);
+                Neighbor neighbor = (Neighbor) getItem(position);
                 //First check if the user is connected to a network
                 if(Globals.isConnectedToANetwork){
                     try{
@@ -125,7 +123,7 @@ public class NeighborListAdapter extends BaseAdapter {
             @Override
             public void onClick(View v) {
 
-                final Neighbor neighbor = (Neighbor) getItem(position + 1);
+                final Neighbor neighbor = (Neighbor) getItem(position);
                 new AlertDialog.Builder(TabsActivity.ctx)
                         .setTitle("Add a friend")
                         .setMessage("Do you want to add " + neighbor.getInstanceName() + " as a friend?")
@@ -158,6 +156,10 @@ public class NeighborListAdapter extends BaseAdapter {
 
     public static void updateNeighborsList(Neighbor neighbor){
         NeighborSectionFragment.updateAddedFriend(neighbor);
+    }
+
+    public static void addToNeighbors(Neighbor neighbor){
+        NeighborSectionFragment.updateDeletedFriend(neighbor);
     }
 
 }

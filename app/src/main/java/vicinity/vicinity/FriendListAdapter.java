@@ -18,6 +18,7 @@ import android.widget.Toast;
 import java.sql.SQLException;
 import java.util.ArrayList;
 
+import vicinity.ConnectionManager.RequestsManager;
 import vicinity.model.Neighbor;
 
 
@@ -81,6 +82,9 @@ public class FriendListAdapter extends BaseAdapter {
                         .setPositiveButton(android.R.string.yes, new DialogInterface.OnClickListener() {
                             public void onClick(DialogInterface dialog, int which) {
                                 Log.i(TAG, "YES");
+
+                                new RequestsManager().execute(deleteFriend);
+
                                 TabsActivity.controller.deleteFriend(deleteFriend.getDeviceAddress());
                                 NeighborSectionFragment.updateDeletedFriend(deleteFriend);
                                 CharSequence text = deleteFriend.getInstanceName()+" is deleted.";

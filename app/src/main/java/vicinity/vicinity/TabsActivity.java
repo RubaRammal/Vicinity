@@ -76,6 +76,11 @@ public class TabsActivity extends FragmentActivity implements ActionBar.TabListe
                     intent1.putExtra("REPLY_REQUEST",false);
                     replyToRequest.sendBroadcast(intent1);
                 }
+                else if(controller.isThisMyFriend(receivedRequest.getDeviceAddress())){
+                    Toast.makeText(TabsActivity.ctx,"You are not friends with "+receivedRequest.getInstanceName()+" anymore!",Toast.LENGTH_LONG).show();
+                    controller.deleteFriend(receivedRequest.getDeviceAddress());
+                    NeighborListAdapter.addToNeighbors(receivedRequest);
+                }
                 //Display a dialog to the user
                 else{
                     new AlertDialog.Builder(ctx)
