@@ -46,16 +46,22 @@ public class ChatActivity extends ActionBarActivity {
 
     private ListView chatListView;
     private EditText chatText;
+    private Button send;
+    private Button sendImgButton;
     private VicinityMessage vicinityMessage;
     private static ChatAdapter adapter;
     public static Context ctx;
     private MainController controller;
+    private int chatID;
     private static final int SELECT_PICTURE_ACTIVITY_REQUEST_CODE = 0;
     private VicinityMessage imgMsg;
     private static String TAG = "ChatActivity";
 
+    private static VicinityMessage message;
+    private BroadcastReceiver newMessage;
     private ChatClient chatClient;
     private String friendsIp;
+    private Neighbor friendChat;
     private Thread chatThread;
 
 
@@ -85,19 +91,20 @@ public class ChatActivity extends ActionBarActivity {
         chatListView = (ListView) findViewById(R.id.chatList);
         adapter = new ChatAdapter(ctx, R.layout.chat_box_layout);
         chatText = (EditText) findViewById(R.id.chatText);
-        Button send = (Button) findViewById(R.id.sendButton);
-        Button sendImgButton = (Button) findViewById(R.id.sendImage);
+        send = (Button) findViewById(R.id.sendButton);
+        sendImgButton = (Button) findViewById(R.id.sendImage);
         controller = new MainController(ctx);
 
 
         ArrayList<VicinityMessage> vicinityMessages = controller.viewAllMessages();
 
-        try {
+
         imgMsg = new VicinityMessage();
+        imgMsg.setChatId(5);
         imgMsg.setIsMyMsg(true);
         imgMsg.setMessageBody("");
-        imgMsg.setFriendID(controller.retrieveCurrentUsername());
-        imgMsg.setChatId(5);
+        try {
+            imgMsg.setFriendID(controller.retrieveCurrentUsername());
         } catch (SQLException e) {
             e.printStackTrace();
         }
@@ -109,14 +116,14 @@ public class ChatActivity extends ActionBarActivity {
         savedInstanceState = getIntent().getExtras();
             if(savedInstanceState.getSerializable("FRIEND") instanceof Neighbor)
             {
-                Neighbor friendChat = (Neighbor) savedInstanceState.getSerializable("FRIEND");
-                chatClient = new ChatClient(ctx, friendChat.getIpAddress().getHostAddress());
+                friendChat = (Neighbor) savedInstanceState.getSerializable("FRIEND");
+                chatClient = new ChatClient(ctx,friendChat.getIpAddress().getHostAddress());
                 friendsIp = friendChat.getIpAddress().getHostAddress();
                 textviewTitle.setText(friendChat.getInstanceName());
             }
             else if(savedInstanceState.getSerializable("MSG") instanceof VicinityMessage){
-                VicinityMessage message = (VicinityMessage) savedInstanceState.getSerializable("MSG");
-                chatClient = new ChatClient(ctx, message.getFrom());
+                message = (VicinityMessage) savedInstanceState.getSerializable("MSG");
+                chatClient = new ChatClient(ctx,message.getFrom());
                 textviewTitle.setText(message.getFriendID());
                 friendsIp = message.getFrom();
 
@@ -149,20 +156,20 @@ public class ChatActivity extends ActionBarActivity {
                 new Button.OnClickListener() {
                     public void onClick(View v) {
                         try {
-                            Log.i(TAG, "onClick ");
+                        Log.i(TAG, "onClick ");
 
-                            //Message
-                            vicinityMessage = new VicinityMessage(ctx, controller.retrieveCurrentUsername(),
+                        //Message
+                        vicinityMessage = new VicinityMessage(ctx, controller.retrieveCurrentUsername(),
                                     5, true, chatText.getText().toString());
 
-                            vicinityMessage.setFrom(friendsIp);
-                            //Display Message to user
-                            pushMessage(vicinityMessage);
+                        vicinityMessage.setFrom(friendsIp);
+                        //Display Message to user
+                        pushMessage(vicinityMessage);
 
-                            chatClient.write(vicinityMessage);
-                            Log.i(TAG, "Writing vicinityMessage successful");
+                        chatClient.write(vicinityMessage);
+                        Log.i(TAG, "Writing vicinityMessage successful");
 
-                            //To add vicinityMessage to db
+                        //To add vicinityMessage to db
                             boolean added = controller.addMessage(vicinityMessage);
                             if (added)
                                 Log.i(TAG, "Message added");
@@ -186,20 +193,23 @@ public class ChatActivity extends ActionBarActivity {
                 }
         );
 
-        BroadcastReceiver newMessage = new BroadcastReceiver() {
+        newMessage = new BroadcastReceiver() {
             @Override
             public void onReceive(Context context, Intent intent) {
                 try {
                     final Bundle bundle = intent.getExtras();
-                    Log.i(TAG, "onReceive");
-                    VicinityMessage vMessage = (VicinityMessage) bundle.getSerializable("NEW_MESSAGE");
-                    Log.i(TAG, "Received new message: " + vMessage.getMessageBody());
-                    friendsIp = vMessage.getFrom();
-                    pushMessage(vMessage);
 
-                } catch (NullPointerException e) {
+                        Log.i(TAG,"onReceive");
+                        VicinityMessage vMessage = (VicinityMessage) bundle.getSerializable("NEW_MESSAGE");
+                        Log.i(TAG,"Received new message: "+vMessage.getMessageBody());
+                        friendsIp = vMessage.getFrom();
+                        pushMessage(vMessage);
+
+                }
+                catch (NullPointerException e){
                     e.printStackTrace();
                 }
+
             }
         };
         IntentFilter filter = new IntentFilter();
@@ -248,7 +258,6 @@ public class ChatActivity extends ActionBarActivity {
                     if (cursor.moveToFirst()) {
                         int columnIndex = cursor.getColumnIndex(filePathColumn[0]);
                         String filePath = cursor.getString(columnIndex);
-
                         BitmapFactory.Options bmOptions = new BitmapFactory.Options();
                         bmOptions.inJustDecodeBounds = true;
                         BitmapFactory.decodeFile(filePath, bmOptions);
@@ -259,17 +268,12 @@ public class ChatActivity extends ActionBarActivity {
                                 photoW, photoH, getImageOrientation(filePath));
 
                         try {
-
                             sendPhotoObj(rotatedBitmap);
-
-
                         } catch (SQLException e) {
                             e.printStackTrace();
                         }
-
                     }
                     cursor.close();
-
                 }
                 break;
         }
@@ -380,7 +384,6 @@ public class ChatActivity extends ActionBarActivity {
         return b;
     }
 
-
     public void sendPhotoObj(Bitmap b) throws SQLException {
         ByteArrayOutputStream baos = new ByteArrayOutputStream();
         Bitmap resized = Bitmap.createScaledBitmap(b,(int)(b.getWidth()*0.3), (int)(b.getHeight()*0.3), true);
@@ -391,9 +394,9 @@ public class ChatActivity extends ActionBarActivity {
         String encodedImage = Base64.encodeToString(imageBytes, Base64.DEFAULT);
 
         imgMsg.setImageString(encodedImage);
-        friendsIp = imgMsg.getFrom();
         pushMessage(imgMsg);
         chatClient.write(imgMsg);
+
 
     }
 

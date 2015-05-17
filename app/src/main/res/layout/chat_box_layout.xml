@@ -8,6 +8,7 @@
         android:layout_height="wrap_content"
         android:id="@+id/nameOfFriend"
         android:textColor="#000"
+        android:text="Sarah"
         android:textStyle="bold"
         android:layout_marginBottom="0dip" />
     <TextView
@@ -18,6 +19,7 @@
         android:paddingLeft="10dip"
         android:textColor="#000"
         android:background="@drawable/chatboxright"
+        android:text="eq4fmklq34fmko34fmnlk4s"
         android:layout_marginLeft="5dip"
         android:layout_marginTop="0dip"
         android:layout_marginRight="5dip"
