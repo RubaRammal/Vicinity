@@ -10,8 +10,10 @@ import android.util.Log;
 import android.widget.Toast;
 
 import java.io.IOException;
+import java.net.InetAddress;
 import java.sql.SQLException;
 import java.util.ArrayList;
+import java.util.Iterator;
 
 import vicinity.ConnectionManager.ChatClient;
 import vicinity.ConnectionManager.ConnectAndDiscoverService;
@@ -44,6 +46,7 @@ public class MainController {
     private ArrayList<Comment> commentsList;
     private ArrayList<ChatClient> clientThreads;
 
+    public static ArrayList<Neighbor> mutedNeighbors = new ArrayList<>();
 
 
 
@@ -149,21 +152,38 @@ public class MainController {
     /*--------------------------------------------------------------------------------------*/
 
 
+
     /*--------------------------Neighbors Methods----------------------------------------------*/
 
     /**
      * This method mutes user by searching for a peer with the given
      * device address in the neighbours list and deleting the user
      * It also deletes posts & comments by this specific user as well
-     * @param user the to-be muted user
+     * @param neighbor the to-be muted user
      * @return isMuted true if the user was muted, false otherwise
      */
-    public boolean muteUser(Neighbor user){
+    public static boolean muteNeighbor(Neighbor neighbor) throws NullPointerException{
         boolean isMuted = false;
-        if(user.getIpAddress()!=null && UDPpacketListner.doesAddressExist(user.getDeviceAddress())){
+        if(UDPpacketListner.doesAddressExist(neighbor.getDeviceAddress())){
+            //Get the neighbor's IP
+            neighbor.setIpAddress(UDPpacketListner.getPeerAddress(neighbor.getDeviceAddress()));
 
+            isMuted=mutedNeighbors.add(neighbor);
+            Log.i("mute",neighbor.getInstanceName()+" is muted? "+isMuted);
         }
         return isMuted;
+    }
+
+    /**
+     * Removes a given neighbor from the muted neighbors list
+     * @param neighbor a Neighbor object to be removed from the list
+     * @return a boolean true if the operation was successful,
+     *          false otherwise.
+     */
+    public static boolean unmuteNeighbor(Neighbor neighbor){
+        boolean isUnmuted = mutedNeighbors.remove(neighbor);
+        Log.i("mute",neighbor.getInstanceName()+" Is unmuted? "+isUnmuted);
+        return isUnmuted;
     }
 
     /**
@@ -173,17 +193,32 @@ public class MainController {
      * @return isMuted a boolean that is true if user exists in muted users list
      * false otherwise
      */
-    public boolean isUserMuted(Neighbor user){
-        boolean isMuted = false;
+    public static boolean isUserMuted(Neighbor user){
+        Log.i("mute",user.getInstanceName()+" Is muted? "+mutedNeighbors.contains(user));
+        return mutedNeighbors.contains(user);
+    }
 
-
-        return isMuted;
+    /**
+     * Checks if the IP belongs to a muted neighbor
+     * @param IP InetAddress IP to be checked
+     * @return boolean that is true if the IP belongs
+     *          to a muted user, false otherwise.
+     */
+    public static boolean isThisIPMuted(InetAddress IP){
+        Iterator<Neighbor> it = mutedNeighbors.iterator();
+        while (it.hasNext()) {
+            Neighbor peer = it.next();
+            if(peer.getIpAddress().equals(IP))
+                return true;
+        }
+        return false;
     }
 
 
 
 
     /*--------------------------------------------------------------------------------------*/
+
 
 
 

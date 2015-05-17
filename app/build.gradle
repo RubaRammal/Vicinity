@@ -23,4 +23,5 @@ dependencies {
     compile fileTree(dir: 'libs', include: ['*.jar'])
     compile 'com.android.support:appcompat-v7:21.0.3'
     compile files('/Users/macproretina/AndroidStudioProjects/Vicinity/libs/guava.jar')
+    compile files('/Users/nansherbeeni/Desktop/Vicinity/libs/guava.jar')
 }
