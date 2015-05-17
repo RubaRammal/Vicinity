@@ -131,7 +131,7 @@ public class NeighborListAdapter extends BaseAdapter {
                             public void onClick(DialogInterface dialog, int which) {
                                 Log.i(TAG, "Neighbor status: " + neighbor.getStatus());
                                 //Sending the request through RequestsManager AsyncTask
-                                new RequestsManager().execute(neighbor);
+                                new RequestsManager().execute(neighbor);//
                             }
                         })
                         .setNegativeButton(android.R.string.no, new DialogInterface.OnClickListener() {
