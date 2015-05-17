@@ -13,12 +13,13 @@ import java.net.Socket;
 import java.sql.SQLException;
 
 import vicinity.Controller.MainController;
+import vicinity.Controller.VicinityNotifications;
 import vicinity.model.Globals;
 import vicinity.model.VicinityMessage;
 import vicinity.vicinity.ChatActivity;
 
 
-public class ChatServer extends Thread{
+public class ChatServer implements Runnable{
 
     private final static String TAG ="ChatServer";
     private ServerSocket chatSocket;
@@ -65,17 +66,16 @@ public class ChatServer extends Thread{
                 controller.addMessage(msg);
 
 
-                //VicinityNotifications.newMessageNotification(msg);
 
 
                 if(!Globals.chatActive){
+                VicinityNotifications.newMessageNotification(msg);
                 intent.putExtra("MSG", msg);
                 intent.setAction(Intent.ACTION_MAIN);
                 intent.addCategory(Intent.CATEGORY_LAUNCHER);
                 intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
                 ComponentName cn = new ComponentName(ConnectAndDiscoverService.ctx, ChatActivity.class);
                 intent.setComponent(cn);
-                ConnectAndDiscoverService.ctx.startActivity(intent);
                 }
                 else{
                     Intent intent = new Intent("MESSAGE");

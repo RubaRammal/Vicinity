@@ -17,10 +17,10 @@ public class Globals {
     public static final String SERVICE_NAME = "_VicinityApp";
     public static final String SERVICE_REG_TYPE = "_presence._tcp";
     /*-----Port numbers---------*/
-    public static final int SERVER_PORT = 4142;
-    public static final int ADDRESSES_PORT = 4143;
-    public static final int REQUEST_PORT= 4144; //for friend requests among peers
-    public static final int CHAT_PORT= 4145;
+    public static final int SERVER_PORT = 41420;
+    public static final int ADDRESSES_PORT = 41430;
+    public static final int REQUEST_PORT= 41440; //for friend requests among peers
+    public static final int CHAT_PORT= 41450;
 
     public static final int MESSAGE_READ = 0x400 + 1;
     public static final int MY_HANDLE = 0x400 + 2;

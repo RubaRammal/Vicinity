@@ -5,6 +5,8 @@ import android.app.NotificationManager;
 import android.app.PendingIntent;
 import android.content.Intent;
 import android.util.Log;
+
+import vicinity.ConnectionManager.ConnectAndDiscoverService;
 import vicinity.model.VicinityMessage;
 import vicinity.vicinity.ChatActivity;
 import vicinity.vicinity.R;
@@ -23,17 +25,17 @@ public class VicinityNotifications {
      */
     public static void newMessageNotification(VicinityMessage newMsg) {
 
-        NotificationManager notificationManager = (NotificationManager) ChatActivity.ctx.getSystemService(ChatActivity.ctx.NOTIFICATION_SERVICE);
+        NotificationManager notificationManager = (NotificationManager) ConnectAndDiscoverService.ctx.getSystemService(ConnectAndDiscoverService.ctx.NOTIFICATION_SERVICE);
         Notification notification = new Notification(R.drawable.vicinity_logo, newMsg.getMessageBody(), System.currentTimeMillis());
         notification.defaults |= Notification.DEFAULT_VIBRATE;
         CharSequence title = "Afnan";//TODO change this to the friend's name
         CharSequence text = newMsg.getMessageBody();
 
-        Intent notificationIntent = new Intent(ChatActivity.ctx, ChatActivity.class);
+        Intent notificationIntent = new Intent(ConnectAndDiscoverService.ctx, ChatActivity.class);
         // pendingIntent that will start a new activity.
-        PendingIntent contentIntent = PendingIntent.getActivity(ChatActivity.ctx, 0, notificationIntent, PendingIntent.FLAG_UPDATE_CURRENT | PendingIntent.FLAG_ONE_SHOT);
+        PendingIntent contentIntent = PendingIntent.getActivity(ConnectAndDiscoverService.ctx, 0, notificationIntent, PendingIntent.FLAG_UPDATE_CURRENT | PendingIntent.FLAG_ONE_SHOT);
 
-        notification.setLatestEventInfo(ChatActivity.ctx, title, text, contentIntent);
+        notification.setLatestEventInfo(ConnectAndDiscoverService.ctx, title, text, contentIntent);
         notificationManager.notify(1, notification);
         Log.d(TAG, "Notification: " + newMsg.getMessageBody());
     }

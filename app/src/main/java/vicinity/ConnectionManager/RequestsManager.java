@@ -6,6 +6,7 @@ import android.util.Log;
 import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
+import java.io.StreamCorruptedException;
 import java.net.Socket;
 import java.sql.SQLException;
 import vicinity.Controller.MainController;
@@ -18,35 +19,35 @@ import vicinity.vicinity.TabsActivity;
  * This class performs send a friend request to a neighbor
  *
  */
-public class RequestsManager extends AsyncTask<Neighbor,Void,Boolean>{
+public class RequestsManager extends AsyncTask<Neighbor,Void,Boolean> {
 
-    private static final String TAG ="RequestsManager";
+    private static final String TAG = "RequestsManager";
     private Socket requestSocket;
     private ObjectOutputStream outToServer;
     private ObjectInputStream inputStream;
     private MainController controller;
     private boolean reply;
-    private Neighbor  requestedTo;
+    private Neighbor requestedTo;
     private Neighbor me;
 
     @Override
-    protected void onPreExecute(){
+    protected void onPreExecute() {
     }
 
     @Override
-    protected Boolean doInBackground(Neighbor... param){
+    protected Boolean doInBackground(Neighbor... param) {
 
-        try{
+        try {
             controller = new MainController(TabsActivity.ctx);
-        //Peer
+            //Peer
             requestedTo = (Neighbor) param[0];
-        //My info
+            //My info
             //Getting current device info to send it as an object of Neighbor in the request
             me = WiFiDirectBroadcastReceiver.getMyP2pInfo();
 
             //Getting neighbor's IP address
-            if(requestedTo.getIpAddress()==null&&UDPpacketListner.doesAddressExist(requestedTo.getDeviceAddress()))
-            {   requestedTo.setIpAddress(UDPpacketListner.getPeerAddress(requestedTo.getDeviceAddress()));
+            if (requestedTo.getIpAddress() == null && UDPpacketListner.doesAddressExist(requestedTo.getDeviceAddress())) {
+                requestedTo.setIpAddress(UDPpacketListner.getPeerAddress(requestedTo.getDeviceAddress()));
             }
             Log.i(TAG, "Sending request to.." + requestedTo.toString());
             //Initializing sockets and streams
@@ -57,11 +58,10 @@ public class RequestsManager extends AsyncTask<Neighbor,Void,Boolean>{
 
             //if neighbor is already my friend then it means
             //it's a deletion request
-            if(controller.isThisMyFriend(requestedTo.getDeviceAddress())) {
+            if (controller.isThisMyFriend(requestedTo.getDeviceAddress())) {
                 outToServer.writeObject(me);
                 outToServer.flush();
-            }
-            else {
+            } else {
 
                 //Sending the object
                 outToServer.writeObject(me);
@@ -70,10 +70,6 @@ public class RequestsManager extends AsyncTask<Neighbor,Void,Boolean>{
                 reply = inputStream.readBoolean();
                 Log.i(TAG, "isAccepted: " + reply);
 
-                if (reply) {
-                    Thread chatServerSocket = new ChatServer();
-                    chatServerSocket.start();
-                }
 
 
                 //Closing sockets and streams
@@ -82,17 +78,17 @@ public class RequestsManager extends AsyncTask<Neighbor,Void,Boolean>{
                 requestSocket.close();
             }
 
-        }
-        catch(NullPointerException e){
+        } catch (NullPointerException e) {
             e.printStackTrace();
-        }
-        catch(IOException e){
+        } catch (IOException e) {
             e.printStackTrace();
         }
         return reply;
     }
 
-    @Override
+
+
+        @Override
     protected void onPostExecute (Boolean result){
 
         //Alert user if request was accepted

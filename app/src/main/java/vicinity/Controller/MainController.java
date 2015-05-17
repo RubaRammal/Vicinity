@@ -592,6 +592,8 @@ public class MainController {
                     msg.setFriendID(c.getString(2));
                     msg.setChatId(c.getInt(c.getColumnIndex("chatId")));
                     msg.setFrom(c.getString(c.getColumnIndex("fromIP")));
+                    msg.setImageString(c.getString(c.getColumnIndex("image")));
+
 
 
                     msg.setDate(c.getString(1));
@@ -641,7 +643,7 @@ public class MainController {
                     msg.setIsMyMsg(c.getInt(c.getColumnIndex("isMyMsg"))>0);
                     msg.setChatId(c.getInt(c.getColumnIndex("chatId")));
                     msg.setFrom(c.getString(c.getColumnIndex("fromIP")));
-
+                    msg.setImageString(c.getString(c.getColumnIndex("image")));
 
                     msg.setDate(c.getString(1));
                     //contact.setPicture(c.getBlob(3));
@@ -765,6 +767,7 @@ public class MainController {
             values.put("sentBy", message.getFriendID());
             values.put("msgTimestamp", message.getDate());
             values.put("fromIP", message.getFrom().toString());
+            values.put("image" , message.getImageString());
 
 
             isAdded=database.insert("Message", null, values)>0;

@@ -24,7 +24,7 @@ import vicinity.model.Globals;
 import vicinity.model.Neighbor;
 
 
-public class NeighborListAdapter extends BaseAdapter {
+public class   NeighborListAdapter extends BaseAdapter {
     private LayoutInflater mInflater;
     public static ArrayList<Neighbor> services;
     public ImageButton mute, addFriend;

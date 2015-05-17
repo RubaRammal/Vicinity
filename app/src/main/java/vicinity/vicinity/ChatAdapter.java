@@ -54,12 +54,10 @@ public class ChatAdapter extends ArrayAdapter<VicinityMessage> {
         return vicinityMessages.get(position);
     }
 
-    /**
-     * Google this method if you wanna understand it. - Ruba
-     */
     @Override
     public View getView(int position, View convertView, ViewGroup parent) {
         ViewHolder holder;
+        LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(LayoutParams.WRAP_CONTENT, LayoutParams.WRAP_CONTENT);
         if(convertView == null){
             convertView = mInflater.inflate(R.layout.chat_box_layout, null);
 
@@ -68,8 +66,6 @@ public class ChatAdapter extends ArrayAdapter<VicinityMessage> {
             holder.name_text = (TextView) convertView.findViewById(R.id.nameOfFriend);
             holder.chat_image = (ImageView) convertView.findViewById(R.id.chatImage);
 
-            holder.chat_text.setVisibility(View.GONE);
-            holder.chat_image.setVisibility(View.GONE);
 
 
             convertView.setTag(holder);
@@ -77,24 +73,6 @@ public class ChatAdapter extends ArrayAdapter<VicinityMessage> {
             holder = (ViewHolder) convertView.getTag();
         }
 
-        if(!vicinityMessages.get(position).getMessageBody().equals("")){
-            holder.chat_text.setVisibility(View.VISIBLE);
-            holder.chat_text.setText(vicinityMessages.get(position).getMessageBody());
-        }
-        else{
-            holder.chat_image.setVisibility(View.VISIBLE);
-            String imageBitmap = vicinityMessages.get(position).getImageString();
-            byte[] decodedString = Base64.decode(imageBitmap, Base64.DEFAULT);
-            Bitmap decodedByte = BitmapFactory.decodeByteArray(decodedString, 0, decodedString.length);
-            holder.chat_image.setImageBitmap(decodedByte);
-        }
-
-        holder.chat_text.setBackgroundDrawable(vicinityMessages.get(position).isMyMsg() ?
-                    ctx.getResources().getDrawable(R.drawable.chatboxright) : ctx.getResources().getDrawable(R.drawable.chatboxleft));
-
-        holder.name_text.setText(vicinityMessages.get(position).isMyMsg() ? "" : vicinityMessages.get(position).getFriendID());
-
-        LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(LayoutParams.WRAP_CONTENT, LayoutParams.WRAP_CONTENT);
 
         if(!vicinityMessages.get(position).isMyMsg()){
             params.gravity = Gravity.LEFT;
@@ -103,15 +81,38 @@ public class ChatAdapter extends ArrayAdapter<VicinityMessage> {
             params.gravity = Gravity.RIGHT;
         }
 
-        holder.chat_text.setLayoutParams(params);
+        holder.chat_text.setVisibility(View.GONE);
+        holder.chat_image.setVisibility(View.GONE);
 
+        if(!vicinityMessages.get(position).getMessageBody().equals("")){
+            holder.chat_text.setVisibility(View.VISIBLE);
+            holder.chat_text.setText(vicinityMessages.get(position).getMessageBody());
+            holder.chat_text.setBackgroundDrawable(vicinityMessages.get(position).isMyMsg() ?
+                    ctx.getResources().getDrawable(R.drawable.chatboxright) : ctx.getResources().getDrawable(R.drawable.chatboxleft));
+            holder.name_text.setText(vicinityMessages.get(position).isMyMsg() ? "" : vicinityMessages.get(position).getFriendID());
+            holder.chat_text.setLayoutParams(params);
+
+
+        }
+        else{
+            holder.chat_image.setVisibility(View.VISIBLE);
+            String imageBitmap = vicinityMessages.get(position).getImageString();
+            byte[] decodedString = Base64.decode(imageBitmap, Base64.DEFAULT);
+            Bitmap decodedByte = BitmapFactory.decodeByteArray(decodedString, 0, decodedString.length);
+            holder.chat_image.setImageBitmap(decodedByte);
+            holder.chat_image.setBackgroundDrawable(vicinityMessages.get(position).isMyMsg() ?
+                    ctx.getResources().getDrawable(R.drawable.chatboxright) : ctx.getResources().getDrawable(R.drawable.chatboxleft));
+            holder.name_text.setText(vicinityMessages.get(position).isMyMsg() ? "" : vicinityMessages.get(position).getFriendID());
+            holder.chat_image.setLayoutParams(params);
+
+
+        }
 
         return convertView;
     }
 
     static class ViewHolder{
-         TextView chat_text, name_text;
-            ImageView chat_image;
+        TextView chat_text, name_text;
+        ImageView chat_image;
     }
 }
-
