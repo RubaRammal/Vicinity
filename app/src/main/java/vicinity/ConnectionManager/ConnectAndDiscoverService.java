@@ -3,7 +3,6 @@ package vicinity.ConnectionManager;
 import android.app.Service;
 import android.content.ComponentName;
 import android.content.Intent;
-import android.os.Handler;
 import android.os.IBinder;
 import android.content.Context;
 import android.content.IntentFilter;
@@ -15,7 +14,6 @@ import android.net.wifi.p2p.nsd.WifiP2pDnsSdServiceInfo;
 import android.net.wifi.p2p.nsd.WifiP2pDnsSdServiceRequest;
 import android.net.wifi.p2p.WifiP2pManager;
 import android.content.BroadcastReceiver;
-import android.os.Message;
 import android.util.Log;
 import android.net.wifi.p2p.WifiP2pManager.Channel;
 
@@ -28,11 +26,9 @@ import java.sql.SQLException;
 import java.util.HashMap;
 import java.util.Map;
 import vicinity.Controller.MainController;
-import vicinity.Controller.VicinityNotifications;
 import vicinity.model.DBHandler;
 import vicinity.model.Globals;
 import vicinity.model.Neighbor;
-import vicinity.model.VicinityMessage;
 import vicinity.vicinity.ChatActivity;
 import vicinity.vicinity.FriendListAdapter;
 import vicinity.vicinity.NeighborListAdapter;
@@ -60,7 +56,6 @@ public class ConnectAndDiscoverService extends Service
     public static FriendListAdapter friendListAdapter;
     private MainController controller;
     private static InetAddress GOIP;
-    private Handler handler;
     private DBHandler db;
 
 
@@ -81,6 +76,7 @@ public class ConnectAndDiscoverService extends Service
 
         ctx= ConnectAndDiscoverService.this;
         controller = new MainController(ctx);
+        db = new DBHandler(this);
 
         //Initializing WiFiP2pManager
         manager = (WifiP2pManager) getSystemService(Context.WIFI_P2P_SERVICE);
@@ -99,7 +95,6 @@ public class ConnectAndDiscoverService extends Service
             e.printStackTrace();
         }
         startRegistrationAndDiscovery();
-        db = new DBHandler(this);
     }
 
     @Override

@@ -298,7 +298,7 @@ public class ChatActivity extends ActionBarActivity {
     @Override
     protected void onDestroy() {
         super.onDestroy();
-        chatThread.stop();
+        //chatThread.stop();
 
     }
 }

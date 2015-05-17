@@ -27,6 +27,7 @@ public class RequestsManager extends AsyncTask<Neighbor,Void,Boolean>{
     private MainController controller;
     private boolean reply;
     private Neighbor  requestedTo;
+    private Neighbor me;
 
     @Override
     protected void onPreExecute(){
@@ -41,38 +42,45 @@ public class RequestsManager extends AsyncTask<Neighbor,Void,Boolean>{
             requestedTo = (Neighbor) param[0];
         //My info
             //Getting current device info to send it as an object of Neighbor in the request
-            Neighbor me = WiFiDirectBroadcastReceiver.getMyP2pInfo();
+            me = WiFiDirectBroadcastReceiver.getMyP2pInfo();
 
             //Getting neighbor's IP address
-            if(UDPpacketListner.doesAddressExist(requestedTo.getDeviceAddress()))
+            if(requestedTo.getIpAddress()==null&&UDPpacketListner.doesAddressExist(requestedTo.getDeviceAddress()))
             {   requestedTo.setIpAddress(UDPpacketListner.getPeerAddress(requestedTo.getDeviceAddress()));
-                Log.i(TAG, "Sending request to.." + requestedTo.toString());
             }
-
+            Log.i(TAG, "Sending request to.." + requestedTo.toString());
             //Initializing sockets and streams
-            requestSocket = new Socket (requestedTo.getIpAddress(), Globals.REQUEST_PORT);
+            requestSocket = new Socket(requestedTo.getIpAddress(), Globals.REQUEST_PORT);
             outToServer = new ObjectOutputStream(requestSocket.getOutputStream());
             inputStream = new ObjectInputStream(requestSocket.getInputStream());
 
-            //Sending the object
-            outToServer.writeObject(me);
-            outToServer.flush();
-            //Receiving acceptance or rejection
-            reply= inputStream.readBoolean();
-            Log.i(TAG,"isAccepted: "+reply);
 
-            if(reply){
-                Thread chatServerSocket = new ChatServer();
-                chatServerSocket.start();
+            //if neighbor is already my friend then it means
+            //it's a deletion request
+            if(controller.isThisMyFriend(requestedTo.getDeviceAddress())) {
+                outToServer.writeObject(me);
+                outToServer.flush();
             }
+            else {
+
+                //Sending the object
+                outToServer.writeObject(me);
+                outToServer.flush();
+                //Receiving acceptance or rejection
+                reply = inputStream.readBoolean();
+                Log.i(TAG, "isAccepted: " + reply);
+
+                if (reply) {
+                    Thread chatServerSocket = new ChatServer();
+                    chatServerSocket.start();
+                }
 
 
-
-
-            //Closing sockets and streams
-            outToServer.close();
-            inputStream.close();
-            requestSocket.close();
+                //Closing sockets and streams
+                outToServer.close();
+                inputStream.close();
+                requestSocket.close();
+            }
 
         }
         catch(NullPointerException e){

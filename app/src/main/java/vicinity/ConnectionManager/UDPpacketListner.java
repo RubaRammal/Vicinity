@@ -14,6 +14,7 @@ import java.net.DatagramSocket;
 import java.net.InetAddress;
 import java.net.InetSocketAddress;
 
+import vicinity.Controller.MainController;
 import vicinity.model.Comment;
 import vicinity.model.Globals;
 import vicinity.model.Post;
@@ -33,12 +34,14 @@ public class UDPpacketListner extends Service {
     private static HashMap<String, InetAddress> addressHashMap;    //HashMap that stores received addresses pairs
 
 
+
     /*---------Overridden Methods------------*/
     @Override
     public void onCreate(){
         super.onCreate();
         updateUIThread= LocalBroadcastManager.getInstance(this);
         addressHashMap = new HashMap<>();
+
     }
     @Override
     public IBinder onBind(Intent intent) {
@@ -93,22 +96,23 @@ public class UDPpacketListner extends Service {
                 byte[] data = packet.getData();
                 ByteArrayInputStream inputStream = new ByteArrayInputStream(data);
                 ObjectInputStream objectInputStream = new ObjectInputStream(inputStream);
-                String senderIP = packet.getAddress().getHostAddress();
+                InetAddress senderIP = packet.getAddress();
                 //Receiving an object
                 Object obj = objectInputStream.readObject();
 
                 /*-----Determine if incoming udp packet contains Post, Comment or HasMap of addresses----*/
                 if (obj instanceof Post){
                     Post p = (Post) obj;
-                    Log.i(TAG,"received Post object: "+p.getPostBody()+" from: "+senderIP+" "+p.getPostedBy()+" posted at: "+p.getPostedAt());//-Lama
-                    updateUIPosts(p);
+                    Log.i(TAG,"received Post object: "+p.getPostBody()+" from: "+senderIP+" "+p.getPostedBy()+" posted at: "+p.getPostedAt());
+                    //First check if this IP belongs to a muted user
+                    if(!MainController.isThisIPMuted(senderIP))
+                        updateUIPosts(p);
 
                 }
 
                 else if (obj instanceof Comment){
                     Comment c = (Comment) obj;
                     Log.i(TAG,"received Comment object: "+c.getCommentBody()+" from: "+senderIP+" "+c.getCommentedBy());
-                    updateUIComments(c);
 
                 }
                 else if(obj instanceof HashMap){
@@ -125,7 +129,7 @@ public class UDPpacketListner extends Service {
                         }
                         //if it was my IP-MAC pair then update my IP address only
                         else if(key.equals(Globals.MY_MAC)){
-                            Log.i(TAG,"This is my MAC address");
+                            Log.i(TAG,"This is my MAC address: , my IP is: "+receivedAddresses.get(Globals.MY_MAC));
                             if(Globals.MY_IP!=null)
                                 Globals.MY_IP= receivedAddresses.get(Globals.MY_MAC);
                         }
@@ -155,17 +159,6 @@ public class UDPpacketListner extends Service {
         updateUIThread.sendBroadcast(intent);
     }
 
-    /**
-     * Sends intent to the broadcast receiver in Timeline
-     * and it set comments to post
-     * @param c a new comment to update UI (Timeline) thread
-     */
-    private void updateUIComments(Comment c) {
-        Log.i(TAG,"update comments");
-        Intent intent = new Intent("COMMENT");
-        intent.putExtra("NEW_COMMENT", c);
-        updateUIThread.sendBroadcast(intent);
-    }
 
     /**
      * Retrieves the peer's IP from given key (MAC)
@@ -187,7 +180,6 @@ public class UDPpacketListner extends Service {
      * @return a boolean that is true if the address exists, false otherwise
      */
     public static boolean doesAddressExist(String MAC){
-        Log.i("Request","Received key= "+MAC);
         return addressHashMap.containsKey(MAC);
     }
 

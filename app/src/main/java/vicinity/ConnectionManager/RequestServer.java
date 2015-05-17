@@ -55,32 +55,23 @@ public class RequestServer extends Thread{
                 //Client socket to receive requests
                 clientSocket = requestSocket.accept();
                 InetAddress requestIP = clientSocket.getInetAddress();
-                ObjectInputStream inputStream =  new ObjectInputStream(clientSocket.getInputStream());
+                ObjectInputStream inputStream = new ObjectInputStream(clientSocket.getInputStream());
                 final ObjectOutputStream outputStream = new ObjectOutputStream(clientSocket.getOutputStream());
-                Neighbor requestFrom = (Neighbor)inputStream.readObject();
+                Neighbor requestFrom = (Neighbor) inputStream.readObject();
                 requestFrom.setIpAddress(requestIP);
 
-                Log.i(TAG,"Received a request from: "+requestFrom.toString()+" IP: "+requestFrom.getIpAddress());
+                Log.i(TAG, "Received a request from: " + requestFrom.toString() + " IP: " + requestFrom.getIpAddress());
 
 
-                //First make sure the peer is not muted
-                //The request is rejected directly if the user was muted
-                //and the user is not alerted of the request
-                if(controller.isUserMuted(requestFrom)){
-                    outputStream.writeBoolean(false);
-                    outputStream.flush();
-                }
-                //if the peer is not muted, alert the user and reply to request
-                else{
                     //BroadcastReceiver to receive user reply from the main thread
                     alertUser(requestFrom);
                     BroadcastReceiver requestsReceiver = new BroadcastReceiver() {
                         @Override
-                        public void onReceive(Context context, final Intent intent)  {
+                        public void onReceive(Context context, final Intent intent) {
                             final Bundle bundle = intent.getExtras();
                             boolean reply = bundle.getBoolean("REPLY_REQUEST");
-                            Log.i("REQUEST"," "+reply);
-                            if(reply){
+                            Log.i("REQUEST", " " + reply);
+                            if (reply) {
                                 try {
                                     Thread chatSocket = new ChatServer();
                                     chatSocket.start();
@@ -91,8 +82,7 @@ public class RequestServer extends Thread{
                             try {
                                 outputStream.writeBoolean(reply);
                                 outputStream.flush();
-                            }
-                            catch (IOException e){
+                            } catch (IOException e) {
                                 e.printStackTrace();
                             }
                         }
@@ -100,16 +90,17 @@ public class RequestServer extends Thread{
                     LocalBroadcastManager.getInstance(ConnectAndDiscoverService.ctx).registerReceiver((requestsReceiver),
                             new IntentFilter("REPLY")
                     );
+
+
+                }catch(IOException e){
+                    e.printStackTrace();
+                    break;
+                }
+                catch(ClassNotFoundException e){
+                    e.printStackTrace();
+                    break;
                 }
 
-            } catch (IOException e) {
-                e.printStackTrace();
-                break;
-            }
-            catch (ClassNotFoundException e){
-                e.printStackTrace();
-                break;
-            }
         }
     }
 
