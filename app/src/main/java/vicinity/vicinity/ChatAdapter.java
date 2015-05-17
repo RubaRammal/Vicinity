@@ -77,11 +77,11 @@ public class ChatAdapter extends ArrayAdapter<VicinityMessage> {
             holder = (ViewHolder) convertView.getTag();
         }
 
-        if(!vicinityMessages.get(position).getMessageBody().equals("")){
+        if(!vicinityMessages.get(position).getMessageBody().equals("")) {
             holder.chat_text.setVisibility(View.VISIBLE);
             holder.chat_text.setText(vicinityMessages.get(position).getMessageBody());
         }
-        else{
+        else {
             holder.chat_image.setVisibility(View.VISIBLE);
             String imageBitmap = vicinityMessages.get(position).getImageString();
             byte[] decodedString = Base64.decode(imageBitmap, Base64.DEFAULT);
@@ -91,6 +91,9 @@ public class ChatAdapter extends ArrayAdapter<VicinityMessage> {
 
         holder.chat_text.setBackgroundDrawable(vicinityMessages.get(position).isMyMsg() ?
                     ctx.getResources().getDrawable(R.drawable.chatboxright) : ctx.getResources().getDrawable(R.drawable.chatboxleft));
+
+        holder.chat_image.setBackgroundDrawable(vicinityMessages.get(position).isMyMsg() ?
+                ctx.getResources().getDrawable(R.drawable.chatboxright) : ctx.getResources().getDrawable(R.drawable.chatboxleft));
 
         holder.name_text.setText(vicinityMessages.get(position).isMyMsg() ? "" : vicinityMessages.get(position).getFriendID());
 

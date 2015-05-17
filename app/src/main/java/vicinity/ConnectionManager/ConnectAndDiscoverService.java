@@ -60,7 +60,6 @@ public class ConnectAndDiscoverService extends Service
     public static FriendListAdapter friendListAdapter;
     private MainController controller;
     private static InetAddress GOIP;
-    private Handler handler;
     private DBHandler db;
 
 
