@@ -16,6 +16,8 @@ import android.widget.EditText;
 import android.widget.ListView;
 import android.widget.TextView;
 import java.util.ArrayList;
+
+import vicinity.ConnectionManager.UdpBroadcastManager;
 import vicinity.Controller.MainController;
 import vicinity.model.Comment;
 import vicinity.model.Post;
@@ -23,12 +25,6 @@ import android.text.Editable;
 import android.text.TextUtils;
 import android.text.TextWatcher;
 import java.sql.SQLException;
-import vicinity.ConnectionManager.UdpBroadcastManager;
-
-/* this class is supposed to implement the method sendClickedPost from TimelineInterface
-* still working on it
-* amjad
-*/
 
 public class PostComment extends ActionBarActivity {
 
@@ -46,7 +42,7 @@ public class PostComment extends ActionBarActivity {
     private String TAG = "PostComment";
     private MainController controller;
     private int commentCount;
-    private UdpBroadcastManager udpBroadcastManager;//-Lama
+    private UdpBroadcastManager broadcastManager;//-Lama
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -72,7 +68,7 @@ public class PostComment extends ActionBarActivity {
         ctx = this;
         controller = new MainController(ctx);
         comment = new Comment();//-Lama
-        udpBroadcastManager = new UdpBroadcastManager();//-Lama
+        broadcastManager = new UdpBroadcastManager();//-Lama
         Bundle extras = getIntent().getExtras();
         postID = extras.getInt("POST_ID");
 
@@ -132,7 +128,7 @@ public class PostComment extends ActionBarActivity {
                             comment.setCommentBody(commentText);
                             comment.setCommentedBy(controller.retrieveCurrentUsername());
                             comment.setPostID(postID);
-                            udpBroadcastManager.setComment(comment);
+                            broadcastManager.setComment(comment);
 
 
                         } catch (SQLException e) {
@@ -142,7 +138,7 @@ public class PostComment extends ActionBarActivity {
                         adapter.notifyDataSetChanged();
                         commentTextField.setText("");
                         commentedOn.setCommentCount(commentCount);
-                        udpBroadcastManager.execute();
+                        broadcastManager.execute();
                         //finish();
 
 
@@ -150,5 +146,9 @@ public class PostComment extends ActionBarActivity {
                 }
         );
     }//End onCreate
+
+    private void postComment(Comment comment){
+
+    }
 
 }

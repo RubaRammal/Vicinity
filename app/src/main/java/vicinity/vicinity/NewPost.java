@@ -42,7 +42,7 @@ public class NewPost extends ActionBarActivity {
     private EditText postTextField ;
     private Button sendImgButton;
     private MainController mc ;
-    private UdpBroadcastManager udpBroadcastManager;
+    private UdpBroadcastManager broadcastManager;
     private static final int SELECT_PICTURE_ACTIVITY_REQUEST_CODE = 0;
     Post aPost;
 
@@ -73,7 +73,7 @@ public class NewPost extends ActionBarActivity {
 
         mc = new MainController(this);
 
-        udpBroadcastManager = new UdpBroadcastManager();
+        broadcastManager = new UdpBroadcastManager();
         postTextField = (EditText) findViewById(R.id.postTextField);
         sendImgButton = (Button) findViewById(R.id.sendImageButton);
         sendImgButton.setEnabled(true);
@@ -138,8 +138,8 @@ public class NewPost extends ActionBarActivity {
                 aPost.setPostedBy(mc.retrieveCurrentUsername());
                 aPost.setPostDate();
                 aPost.setPostID(r.nextInt((1000 - 1) + 1) + 1);
-                udpBroadcastManager.setPost(aPost);
-                udpBroadcastManager.execute();
+                broadcastManager.setPost(aPost);
+                broadcastManager.execute();
                 finish();
 
             }
@@ -201,4 +201,3 @@ public class NewPost extends ActionBarActivity {
 
 
 }
-

@@ -558,13 +558,12 @@ public class MainController {
         boolean areDeleted;
         database = dbH.getReadableDatabase();
         dbH.openDataBase();
-        areDeleted= database.delete("Post", null, null)>0;
+        areDeleted= database.delete("Comment", null, null)>0;
 
         dbH.close();
         return areDeleted;
     }
 
-    /*--------------------------------------------------------------------------------------*/
 
 
     /*------------------------------Chat Methods--------------------------------------------*/
