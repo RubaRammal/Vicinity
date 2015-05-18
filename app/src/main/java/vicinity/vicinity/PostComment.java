@@ -68,7 +68,6 @@ public class PostComment extends ActionBarActivity {
         ctx = this;
         controller = new MainController(ctx);
         comment = new Comment();//-Lama
-        broadcastManager = new UdpBroadcastManager();//-Lama
         Bundle extras = getIntent().getExtras();
         postID = extras.getInt("POST_ID");
 
@@ -128,7 +127,7 @@ public class PostComment extends ActionBarActivity {
                             comment.setCommentBody(commentText);
                             comment.setCommentedBy(controller.retrieveCurrentUsername());
                             comment.setPostID(postID);
-                            broadcastManager.setComment(comment);
+                            postComment(comment);
 
 
                         } catch (SQLException e) {
@@ -138,7 +137,7 @@ public class PostComment extends ActionBarActivity {
                         adapter.notifyDataSetChanged();
                         commentTextField.setText("");
                         commentedOn.setCommentCount(commentCount);
-                        broadcastManager.execute();
+
                         //finish();
 
 
@@ -148,7 +147,9 @@ public class PostComment extends ActionBarActivity {
     }//End onCreate
 
     private void postComment(Comment comment){
-
+        broadcastManager = new UdpBroadcastManager();//-Lama
+        broadcastManager.setComment(comment);
+        broadcastManager.execute();
     }
 
 }
