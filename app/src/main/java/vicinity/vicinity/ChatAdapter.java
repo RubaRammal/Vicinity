@@ -112,8 +112,7 @@ public class ChatAdapter extends ArrayAdapter<VicinityMessage> {
     }
 
     static class ViewHolder{
-         TextView chat_text, name_text;
-            ImageView chat_image;
+        TextView chat_text, name_text;
+        ImageView chat_image;
     }
 }
-

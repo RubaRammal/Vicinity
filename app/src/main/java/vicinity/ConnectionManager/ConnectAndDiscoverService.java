@@ -78,6 +78,8 @@ public class ConnectAndDiscoverService extends Service
         controller = new MainController(ctx);
         db = new DBHandler(this);
 
+
+
         //Initializing WiFiP2pManager
         manager = (WifiP2pManager) getSystemService(Context.WIFI_P2P_SERVICE);
 
@@ -319,6 +321,8 @@ public class ConnectAndDiscoverService extends Service
                 handler.start();
                 Thread requestServer = new RequestServer();
                 requestServer.start();
+            ChatServer chatSocket = new ChatServer();
+            new Thread(chatSocket).start();
 
         }
 
@@ -330,6 +334,8 @@ public class ConnectAndDiscoverService extends Service
             handler.start();
             Thread requestServer = new RequestServer();
             requestServer.start();
+            ChatServer chatSocket = new ChatServer();
+            new Thread(chatSocket).start();
         }
         }catch (IOException e) {
             Log.d(TAG,"Failed to create a server thread - " + e.getMessage());

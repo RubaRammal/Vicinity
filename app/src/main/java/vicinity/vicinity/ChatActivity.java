@@ -113,7 +113,7 @@ public class ChatActivity extends ActionBarActivity {
         chatListView.setTranscriptMode(AbsListView.TRANSCRIPT_MODE_ALWAYS_SCROLL);
 
         try{
-        savedInstanceState = getIntent().getExtras();
+            savedInstanceState = getIntent().getExtras();
             if(savedInstanceState.getSerializable("FRIEND") instanceof Neighbor)
             {
                 friendChat = (Neighbor) savedInstanceState.getSerializable("FRIEND");
@@ -156,20 +156,20 @@ public class ChatActivity extends ActionBarActivity {
                 new Button.OnClickListener() {
                     public void onClick(View v) {
                         try {
-                        Log.i(TAG, "onClick ");
+                            Log.i(TAG, "onClick ");
 
-                        //Message
-                        vicinityMessage = new VicinityMessage(ctx, controller.retrieveCurrentUsername(),
+                            //Message
+                            vicinityMessage = new VicinityMessage(ctx, controller.retrieveCurrentUsername(),
                                     5, true, chatText.getText().toString());
 
-                        vicinityMessage.setFrom(friendsIp);
-                        //Display Message to user
-                        pushMessage(vicinityMessage);
+                            vicinityMessage.setFrom(friendsIp);
+                            //Display Message to user
+                            pushMessage(vicinityMessage);
 
-                        chatClient.write(vicinityMessage);
-                        Log.i(TAG, "Writing vicinityMessage successful");
+                            chatClient.write(vicinityMessage);
+                            Log.i(TAG, "Writing vicinityMessage successful");
 
-                        //To add vicinityMessage to db
+                            //To add vicinityMessage to db
                             boolean added = controller.addMessage(vicinityMessage);
                             if (added)
                                 Log.i(TAG, "Message added");
@@ -199,11 +199,11 @@ public class ChatActivity extends ActionBarActivity {
                 try {
                     final Bundle bundle = intent.getExtras();
 
-                        Log.i(TAG,"onReceive");
-                        VicinityMessage vMessage = (VicinityMessage) bundle.getSerializable("NEW_MESSAGE");
-                        Log.i(TAG,"Received new message: "+vMessage.getMessageBody());
-                        friendsIp = vMessage.getFrom();
-                        pushMessage(vMessage);
+                    Log.i(TAG,"onReceive");
+                    VicinityMessage vMessage = (VicinityMessage) bundle.getSerializable("NEW_MESSAGE");
+                    Log.i(TAG,"Received new message: "+vMessage.getMessageBody());
+                    friendsIp = vMessage.getFrom();
+                    pushMessage(vMessage);
 
                 }
                 catch (NullPointerException e){
@@ -387,7 +387,7 @@ public class ChatActivity extends ActionBarActivity {
     public void sendPhotoObj(Bitmap b) throws SQLException {
         ByteArrayOutputStream baos = new ByteArrayOutputStream();
         Bitmap resized = Bitmap.createScaledBitmap(b,(int)(b.getWidth()*0.3), (int)(b.getHeight()*0.3), true);
-        resized.compress(Bitmap.CompressFormat.JPEG, 10, baos);
+        resized.compress(Bitmap.CompressFormat.JPEG, 100, baos);
 
         Log.i(TAG, resized.getHeight()* resized.getWidth()+"");
         byte[] imageBytes = baos.toByteArray();

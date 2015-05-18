@@ -4,6 +4,7 @@ import android.app.AlertDialog;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.res.Resources;
+import android.graphics.drawable.Drawable;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -24,7 +25,7 @@ import vicinity.model.Globals;
 import vicinity.model.Neighbor;
 
 
-public class NeighborListAdapter extends BaseAdapter {
+public class   NeighborListAdapter extends BaseAdapter {
     private LayoutInflater mInflater;
     public static ArrayList<Neighbor> services;
     public ImageButton mute, addFriend;
@@ -78,6 +79,8 @@ public class NeighborListAdapter extends BaseAdapter {
         /*----Mute user button-----*/
         mute = (ImageButton) convertView.findViewById(R.id.muteButton);
 
+
+
         mute.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -101,7 +104,6 @@ public class NeighborListAdapter extends BaseAdapter {
                             Log.i(TAG,"UNMUTE!!!");
                             MainController.unmuteNeighbor(neighbor);
                             mute.setImageResource(R.drawable.muteicon2);
-
                         }
 
                     }
@@ -131,7 +133,7 @@ public class NeighborListAdapter extends BaseAdapter {
                             public void onClick(DialogInterface dialog, int which) {
                                 Log.i(TAG, "Neighbor status: " + neighbor.getStatus());
                                 //Sending the request through RequestsManager AsyncTask
-                                new RequestsManager().execute(neighbor);//
+                                new RequestsManager().execute(neighbor);
                             }
                         })
                         .setNegativeButton(android.R.string.no, new DialogInterface.OnClickListener() {
@@ -161,5 +163,6 @@ public class NeighborListAdapter extends BaseAdapter {
     public static void addToNeighbors(Neighbor neighbor){
         NeighborSectionFragment.updateDeletedFriend(neighbor);
     }
+
 
 }
