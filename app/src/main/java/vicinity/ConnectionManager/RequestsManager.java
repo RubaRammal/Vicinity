@@ -6,7 +6,6 @@ import android.util.Log;
 import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
-import java.io.StreamCorruptedException;
 import java.net.Socket;
 import java.sql.SQLException;
 import vicinity.Controller.MainController;
@@ -40,15 +39,14 @@ public class RequestsManager extends AsyncTask<Neighbor,Void,Boolean> {
         try {
             controller = new MainController(TabsActivity.ctx);
             //Peer
-            requestedTo = (Neighbor) param[0];
+            requestedTo = param[0];
             //My info
             //Getting current device info to send it as an object of Neighbor in the request
             me = WiFiDirectBroadcastReceiver.getMyP2pInfo();
 
             //Getting neighbor's IP address
-            if (requestedTo.getIpAddress() == null && UDPpacketListner.doesAddressExist(requestedTo.getDeviceAddress())) {
-                requestedTo.setIpAddress(UDPpacketListner.getPeerAddress(requestedTo.getDeviceAddress()));
-            }
+            requestedTo.setIpAddress(UDPpacketListner.getPeerAddress(requestedTo.getDeviceAddress()));
+
             Log.i(TAG, "Sending request to.." + requestedTo.toString());
             //Initializing sockets and streams
             requestSocket = new Socket(requestedTo.getIpAddress(), Globals.REQUEST_PORT);
@@ -70,13 +68,12 @@ public class RequestsManager extends AsyncTask<Neighbor,Void,Boolean> {
                 reply = inputStream.readBoolean();
                 Log.i(TAG, "isAccepted: " + reply);
 
-
-
-                //Closing sockets and streams
-                outToServer.close();
-                inputStream.close();
-                requestSocket.close();
             }
+
+            //Closing sockets and streams
+            outToServer.close();
+            inputStream.close();
+            requestSocket.close();
 
         } catch (NullPointerException e) {
             e.printStackTrace();
@@ -88,7 +85,7 @@ public class RequestsManager extends AsyncTask<Neighbor,Void,Boolean> {
 
 
 
-        @Override
+    @Override
     protected void onPostExecute (Boolean result){
 
         //Alert user if request was accepted

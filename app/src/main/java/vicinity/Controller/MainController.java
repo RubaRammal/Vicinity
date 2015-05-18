@@ -36,11 +36,9 @@ public class MainController {
     private SQLiteDatabase database;
     private DBHandler dbH;
     private Context context;
-    private ArrayList<Neighbor> friendsList;
     private ArrayList<Post> postList;
     private ArrayList<VicinityMessage> allMessages;
     private ArrayList<VicinityMessage> allChatMessages;
-    private ArrayList<Neighbor> mutedUsers;
     public String query;
     public Cursor cursor;
     private ArrayList<Comment> commentsList;
@@ -92,7 +90,7 @@ public class MainController {
         CurrentUser newUser=new CurrentUser(context,username);
         try{
 
-            database = dbH.getReadableDatabase();
+            database = dbH.getWritableDatabase();
             dbH.openDataBase();
             database.execSQL("INSERT INTO CurrentUser (Username) VALUES ('" + newUser.getUsername() + "');");
             isCreated=true;
@@ -116,9 +114,7 @@ public class MainController {
     public String retrieveCurrentUsername()throws SQLException{
         String username2=null;
 
-        //try {
-        //dbH.openDataBase();
-        database = dbH.getWritableDatabase();
+        database = dbH.getReadableDatabase();
         query="SELECT Username FROM CurrentUser";
         cursor = database.rawQuery(query,null);
 
@@ -127,11 +123,7 @@ public class MainController {
         cursor.close();
         dbH.close();
         return username2;
-       /* }
-        catch (SQLException e){
-            Log.i(TAG,"SQLException IN retrieveCurrentUser > currentUser");
-        }*/
-        //return username2;
+
     }
 
     /**
@@ -164,12 +156,14 @@ public class MainController {
      */
     public static boolean muteNeighbor(Neighbor neighbor) throws NullPointerException{
         boolean isMuted = false;
-        if(UDPpacketListner.doesAddressExist(neighbor.getDeviceAddress())){
-            //Get the neighbor's IP
-            neighbor.setIpAddress(UDPpacketListner.getPeerAddress(neighbor.getDeviceAddress()));
+        if(!isUserMuted(neighbor)) {
+            if (UDPpacketListner.doesAddressExist(neighbor.getDeviceAddress())) {
+                //Get the neighbor's IP
+                neighbor.setIpAddress(UDPpacketListner.getPeerAddress(neighbor.getDeviceAddress()));
 
-            isMuted=mutedNeighbors.add(neighbor);
-            Log.i("mute",neighbor.getInstanceName()+" is muted? "+isMuted);
+                isMuted = mutedNeighbors.add(neighbor);
+                Log.i("mute", neighbor.getInstanceName() + " is muted? " + isMuted);
+            }
         }
         return isMuted;
     }
@@ -181,9 +175,9 @@ public class MainController {
      *          false otherwise.
      */
     public static boolean unmuteNeighbor(Neighbor neighbor){
-        boolean isUnmuted = mutedNeighbors.remove(neighbor);
-        Log.i("mute",neighbor.getInstanceName()+" Is unmuted? "+isUnmuted);
-        return isUnmuted;
+        if(isUserMuted(neighbor))
+            return mutedNeighbors.remove(neighbor);
+        return false;
     }
 
     /**
@@ -194,8 +188,16 @@ public class MainController {
      * false otherwise
      */
     public static boolean isUserMuted(Neighbor user){
-        Log.i("mute",user.getInstanceName()+" Is muted? "+mutedNeighbors.contains(user));
-        return mutedNeighbors.contains(user);
+        Iterator<Neighbor> it = mutedNeighbors.iterator();
+        while (it.hasNext()) {
+            Neighbor peer = it.next();
+            if(peer.getDeviceAddress().equals(user.getDeviceAddress())) {
+                Log.i(TAG,"User is muted");
+                return true;
+            }
+        }
+        Log.i(TAG,"User is NOT muted");
+        return false;
     }
 
     /**

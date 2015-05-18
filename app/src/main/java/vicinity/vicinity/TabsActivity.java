@@ -15,14 +15,11 @@ import android.support.v4.app.FragmentPagerAdapter;
 import android.support.v4.content.LocalBroadcastManager;
 import android.support.v4.view.ViewPager;
 import android.util.Log;
-import android.view.View;
 import android.view.Window;
 import android.widget.ImageButton;
 import android.content.Context;
 import android.widget.Toast;
 
-import java.util.Timer;
-import java.util.TimerTask;
 
 import vicinity.ConnectionManager.UDPpacketListner;
 import vicinity.ConnectionManager.ConnectAndDiscoverService;
@@ -37,23 +34,15 @@ public class TabsActivity extends FragmentActivity implements ActionBar.TabListe
     private final String TAG ="Tabs";
     AppSectionsPagerAdapter mAppSectionsPagerAdapter;
     ViewPager mViewPager;
-    private ImageButton muteButton;
     public static Context ctx;
     public static MainController controller;
     private static Fragment timeline = new TimelineSectionFragment()
             , neighbors = new NeighborSectionFragment(), chat = new MessagesSectionFragment(),
             settings= new SettingsSectionFragment();
 
-    Fragment neghbors = new Fragment();
     public void onCreate(Bundle savedInstanceState) {
 
         super.onCreate(savedInstanceState);
-
-        /*------saving instance-----
-        if(savedInstanceState!=null){
-            neghbors =  getSupportFragmentManager().getFragment(
-                    savedInstanceState, "NeighborsFragment");
-        }*/
 
 
         ctx=TabsActivity.this;
@@ -82,7 +71,7 @@ public class TabsActivity extends FragmentActivity implements ActionBar.TabListe
                     NeighborListAdapter.addToNeighbors(receivedRequest);
                 }
                 //Display a dialog to the user
-                else{
+                else if (!controller.isThisMyFriend(receivedRequest.getDeviceAddress())){
                     new AlertDialog.Builder(ctx)
                             .setTitle("Friend's Request")
                             .setMessage(receivedRequest.getInstanceName() + " wants to add you as a friend")
@@ -150,7 +139,6 @@ public class TabsActivity extends FragmentActivity implements ActionBar.TabListe
 
         // Set up the ViewPager, attaching the adapter and setting up a listener for when the
         // user swipes between sections.
-        muteButton = (ImageButton) findViewById(R.id.muteButton);
         mViewPager = (ViewPager) findViewById(R.id.pager);
         mViewPager.setAdapter(mAppSectionsPagerAdapter);
         mViewPager.setOnPageChangeListener(new ViewPager.SimpleOnPageChangeListener() {

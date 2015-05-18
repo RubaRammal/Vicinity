@@ -15,7 +15,6 @@ import java.net.InetAddress;
 import java.net.ServerSocket;
 import java.net.Socket;
 
-import vicinity.Controller.MainController;
 import vicinity.model.Globals;
 import vicinity.model.Neighbor;
 
@@ -29,7 +28,6 @@ public class RequestServer extends Thread{
     final static String TAG ="Request";
     ServerSocket requestSocket;
     Socket clientSocket;
-    MainController controller = new MainController(ConnectAndDiscoverService.ctx);
     private LocalBroadcastManager alertUser;     //To alert user about the request
 
 
@@ -43,8 +41,6 @@ public class RequestServer extends Thread{
             Log.i(TAG,"Requests thread has started...");
             requestSocket = new ServerSocket(Globals.REQUEST_PORT);
             alertUser = LocalBroadcastManager.getInstance(ConnectAndDiscoverService.ctx);
-
-
     }
 
 
