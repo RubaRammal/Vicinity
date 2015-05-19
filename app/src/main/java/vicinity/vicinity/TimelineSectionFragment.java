@@ -118,7 +118,7 @@ public class TimelineSectionFragment extends Fragment {
 
             public boolean onItemLongClick(AdapterView<?> parent, View view,
                                            final int position, long id) {
-                // TODO Auto-generated method stub
+
 
                 //int postID = ((Post) adapter.getItem(position)).getPostID();
                 if(!((Post) adapter.getItem(position)).getBitmap().equals("")){

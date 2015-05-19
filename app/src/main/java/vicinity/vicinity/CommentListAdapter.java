@@ -1,17 +1,16 @@
 package vicinity.vicinity;
 
 import android.content.Context;
-import android.graphics.Color;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.BaseAdapter;
 import android.widget.TextView;
-import vicinity.model.Comment;
-import vicinity.vicinity.R;
 
-import java.lang.Override;import java.util.ArrayList;
+import java.util.ArrayList;
 import java.util.List;
+
+import vicinity.model.Comment;
 
 
 /**
@@ -78,6 +77,7 @@ public class CommentListAdapter extends BaseAdapter {
             holder.name_text = (TextView) convertView.findViewById(R.id.commetName);
             holder.body_text = (TextView) convertView.findViewById(R.id.commentBody);
 
+
             convertView.setTag(holder);
         } else {
             holder = (ViewHolder) convertView.getTag();
@@ -115,6 +115,7 @@ public class CommentListAdapter extends BaseAdapter {
     }
 
     static class ViewHolder{
-        TextView name_text, body_text;    }
+        TextView name_text, body_text;
+         }
 }
 
