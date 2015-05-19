@@ -24,8 +24,6 @@ import vicinity.model.Post;
  */
 public class UdpBroadcastManager extends AsyncTask <Void, Void, Void> {
 
-    //TODO this class shall be named UDPBroadcastManager
-
     private static final String TAG = "PostManager";
     private Post post;
     private Comment comment;
@@ -180,8 +178,6 @@ public class UdpBroadcastManager extends AsyncTask <Void, Void, Void> {
             e.printStackTrace();
         }
     }
-
-
 
 }
 
