@@ -5,26 +5,30 @@ import android.database.Cursor;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Color;
+import android.graphics.Matrix;
 import android.graphics.drawable.ColorDrawable;
+import android.media.ExifInterface;
 import android.net.Uri;
+import android.os.Bundle;
 import android.provider.MediaStore;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.ActionBarActivity;
-import android.os.Bundle;
+import android.text.Editable;
+import android.text.TextWatcher;
 import android.util.Base64;
+import android.util.Log;
 import android.view.Gravity;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
-import android.widget.TextView;
-import android.text.Editable;
-import android.text.TextWatcher;
-import android.widget.EditText;
 import android.widget.Button;
-import android.util.Log;
+import android.widget.EditText;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import java.io.ByteArrayOutputStream;
+import java.io.File;
+import java.io.IOException;
 import java.sql.SQLException;
 import java.util.Random;
 
@@ -171,14 +175,132 @@ public class NewPost extends ActionBarActivity {
                     if (cursor.moveToFirst()) {
                         int columnIndex = cursor.getColumnIndex(filePathColumn[0]);
                         String filePath = cursor.getString(columnIndex);
-                        Bitmap bitmap = BitmapFactory.decodeFile(filePath);
-                        sendPhotoObj(bitmap);
+                        BitmapFactory.Options bmOptions = new BitmapFactory.Options();
+                        bmOptions.inJustDecodeBounds = true;
+                        BitmapFactory.decodeFile(filePath, bmOptions);
+                        int photoW = bmOptions.outWidth;
+                        int photoH = bmOptions.outHeight;
+
+                        Bitmap rotatedBitmap = decodeFile(new File(filePath),
+                                photoW, photoH, getImageOrientation(filePath));
+                      Log.i(TAG, "SHOULD BE ROTATED");
+                        try {
+                            sendPhotoObj(rotatedBitmap);
+                        } catch (Exception e) {
+                            e.printStackTrace();
+                        }
                     }
                     cursor.close();
                 }
                 break;
         }
     }
+
+    public static int getImageOrientation(String imagePath) {
+        int rotate = 0;
+        try {
+
+            File imageFile = new File(imagePath);
+            ExifInterface exif = new ExifInterface(imageFile.getAbsolutePath());
+            int orientation = exif.getAttributeInt(
+                    ExifInterface.TAG_ORIENTATION,
+                    ExifInterface.ORIENTATION_NORMAL);
+
+            switch (orientation) {
+                case ExifInterface.ORIENTATION_ROTATE_270:
+                    rotate = 270;
+                    break;
+                case ExifInterface.ORIENTATION_ROTATE_180:
+                    rotate = 180;
+                    break;
+                case ExifInterface.ORIENTATION_ROTATE_90:
+                    rotate = 90;
+                    break;
+            }
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        return rotate;
+    }
+
+    public static Bitmap decodeFile(File f, double REQUIRED_WIDTH,
+                                    double REQUIRED_HEIGHT, int rotation) {
+        try {
+            if (REQUIRED_WIDTH == 0 || REQUIRED_HEIGHT == 0) {
+                return BitmapFactory.decodeFile(f.getAbsolutePath());
+            } else {
+                BitmapFactory.Options o = new BitmapFactory.Options();
+                o.inJustDecodeBounds = true;
+                BitmapFactory.decodeFile(f.getAbsolutePath(), o);
+
+                o.inSampleSize = calculateInSampleSize(o, REQUIRED_WIDTH,
+                        REQUIRED_HEIGHT);
+
+                o.inJustDecodeBounds = false;
+                o.inPurgeable = true;
+                Bitmap b = BitmapFactory.decodeFile(f.getAbsolutePath(), o);
+                if (rotation != 0)
+                    b = rotate(b, rotation);
+                if (b.getWidth() > REQUIRED_WIDTH
+                        || b.getHeight() > REQUIRED_HEIGHT) {
+                    double ratio = Math.max((double) b.getWidth(),
+                            (double) b.getHeight())
+                            / (double) Math
+                            .min(REQUIRED_WIDTH, REQUIRED_HEIGHT);
+
+                    return Bitmap.createScaledBitmap(b,
+                            (int) (b.getWidth() / ratio),
+                            (int) (b.getHeight() / ratio), true);
+                } else
+                    return b;
+            }
+
+        } catch (Throwable ex) {
+            ex.printStackTrace();
+        }
+        return null;
+    }
+
+    public static int calculateInSampleSize(BitmapFactory.Options options,
+                                            double reqWidth, double reqHeight) {
+        // Raw height and width of image
+        final int height = options.outHeight;
+        final int width = options.outWidth;
+        int inSampleSize = 1;
+
+        if (height > reqHeight || width > reqWidth) {
+
+            // Calculate the largest inSampleSize value that is a power of 2 and
+            // keeps both
+            // height and width larger than the requested height and width.
+            while ((height / inSampleSize) > reqHeight
+                    || (width / inSampleSize) > reqWidth) {
+                inSampleSize *= 2;
+            }
+        }
+        inSampleSize = Math.max(1, inSampleSize / 2);
+        return inSampleSize;
+    }
+
+    public static Bitmap rotate(Bitmap b, int degrees) {
+        if (degrees != 0 && b != null) {
+            Matrix m = new Matrix();
+            m.setRotate(degrees, (float) b.getWidth() / 2,
+                    (float) b.getHeight() / 2);
+            try {
+                Bitmap b2 = Bitmap.createBitmap(b, 0, 0, b.getWidth(),
+                        b.getHeight(), m, true);
+                if (b != b2) {
+                    b.recycle();
+                    b = b2;
+                }
+            } catch (OutOfMemoryError ex) {
+                // We have no memory to rotate. Return the original bitmap.
+            }
+        }
+        return b;
+    }
+
 
     public void sendPhotoObj(Bitmap b)  {
         ByteArrayOutputStream baos = new ByteArrayOutputStream();

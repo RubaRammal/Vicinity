@@ -30,15 +30,30 @@
         android:textColor="#000"
         />
 
+    <ImageView
+        android:layout_width="fill_parent"
+        android:layout_height="fill_parent"
+        android:id="@+id/commentedOnImage"
+        android:layout_alignBottom="@+id/commentedOn"
+        android:layout_centerHorizontal="true"
+        android:layout_margin="5dip"
+        android:layout_marginLeft="5dip"
+        android:layout_marginTop="0dip"
+        android:layout_marginRight="5dip"
+        android:layout_marginBottom="5dip"
+        android:clickable="true"
+        android:onClick="imageClick"
+        />
+
     <TextView
-        android:layout_marginTop="4dip"
         android:layout_width="fill_parent"
         android:layout_height="wrap_content"
         android:background="#503e3e3d"
         android:text=" "
         android:textSize="0.4dip"
-        android:layout_below="@+id/commentedOn"
+        android:layout_below="@+id/commentedOnImage"
         android:id="@+id/line1" />
+
 
     <ListView
         android:layout_below="@+id/line1"
@@ -46,7 +61,8 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:transcriptMode="alwaysScroll"
-        >
+        android:layout_alignParentRight="false">
+
     </ListView>
 
 
@@ -79,6 +95,7 @@
             android:layout_weight="0.10" />
 
     </LinearLayout>
+
 
 
 

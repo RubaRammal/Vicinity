@@ -1,30 +1,44 @@
 package vicinity.vicinity;
 
+import android.app.AlertDialog;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.database.DataSetObserver;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.graphics.Color;
 import android.graphics.drawable.ColorDrawable;
+import android.media.MediaScannerConnection;
+import android.net.Uri;
 import android.os.Bundle;
+import android.os.Environment;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.ActionBarActivity;
+import android.text.Editable;
+import android.text.TextUtils;
+import android.text.TextWatcher;
+import android.util.Base64;
 import android.util.Log;
 import android.view.Gravity;
 import android.view.View;
 import android.widget.AbsListView;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.ImageView;
 import android.widget.ListView;
 import android.widget.TextView;
+import android.widget.Toast;
+
+import java.io.File;
+import java.io.FileOutputStream;
+import java.sql.SQLException;
 import java.util.ArrayList;
+import java.util.Calendar;
 
 import vicinity.ConnectionManager.UdpBroadcastManager;
 import vicinity.Controller.MainController;
 import vicinity.model.Comment;
 import vicinity.model.Post;
-import android.text.Editable;
-import android.text.TextUtils;
-import android.text.TextWatcher;
-import java.sql.SQLException;
 
 public class PostComment extends ActionBarActivity {
 
@@ -33,6 +47,7 @@ public class PostComment extends ActionBarActivity {
     private Button sendCommentButton;
     private TextView commentedOnName;
     private TextView commentedOnText;
+    private ImageView commentedOnImage;
     private Comment comment;
     private static CommentListAdapter adapter;
     public static Context ctx;
@@ -43,6 +58,7 @@ public class PostComment extends ActionBarActivity {
     private MainController controller;
     private int commentCount;
     private UdpBroadcastManager broadcastManager;//-Lama
+    private MediaScannerConnection msConn ;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -64,6 +80,8 @@ public class PostComment extends ActionBarActivity {
         // I disabled the back button in the action bar cuz it causes an error
         abar.setDisplayHomeAsUpEnabled(false);
         abar.setHomeButtonEnabled(true);
+
+
 
         ctx = this;
         controller = new MainController(ctx);
@@ -96,8 +114,17 @@ public class PostComment extends ActionBarActivity {
         commentTextField = (EditText) findViewById(R.id.commentTextField);
         commentedOnName = (TextView) findViewById(R.id.commentedOnName);
         commentedOnText = (TextView) findViewById(R.id.commentedOn);
+        commentedOnImage = (ImageView) findViewById(R.id.commentedOnImage);
         commentedOnName.setText(commentedOn.getPostedBy());
         commentedOnText.setText(commentedOn.getPostBody());
+        if(!commentedOn.getBitmap().equals("")){
+            String imageBitmap = commentedOn.getBitmap();
+            byte[] decodedString = Base64.decode(imageBitmap, Base64.DEFAULT);
+            Bitmap decodedByte = BitmapFactory.decodeByteArray(decodedString, 0, decodedString.length);
+
+            commentedOnImage.setImageBitmap(decodedByte);
+
+        }
         sendCommentButton = (Button) findViewById(R.id.sendCommentButton);
         sendCommentButton.setEnabled(false);
         commentTextField.addTextChangedListener(new TextWatcher() {
@@ -116,6 +143,7 @@ public class PostComment extends ActionBarActivity {
                 sendCommentButton.setEnabled(!TextUtils.isEmpty(commentTextField.getText().toString().trim()));
             }
         });
+
 
         // When send button is clicked
         sendCommentButton.setOnClickListener(
@@ -145,6 +173,89 @@ public class PostComment extends ActionBarActivity {
                 }
         );
     }//End onCreate
+    public void imageClick(View view) {
+        new AlertDialog.Builder(this)
+                .setTitle("Save image")
+                .setMessage("Do you want to save this image?")
+                .setPositiveButton(android.R.string.yes, new DialogInterface.OnClickListener() {
+                    public void onClick(DialogInterface dialog, int which) {
+                        Log.i(TAG, "YES");
+                        String imageBitmap = commentedOn.getBitmap();
+
+                        byte[] decodedString = Base64.decode(imageBitmap, Base64.DEFAULT);
+                        Bitmap bitmap = BitmapFactory.decodeByteArray(decodedString, 0, decodedString.length);
+                        saveImage(bitmap);
+
+                        int duration = Toast.LENGTH_LONG;
+                        Toast toast = Toast.makeText(TabsActivity.ctx, "The photo has been saved", duration);
+                        toast.show();
+                    }
+                })
+
+                .setNegativeButton(android.R.string.no, new DialogInterface.OnClickListener() {
+                    public void onClick(DialogInterface dialog, int which) {
+                        Log.i(TAG, "no");
+
+                    }
+                })//
+                .setIcon(android.R.drawable.ic_dialog_alert)
+                .show();
+    }
+    public void saveImage(Bitmap bmp)
+    {
+        File imageFileFolder = new File(Environment.getExternalStorageDirectory(),"Rotate");
+        imageFileFolder.mkdir();
+        FileOutputStream out = null;
+        Calendar c = Calendar.getInstance();
+        String date = fromInt(c.get(Calendar.MONTH))
+                + fromInt(c.get(Calendar.DAY_OF_MONTH))
+                + fromInt(c.get(Calendar.YEAR))
+                + fromInt(c.get(Calendar.HOUR_OF_DAY))
+                + fromInt(c.get(Calendar.MINUTE))
+                + fromInt(c.get(Calendar.SECOND));
+        File imageFileName = new File(imageFileFolder, date.toString() + ".jpg");
+        try
+        {
+            out = new FileOutputStream(imageFileName);
+            bmp.compress(Bitmap.CompressFormat.JPEG, 100, out);
+            out.flush();
+            out.close();
+            scanPhoto(imageFileName.toString());
+            out = null;
+        } catch (Exception e)
+        {
+            e.printStackTrace();
+        }
+    }
+
+    public String fromInt(int val)
+    {
+        return String.valueOf(val);
+    }
+
+    public void scanPhoto(final String imageFileName)
+    {
+
+
+        msConn = new MediaScannerConnection(ctx , new MediaScannerConnection.MediaScannerConnectionClient() {
+
+            @Override
+            public void onMediaScannerConnected() {
+
+                msConn.scanFile(imageFileName, null);
+                Log.i("msClient obj  in Photo Utility", "connection established");
+            }
+
+            @Override
+            public void onScanCompleted(String path, Uri uri) {
+                msConn.disconnect();
+                Log.i("msClient obj in Photo Utility","scan completed");
+
+            }
+        });
+        msConn.connect();
+    }
+
 
     private void postComment(Comment comment){
         broadcastManager = new UdpBroadcastManager();//-Lama
