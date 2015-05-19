@@ -7,6 +7,7 @@ import android.content.BroadcastReceiver;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.IntentFilter;
+import android.nfc.Tag;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentActivity;
@@ -15,6 +16,7 @@ import android.support.v4.app.FragmentPagerAdapter;
 import android.support.v4.content.LocalBroadcastManager;
 import android.support.v4.view.ViewPager;
 import android.util.Log;
+import android.view.ViewGroup;
 import android.view.Window;
 import android.widget.ImageButton;
 import android.content.Context;
@@ -24,6 +26,7 @@ import android.widget.Toast;
 import vicinity.ConnectionManager.UDPpacketListner;
 import vicinity.ConnectionManager.ConnectAndDiscoverService;
 import vicinity.Controller.MainController;
+import vicinity.model.Globals;
 import vicinity.model.Neighbor;
 
 /**
@@ -34,6 +37,7 @@ public class TabsActivity extends FragmentActivity implements ActionBar.TabListe
     private final String TAG ="Tabs";
     AppSectionsPagerAdapter mAppSectionsPagerAdapter;
     ViewPager mViewPager;
+    ViewGroup v;
     public static Context ctx;
     public static MainController controller;
     private static Fragment timeline = new TimelineSectionFragment()
@@ -128,6 +132,7 @@ public class TabsActivity extends FragmentActivity implements ActionBar.TabListe
         mAppSectionsPagerAdapter = new AppSectionsPagerAdapter(getSupportFragmentManager());
         final ActionBar actionBar = getActionBar();// Set up the action bar.
 
+
         // Specify that the Home/Up button should not be enabled, since there is no hierarchical
         // parent.
         actionBar.setHomeButtonEnabled(false);
@@ -139,6 +144,8 @@ public class TabsActivity extends FragmentActivity implements ActionBar.TabListe
 
         // Set up the ViewPager, attaching the adapter and setting up a listener for when the
         // user swipes between sections.
+        v = (ViewGroup) findViewById(android.R.id.content);
+
         mViewPager = (ViewPager) findViewById(R.id.pager);
         mViewPager.setAdapter(mAppSectionsPagerAdapter);
         mViewPager.setOnPageChangeListener(new ViewPager.SimpleOnPageChangeListener() {
@@ -187,7 +194,6 @@ public class TabsActivity extends FragmentActivity implements ActionBar.TabListe
     @Override
     public void onResume() {
         super.onResume();
-
     }
 
     @Override
@@ -200,11 +206,15 @@ public class TabsActivity extends FragmentActivity implements ActionBar.TabListe
     }
 
     @Override
+    protected void onStart() {
+        super.onStart();
+
+    }
+
+    @Override
     protected void onStop() {
         Log.i(TAG,"TabsActivity are stopped");
         super.onStop();
-
-
 
     }
     @Override
@@ -233,7 +243,6 @@ public class TabsActivity extends FragmentActivity implements ActionBar.TabListe
         // When the given tab is selected, switch to the corresponding page in the ViewPager.
         mViewPager.setCurrentItem(tab.getPosition());
 
-
     }
 
     @Override
@@ -243,6 +252,7 @@ public class TabsActivity extends FragmentActivity implements ActionBar.TabListe
 
     public static class AppSectionsPagerAdapter extends FragmentPagerAdapter {
 
+        String TAG = "adapter";
         public AppSectionsPagerAdapter(FragmentManager fm) {
             super(fm);
         }
@@ -260,7 +270,7 @@ public class TabsActivity extends FragmentActivity implements ActionBar.TabListe
                     return new NeighborSectionFragment();
 
                 case 2:
-                    return new MessagesSectionFragment();
+                    return chat;
 
                 case 3:
                     return new SettingsSectionFragment();
@@ -280,6 +290,8 @@ public class TabsActivity extends FragmentActivity implements ActionBar.TabListe
         public CharSequence getPageTitle(int position) {
             return "section "+ (position + 1);
         }
+
+
     }
 
 

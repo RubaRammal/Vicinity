@@ -32,6 +32,7 @@ public class MessagesSectionFragment extends Fragment {
     private ArrayList<VicinityMessage> history;
     private ArrayList<VicinityMessage> chatMsgs;
     private Bundle state;
+    private ListView lv;
     public MessagesSectionFragment(){}
 
 
@@ -96,7 +97,7 @@ public class MessagesSectionFragment extends Fragment {
         //Fills an ArrayList with the last message of every chat to send it to the adapter for display
         for (int i=0; i<stringIPs.size(); i++){
             temp = controller.getChatMessages(stringIPs.get(i));
-            Log.i(TAG, temp.get(i).toString());
+            //Log.i(TAG, temp.get(i).toString());
 
             if(temp.size()==0)
                 break;
@@ -118,7 +119,7 @@ public class MessagesSectionFragment extends Fragment {
 
 
         //Get the fragment_messages layout ListView
-        final ListView lv = (ListView) rootView.findViewById(R.id.messagesList);
+        lv = (ListView) rootView.findViewById(R.id.messagesList);
 
         //Create the message rows (message_row_view) in the ListView
         lv.setAdapter(adapter);
@@ -158,11 +159,74 @@ public class MessagesSectionFragment extends Fragment {
         super.setUserVisibleHint(isVisibleToUser);
         if(isVisibleToUser){
             Log.i(TAG, "Message fragment is visible");
-            if(state!=null) {
-                chatMsgs = (ArrayList<VicinityMessage>) state.getSerializable("MESSAGES_LIST");
-                adapter = new MessageListAdapter(this.getActivity(), chatMsgs);
+
+            ctx = this.getActivity();
+
+            controller = new MainController(ctx);
+
+            chatMsgs = new ArrayList<>();
+
+            //Returns the chat IDs of all messages
+            ArrayList<VicinityMessage> vicinityMessages = controller.viewAllMessages();
+            ArrayList<String> stringIPs = controller.viewChatIps();
+
+
+            ArrayList<VicinityMessage> temp;
+            try{
+                //Fills an ArrayList with the last message of every chat to send it to the adapter for display
+                for (int i=0; i<stringIPs.size(); i++){
+                    temp = controller.getChatMessages(stringIPs.get(i));
+                    //Log.i(TAG, temp.get(i).toString());
+
+                    if(temp.size()==0)
+                        break;
+
+                    chatMsgs.add(temp.get(temp.size() - 1));
+
+                }
             }
+            catch (ArrayIndexOutOfBoundsException e){
+                e.printStackTrace();
+            }
+
+            for (int i=0; i<chatMsgs.size() ;i++){
+                Log.i(TAG, "last msg: "+chatMsgs.get(i).getMessageBody());
+                Log.i(TAG, "last ip: "+chatMsgs.get(i).getFrom());
+            }
+
+            adapter = new MessageListAdapter(this.getActivity(), chatMsgs);
+
+            //Create the message rows (message_row_view) in the ListView
+            lv.setAdapter(adapter);
+
+            //List item click listener
+            lv.setOnItemClickListener(
+                    new AdapterView.OnItemClickListener(){
+                        @Override
+                        public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+                            VicinityMessage msg = ((VicinityMessage) adapter.getItem(position));
+                            Log.i(TAG, ((VicinityMessage) adapter.getItem(position)).getMessageBody());
+                            setMsgs(msg.getFrom());
+                            Intent intent = new Intent(ctx, ChatActivity.class);
+                            intent.putExtra("MSG", msg);
+                            startActivity(intent);
+                            Log.i(TAG, "ItemClicked");
+                        }
+                    }
+            );
+
+
         }
+    }
+
+    @Override
+    public void onResume() {
+        super.onResume();
+    }
+
+    @Override
+    public void onStart() {
+        super.onStart();
     }
 }
 

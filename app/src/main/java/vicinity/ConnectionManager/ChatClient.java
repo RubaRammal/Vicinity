@@ -22,15 +22,13 @@ public class ChatClient implements Runnable {
 
 
     private InetAddress ip;
-    private Context ctx;
     private String TAG = "ChatClient";
 
 
     private ObjectOutputStream out;
 
 
-    public ChatClient(Context c, String ip) {
-        ctx = c;
+    public ChatClient(String ip) {
         this.ip = InetAddresses.forString(ip);
 
 

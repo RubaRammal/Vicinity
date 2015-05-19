@@ -508,6 +508,8 @@ public class MainController {
                     comment.setCommentBody(c.getString(c.getColumnIndex("commentBody")));
                     comment.setCommentedBy(c.getString(c.getColumnIndex("commentedBy")));
                     comment.setCommentID(c.getColumnIndex("commentID"));
+                    comment.setPostID(c.getColumnIndex("postID"));
+
 
                     // Adding comment to commentsList
                     commentsList.add(comment);

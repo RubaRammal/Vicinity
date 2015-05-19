@@ -16,6 +16,7 @@ import android.widget.ListView;
 import java.util.ArrayList;
 import java.util.Iterator;
 
+import vicinity.ConnectionManager.ChatClient;
 import vicinity.ConnectionManager.ConnectAndDiscoverService;
 import vicinity.Controller.MainController;
 import vicinity.model.Neighbor;
@@ -35,6 +36,7 @@ public class NeighborSectionFragment extends Fragment {
     private ListView lvf;
     private static NeighborListAdapter neighborListAdapter;
     private static FriendListAdapter friendListAdapter;
+    public static ChatClient chatClient;
 
 
 
@@ -141,11 +143,10 @@ public class NeighborSectionFragment extends Fragment {
                 Log.i(TAG,"Clicked: "+friendListAdapter.getItem(position-1).toString()) ;
                 final Neighbor friend = (Neighbor) friendListAdapter.getItem(position-1);
 
-                    Intent intent = new Intent(ctx, ChatActivity.class);
-                    intent.putExtra("FRIEND", friend);
+                Intent intent = new Intent(ctx, ChatActivity.class);
+                intent.putExtra("FRIEND", friend);
 
-                    startActivity(intent);
-
+                startActivity(intent);
 
             }
         });

@@ -117,13 +117,13 @@ public class ChatActivity extends ActionBarActivity {
             if(savedInstanceState.getSerializable("FRIEND") instanceof Neighbor)
             {
                 friendChat = (Neighbor) savedInstanceState.getSerializable("FRIEND");
-                chatClient = new ChatClient(ctx,friendChat.getIpAddress().getHostAddress());
+                chatClient = new ChatClient(friendChat.getIpAddress().getHostAddress());
                 friendsIp = friendChat.getIpAddress().getHostAddress();
                 textviewTitle.setText(friendChat.getInstanceName());
             }
             else if(savedInstanceState.getSerializable("MSG") instanceof VicinityMessage){
                 message = (VicinityMessage) savedInstanceState.getSerializable("MSG");
-                chatClient = new ChatClient(ctx,message.getFrom());
+                chatClient = new ChatClient(message.getFrom());
                 textviewTitle.setText(message.getFriendID());
                 friendsIp = message.getFrom();
 
@@ -139,8 +139,9 @@ public class ChatActivity extends ActionBarActivity {
 
 
         chatThread = new Thread(chatClient);
-        chatThread.start();
-        controller.addClientThread(chatClient);
+            chatThread.start();
+
+        //controller.addClientThread(chatClient);
 
 
         chatListView.getAdapter().registerDataSetObserver(new DataSetObserver() {
@@ -166,8 +167,8 @@ public class ChatActivity extends ActionBarActivity {
                             //Display Message to user
                             pushMessage(vicinityMessage);
 
-                            chatClient.write(vicinityMessage);
-                            Log.i(TAG, "Writing vicinityMessage successful");
+                                chatClient.write(vicinityMessage);
+                                Log.i(TAG, "Writing vicinityMessage successful");
 
                             //To add vicinityMessage to db
                             boolean added = controller.addMessage(vicinityMessage);

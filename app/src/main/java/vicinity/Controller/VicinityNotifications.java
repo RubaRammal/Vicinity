@@ -28,10 +28,11 @@ public class VicinityNotifications {
         NotificationManager notificationManager = (NotificationManager) ConnectAndDiscoverService.ctx.getSystemService(ConnectAndDiscoverService.ctx.NOTIFICATION_SERVICE);
         Notification notification = new Notification(R.drawable.vicinity_logo, newMsg.getMessageBody(), System.currentTimeMillis());
         notification.defaults |= Notification.DEFAULT_VIBRATE;
-        CharSequence title = "Afnan";//TODO change this to the friend's name
+        CharSequence title = newMsg.getFriendID();//TODO change this to the friend's name
         CharSequence text = newMsg.getMessageBody();
 
         Intent notificationIntent = new Intent(ConnectAndDiscoverService.ctx, ChatActivity.class);
+        notificationIntent.putExtra("MSG", newMsg);
         // pendingIntent that will start a new activity.
         PendingIntent contentIntent = PendingIntent.getActivity(ConnectAndDiscoverService.ctx, 0, notificationIntent, PendingIntent.FLAG_UPDATE_CURRENT | PendingIntent.FLAG_ONE_SHOT);
 
