@@ -116,14 +116,21 @@ public class PostComment extends ActionBarActivity {
         commentedOnText = (TextView) findViewById(R.id.commentedOn);
         commentedOnImage = (ImageView) findViewById(R.id.commentedOnImage);
         commentedOnName.setText(commentedOn.getPostedBy());
-        commentedOnText.setText(commentedOn.getPostBody());
+
+        if(!commentedOn.getPostBody().equals("")){
+            commentedOnText.setText(commentedOn.getPostBody());
+        }else {
+            commentedOnText.setVisibility(View.GONE);
+        }
+
         if(!commentedOn.getBitmap().equals("")){
             String imageBitmap = commentedOn.getBitmap();
             byte[] decodedString = Base64.decode(imageBitmap, Base64.DEFAULT);
             Bitmap decodedByte = BitmapFactory.decodeByteArray(decodedString, 0, decodedString.length);
-
             commentedOnImage.setImageBitmap(decodedByte);
-
+        }
+        else {
+            commentedOnImage.setVisibility(View.GONE);
         }
         sendCommentButton = (Button) findViewById(R.id.sendCommentButton);
         sendCommentButton.setEnabled(false);

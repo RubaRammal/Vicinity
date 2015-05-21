@@ -88,14 +88,21 @@ public class PostListAdapter  extends BaseAdapter {
             holder = (ViewHolder) convertView.getTag();
         }
 
-        holder.txtName.setText(posts.get(position).getPostedBy());
+        holder.txtPost.setVisibility(View.GONE);
+        holder.imageView.setVisibility(View.GONE);
 
+        holder.txtName.setText(posts.get(position).getPostedBy());
+        holder.txtComments.setText("0 comments");
+        holder.txtDate.setText(posts.get(position).getPostedAt());
+
+        if(!posts.get(position).getPostBody().equals("")){
+            holder.txtPost.setVisibility(View.VISIBLE);
             holder.txtPost.setText(posts.get(position).getPostBody());
-            holder.txtComments.setText("0 comments");
-            holder.txtDate.setText(posts.get(position).getPostedAt());
+        }
 
         try {
             if(!posts.get(position).getBitmap().equals("")){
+                holder.imageView.setVisibility(View.VISIBLE);
                 String imageBitmap = posts.get(position).getBitmap();
                 byte[] decodedString = Base64.decode(imageBitmap, Base64.DEFAULT);
                 Bitmap decodedByte = BitmapFactory.decodeByteArray(decodedString, 0, decodedString.length);
@@ -114,6 +121,7 @@ public class PostListAdapter  extends BaseAdapter {
         TextView txtName, txtPost, txtComments, txtDate;
         ImageView imageView;
     }
+
     public  static void clearPosts(){
         posts.clear();
         TimelineSectionFragment.clearPosts();

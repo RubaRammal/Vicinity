@@ -60,7 +60,12 @@ public class ServiceRequest implements Runnable {
 
                 //VicinityNotifications.newMessageNotification(msg);
 
-                if (!Globals.chatActive) {
+
+                if(Globals.chatActive && ChatActivity.friendsIp.equals(msg.getFrom())){
+                    Intent intent = new Intent("MESSAGE");
+                    intent.putExtra("NEW_MESSAGE", msg);
+                    toChat.sendBroadcast(intent);
+                } else {
                     VicinityNotifications.newMessageNotification(msg);
                     intent.putExtra("MSG", msg);
                     intent.setAction(Intent.ACTION_MAIN);
@@ -68,11 +73,6 @@ public class ServiceRequest implements Runnable {
                     intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
                     ComponentName cn = new ComponentName(ConnectAndDiscoverService.ctx, ChatActivity.class);
                     intent.setComponent(cn);
-                }
-                else if(Globals.chatActive && ChatActivity.friendsIp.equals(msg.getFrom())){
-                    Intent intent = new Intent("MESSAGE");
-                    intent.putExtra("NEW_MESSAGE", msg);
-                    toChat.sendBroadcast(intent);
                 }
 
             }

@@ -65,6 +65,7 @@ public class ChatActivity extends ActionBarActivity {
     public static String friendsIp;
     private Neighbor friendChat;
     private Thread chatThread;
+    private boolean gettingImage = false;
 
 
 
@@ -105,6 +106,7 @@ public class ChatActivity extends ActionBarActivity {
         imgMsg.setChatId(5);
         imgMsg.setIsMyMsg(true);
         imgMsg.setMessageBody("");
+
         try {
             imgMsg.setFriendID(controller.retrieveCurrentUsername());
         } catch (SQLException e) {
@@ -210,6 +212,7 @@ public class ChatActivity extends ActionBarActivity {
         sendImgButton.setOnClickListener(
                 new Button.OnClickListener() {
                     public void onClick(View v) {
+                        gettingImage = true;
                         selectPicture();
                     }
                 }
@@ -275,6 +278,7 @@ public class ChatActivity extends ActionBarActivity {
         switch (requestCode) {
             case SELECT_PICTURE_ACTIVITY_REQUEST_CODE:
                 if (resultCode == RESULT_OK) {
+
                     Uri selectedImage = imageReturnedIntent.getData();
                     String[] filePathColumn = {MediaStore.Images.Media.DATA};
                     Cursor cursor = getContentResolver().query(selectedImage, filePathColumn, null, null, null);
@@ -417,8 +421,12 @@ public class ChatActivity extends ActionBarActivity {
         String encodedImage = Base64.encodeToString(imageBytes, Base64.DEFAULT);
 
         imgMsg.setImageString(encodedImage);
+        imgMsg.setFrom(friendsIp);
+        Log.i(TAG, "Chat img ip: " +friendsIp);
+
         pushMessage(imgMsg);
         chatClient.write(imgMsg);
+        gettingImage = false;
 
 
     }
@@ -441,6 +449,9 @@ public class ChatActivity extends ActionBarActivity {
     public void onStop() {
         super.onStop();
         Globals.chatActive = false;
+        if(!gettingImage){
+            finish();
+        }
     }
 
     @Override

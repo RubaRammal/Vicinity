@@ -5,7 +5,7 @@
     android:orientation="vertical">
 
     <TextView
-        android:layout_width="wrap_content"
+        android:layout_width="fill_parent"
         android:layout_height="wrap_content"
         android:id="@+id/commentedOnName"
         android:layout_alignParentTop="true"
@@ -24,44 +24,33 @@
         android:layout_height="wrap_content"
         android:id="@+id/commentedOn"
         android:textSize="17sp"
-        android:paddingBottom="13dip"
+        android:paddingBottom="8dip"
         android:paddingLeft="13dip"
         android:paddingRight="13dip"
         android:textColor="#000"
         />
 
     <ImageView
-        android:layout_width="fill_parent"
-        android:layout_height="fill_parent"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
         android:id="@+id/commentedOnImage"
-        android:layout_alignBottom="@+id/commentedOn"
-        android:layout_centerHorizontal="true"
-        android:layout_margin="5dip"
-        android:layout_marginLeft="5dip"
-        android:layout_marginTop="0dip"
-        android:layout_marginRight="5dip"
-        android:layout_marginBottom="5dip"
         android:clickable="true"
         android:onClick="imageClick"
-        />
-
-    <TextView
-        android:layout_width="fill_parent"
-        android:layout_height="wrap_content"
-        android:background="#503e3e3d"
-        android:text=" "
-        android:textSize="0.4dip"
-        android:layout_below="@+id/commentedOnImage"
-        android:id="@+id/line1" />
+        android:adjustViewBounds="true"
+        android:paddingBottom="10dp"
+        android:layout_below="@+id/commentedOn"
+        android:layout_centerHorizontal="true" />
 
 
     <ListView
-        android:layout_below="@+id/line1"
+        android:layout_below="@+id/commentedOnImage"
         android:id="@+id/commentsList"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:transcriptMode="alwaysScroll"
-        android:layout_alignParentRight="false">
+        android:layout_alignParentRight="false"
+        android:layout_marginBottom="50dip"
+        >
 
     </ListView>
 
