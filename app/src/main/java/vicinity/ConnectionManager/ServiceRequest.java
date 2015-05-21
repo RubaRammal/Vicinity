@@ -8,7 +8,6 @@ import android.util.Log;
 import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.net.InetAddress;
-import java.net.ServerSocket;
 import java.net.Socket;
 import java.sql.SQLException;
 
@@ -17,7 +16,6 @@ import vicinity.Controller.VicinityNotifications;
 import vicinity.model.Globals;
 import vicinity.model.VicinityMessage;
 import vicinity.vicinity.ChatActivity;
-import vicinity.vicinity.NeighborSectionFragment;
 
 /**
  * Created by macproretina on 5/18/15.
@@ -29,7 +27,6 @@ public class ServiceRequest implements Runnable {
     private ObjectInputStream inputStream;
     private Intent intent;
     private MainController controller;
-    public static ChatClient chatClient;
 
     public ServiceRequest(Socket connection) throws IOException {
         this.socket = connection;
@@ -56,9 +53,8 @@ public class ServiceRequest implements Runnable {
                 VicinityMessage msg = (VicinityMessage) inputStream.readObject();
                 msg.setFrom(socket.getInetAddress().getHostAddress());
                 msg.setIsMyMsg(false);
-                Log.i(TAG, "Received a message from: " + msg.getFriendID());
-                Log.i(TAG, "Message content: " + msg.getMessageBody());
-                Log.i(TAG, "Message IP: " + msg.getFrom());
+                Log.i(TAG, "Received a message: " + msg.toString());
+
                 controller.addMessage(msg);
 
 
@@ -72,7 +68,8 @@ public class ServiceRequest implements Runnable {
                     intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
                     ComponentName cn = new ComponentName(ConnectAndDiscoverService.ctx, ChatActivity.class);
                     intent.setComponent(cn);
-                } else {
+                }
+                else if(Globals.chatActive && ChatActivity.friendsIp.equals(msg.getFrom())){
                     Intent intent = new Intent("MESSAGE");
                     intent.putExtra("NEW_MESSAGE", msg);
                     toChat.sendBroadcast(intent);

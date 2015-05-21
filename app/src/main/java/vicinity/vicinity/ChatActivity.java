@@ -62,7 +62,7 @@ public class ChatActivity extends ActionBarActivity {
     private static VicinityMessage message;
     private BroadcastReceiver newMessage;
     private ChatClient chatClient;
-    private String friendsIp;
+    public static String friendsIp;
     private Neighbor friendChat;
     private Thread chatThread;
 
