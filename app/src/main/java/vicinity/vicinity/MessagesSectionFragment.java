@@ -158,13 +158,10 @@ public class MessagesSectionFragment extends Fragment {
     public void setUserVisibleHint(boolean isVisibleToUser) {
         super.setUserVisibleHint(isVisibleToUser);
         if(isVisibleToUser){
+            adapter.clearAdapter();
+            adapter.notifyDataSetChanged();
             Log.i(TAG, "Message fragment is visible");
 
-            ctx = this.getActivity();
-
-            controller = new MainController(ctx);
-
-            chatMsgs = new ArrayList<>();
 
             //Returns the chat IDs of all messages
             ArrayList<VicinityMessage> vicinityMessages = controller.viewAllMessages();

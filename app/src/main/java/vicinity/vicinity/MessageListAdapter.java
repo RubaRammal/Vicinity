@@ -72,4 +72,8 @@ public class MessageListAdapter  extends BaseAdapter {
     static class ViewHolder{
         TextView textDate, textMessage,textName;
     }
+
+    public void clearAdapter(){
+        vicinityMessages.clear();
+    }
 }

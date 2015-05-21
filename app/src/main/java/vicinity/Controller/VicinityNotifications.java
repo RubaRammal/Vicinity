@@ -6,7 +6,9 @@ import android.app.PendingIntent;
 import android.content.Intent;
 import android.util.Log;
 
+import vicinity.ConnectionManager.ChatClient;
 import vicinity.ConnectionManager.ConnectAndDiscoverService;
+import vicinity.model.Globals;
 import vicinity.model.VicinityMessage;
 import vicinity.vicinity.ChatActivity;
 import vicinity.vicinity.R;
@@ -18,6 +20,8 @@ public class VicinityNotifications {
 
 
     private static final String TAG = "Notify";
+    public static ChatClient chatClient;
+    public static boolean isRunning = false;
 
     /**
      * Notifies receiver about new messages.
@@ -30,6 +34,8 @@ public class VicinityNotifications {
         notification.defaults |= Notification.DEFAULT_VIBRATE;
         CharSequence title = newMsg.getFriendID();//TODO change this to the friend's name
         CharSequence text = newMsg.getMessageBody();
+
+
 
         Intent notificationIntent = new Intent(ConnectAndDiscoverService.ctx, ChatActivity.class);
         notificationIntent.putExtra("MSG", newMsg);

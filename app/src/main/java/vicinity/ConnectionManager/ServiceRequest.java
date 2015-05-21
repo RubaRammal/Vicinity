@@ -17,6 +17,7 @@ import vicinity.Controller.VicinityNotifications;
 import vicinity.model.Globals;
 import vicinity.model.VicinityMessage;
 import vicinity.vicinity.ChatActivity;
+import vicinity.vicinity.NeighborSectionFragment;
 
 /**
  * Created by macproretina on 5/18/15.
@@ -28,6 +29,7 @@ public class ServiceRequest implements Runnable {
     private ObjectInputStream inputStream;
     private Intent intent;
     private MainController controller;
+    public static ChatClient chatClient;
 
     public ServiceRequest(Socket connection) throws IOException {
         this.socket = connection;
@@ -44,6 +46,8 @@ public class ServiceRequest implements Runnable {
 
             InetAddress serverThreadId = socket.getInetAddress();
             Log.i(TAG, "Friend : " + serverThreadId + " started a chat");
+
+
             inputStream = new ObjectInputStream(socket.getInputStream());
 
             while (Globals.stopServer) {

@@ -35,7 +35,9 @@ import java.sql.SQLException;
 import java.util.ArrayList;
 
 import vicinity.ConnectionManager.ChatClient;
+import vicinity.ConnectionManager.ServiceRequest;
 import vicinity.Controller.MainController;
+import vicinity.Controller.VicinityNotifications;
 import vicinity.model.Globals;
 import vicinity.model.Neighbor;
 import vicinity.model.VicinityMessage;
@@ -136,10 +138,21 @@ public class ChatActivity extends ActionBarActivity {
         }
 
         getHistory();
-
-
         chatThread = new Thread(chatClient);
-            chatThread.start();
+        chatThread.start();
+
+
+/*
+        if(!(NeighborSectionFragment.chatClient == null)){
+            Log.i(TAG, "Chat client from neighbor fragment");
+        }
+        else if(!chatThread.isAlive()){
+            Log.i(TAG, "Chat client from chat activity");
+        }
+*/
+
+        //chatThread = new Thread(chatClient);
+            //chatThread.start();
 
         //controller.addClientThread(chatClient);
 
@@ -167,8 +180,16 @@ public class ChatActivity extends ActionBarActivity {
                             //Display Message to user
                             pushMessage(vicinityMessage);
 
-                                chatClient.write(vicinityMessage);
+                            /*if(!(NeighborSectionFragment.chatClient == null)){
+                                NeighborSectionFragment.chatClient.write(vicinityMessage);
                                 Log.i(TAG, "Writing vicinityMessage successful");
+                            }
+                            else {
+                                Log.i(TAG, "Writing vicinityMessage successful");
+                            }*/
+
+                            chatClient.write(vicinityMessage);
+
 
                             //To add vicinityMessage to db
                             boolean added = controller.addMessage(vicinityMessage);
@@ -205,6 +226,7 @@ public class ChatActivity extends ActionBarActivity {
                     Log.i(TAG,"Received new message: "+vMessage.getMessageBody());
                     friendsIp = vMessage.getFrom();
                     pushMessage(vMessage);
+                    intent.removeExtra("NEW_MESSAGE");
 
                 }
                 catch (NullPointerException e){

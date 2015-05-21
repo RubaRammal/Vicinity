@@ -50,7 +50,7 @@ public class Globals {
     public static InetAddress MY_IP = null;
     //To check if ChatActivty is active
     public static boolean chatActive = false;
-    
+
     public static boolean stopServer = true;
 
 
