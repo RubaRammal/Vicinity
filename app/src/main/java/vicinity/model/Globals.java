@@ -22,15 +22,8 @@ public class Globals {
     public static final int REQUEST_PORT= 41440; //for friend requests among peers
     public static final int CHAT_PORT= 41450;
 
-    public static final int MESSAGE_READ = 0x400 + 1;
-    public static final int MY_HANDLE = 0x400 + 2;
 
 
-
-
-
-    /*-----Request protocol code messages----*/
-    public static boolean isRequestAccepted=false;
 
 
     /**
@@ -52,6 +45,8 @@ public class Globals {
     public static boolean chatActive = false;
 
     public static boolean stopServer = true;
+
+    public static boolean isNewUser=false;
 
 
 

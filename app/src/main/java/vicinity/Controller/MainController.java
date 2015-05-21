@@ -25,6 +25,7 @@ import vicinity.model.Neighbor;
 import vicinity.model.Post;
 import vicinity.model.VicinityMessage;
 import vicinity.vicinity.NeighborListAdapter;
+import vicinity.vicinity.TabsActivity;
 
 /**
  * This is the main class that integrates different components of the system
@@ -163,6 +164,9 @@ public class MainController {
 
                 isMuted = mutedNeighbors.add(neighbor);
                 Log.i("mute", neighbor.getInstanceName() + " is muted? " + isMuted);
+                if(isMuted)
+                    Toast.makeText(TabsActivity.ctx, neighbor.getInstanceName()+" has been muted", Toast.LENGTH_LONG).show();
+
             }
         }
         return isMuted;
@@ -176,7 +180,9 @@ public class MainController {
      */
     public static boolean unmuteNeighbor(Neighbor neighbor){
         if(isUserMuted(neighbor))
-            return mutedNeighbors.remove(neighbor);
+        {
+            Toast.makeText(TabsActivity.ctx, neighbor.getInstanceName()+" has been unmuted", Toast.LENGTH_LONG).show();
+            return mutedNeighbors.remove(neighbor);}
         return false;
     }
 
@@ -253,8 +259,9 @@ public class MainController {
     /**
      *
      */
+    public static boolean isDeleted = false;
     public void alertUserOfRequestReply(boolean reply, Neighbor neighbor) throws SQLException{
-        CharSequence text;
+        CharSequence text=neighbor.getInstanceName()+" has been removed from your friends";
         int duration = Toast.LENGTH_LONG;
         if(reply){
             addFriend(neighbor);
@@ -262,7 +269,8 @@ public class MainController {
             text = neighbor.getInstanceName()+" is now your friend!";
         }
         else{
-            text = neighbor.getInstanceName()+" has rejected your request...";
+            if(!isDeleted)
+                text = neighbor.getInstanceName()+" has rejected your request...";
         }
         Toast toast = Toast.makeText(ConnectAndDiscoverService.ctx,text,duration);
         toast.show();
@@ -331,7 +339,8 @@ public class MainController {
             cursor.moveToFirst();
             if(cursor.getCount()==0)
                 isFriend=false;
-            //cursor.close();
+            cursor.close();
+            dbH.close();
         }
         catch(SQLException e){
             e.printStackTrace();

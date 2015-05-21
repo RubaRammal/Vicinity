@@ -40,22 +40,7 @@ public class PostListAdapter  extends BaseAdapter {
 
 
     }
-    /*
-    public void updatePosts(ArrayList<Post> p) {
-        if(p.size()!=0) {
-            posts.clear();
-            for (int i = 0; i < p.size(); i++) {
-                posts.add(p.get(i));
 
-                try {
-                    controller.addPost(p.get(i));
-                } catch (SQLException e) {
-                    e.printStackTrace();
-                }
-
-            }
-        }
-    }*/
 
     public void addPost(Post p){
         posts.add(p);
@@ -129,6 +114,11 @@ public class PostListAdapter  extends BaseAdapter {
         TextView txtName, txtPost, txtComments, txtDate;
         ImageView imageView;
     }
+    public  static void clearPosts(){
+        posts.clear();
+        TimelineSectionFragment.clearPosts();
+    }
+
 
 
 }

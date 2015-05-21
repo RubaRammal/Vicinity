@@ -14,6 +14,7 @@ import java.net.DatagramSocket;
 import java.net.InetAddress;
 import java.net.InetSocketAddress;
 
+import vicinity.Controller.MainController;
 import vicinity.model.Comment;
 import vicinity.model.Globals;
 import vicinity.model.Post;
@@ -93,22 +94,24 @@ public class UDPpacketListner extends Service {
                 byte[] data = packet.getData();
                 ByteArrayInputStream inputStream = new ByteArrayInputStream(data);
                 ObjectInputStream objectInputStream = new ObjectInputStream(inputStream);
-                String senderIP = packet.getAddress().getHostAddress();
+                InetAddress senderIP = packet.getAddress();
                 //Receiving an object
                 Object obj = objectInputStream.readObject();
 
                 /*-----Determine if incoming udp packet contains Post, Comment or HasMap of addresses----*/
                 if (obj instanceof Post){
                     Post p = (Post) obj;
-                    Log.i(TAG,"received Post object: "+p.getPostBody()+" from: "+senderIP+" "+p.getPostedBy()+" posted at: "+p.getPostedAt());//-Lama
-                    updateUIPosts(p);
+                    Log.i(TAG,"received Post object: "+p.getPostBody()+" from: "+senderIP+" "+p.getPostedBy()+" posted at: "+p.getPostedAt());
+                    if(!MainController.isThisIPMuted(senderIP))
+                        updateUIPosts(p);
 
                 }
 
                 else if (obj instanceof Comment){
                     Comment c = (Comment) obj;
                     Log.i(TAG,"received Comment object: "+c.getCommentBody()+" from: "+senderIP+" "+c.getCommentedBy());
-                    updateUIComments(c);
+                    if(!MainController.isThisIPMuted(senderIP))
+                        updateUIComments(c);
 
                 }
                 else if(obj instanceof HashMap){
