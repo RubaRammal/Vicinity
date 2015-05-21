@@ -23,6 +23,8 @@ import android.content.Context;
 import android.widget.Toast;
 
 
+import java.sql.SQLException;
+
 import vicinity.ConnectionManager.UDPpacketListner;
 import vicinity.ConnectionManager.ConnectAndDiscoverService;
 import vicinity.Controller.MainController;
@@ -52,6 +54,14 @@ public class TabsActivity extends FragmentActivity implements ActionBar.TabListe
         ctx=TabsActivity.this;
         controller = new MainController(ctx);
 
+        try {
+            if (Globals.isNewUser==false)
+                Toast.makeText(TabsActivity.ctx, "Welcome back " + controller.retrieveCurrentUsername(), Toast.LENGTH_LONG).show();
+        }
+        catch(SQLException e){
+            e.printStackTrace();
+        }
+
         final LocalBroadcastManager replyToRequest = LocalBroadcastManager.getInstance(this);
 
 
@@ -73,6 +83,9 @@ public class TabsActivity extends FragmentActivity implements ActionBar.TabListe
                     Toast.makeText(TabsActivity.ctx,"You are not friends with "+receivedRequest.getInstanceName()+" anymore!",Toast.LENGTH_LONG).show();
                     controller.deleteFriend(receivedRequest.getDeviceAddress());
                     NeighborListAdapter.addToNeighbors(receivedRequest);
+
+                    intent1.putExtra("REPLY_REQUEST",false);
+                    replyToRequest.sendBroadcast(intent1);
                 }
                 //Display a dialog to the user
                 else if (!controller.isThisMyFriend(receivedRequest.getDeviceAddress())){
@@ -264,20 +277,20 @@ public class TabsActivity extends FragmentActivity implements ActionBar.TabListe
         public Fragment getItem(int i) {
             switch (i) {
                 case 0:
-                    return new TimelineSectionFragment();
+                    return timeline;
 
                 case 1:
-                    return new NeighborSectionFragment();
+                    return neighbors;
 
                 case 2:
                     return chat;
 
                 case 3:
-                    return new SettingsSectionFragment();
+                    return settings;
 
                 default:
                     // The other sections of the app are dummy placeholders.
-                    return new TimelineSectionFragment();
+                    return timeline;
             }
         }
 

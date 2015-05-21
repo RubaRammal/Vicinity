@@ -96,6 +96,8 @@ public class SettingsSectionFragment extends Fragment {
                                 timer.schedule(new TimerTask() {
 
                                     public void run() {
+                                        getActivity().stopService(new Intent(getActivity(), ConnectAndDiscoverService.class));
+                                        getActivity().stopService(new Intent(getActivity(), UDPpacketListner.class));
                                         controller.deleteAccount();
                                         getActivity().finish();
                                         Intent intent = new Intent(getActivity(), LaunchActivity.class);
@@ -236,7 +238,7 @@ public class SettingsSectionFragment extends Fragment {
                                 Log.i(TAG,"YES");
                                 try{
                                     if(controller.deleteAllPosts()){
-
+                                        PostListAdapter.clearPosts();
                                         CharSequence text = "Timeline was cleared successfully";
                                         int duration = Toast.LENGTH_LONG;
                                         Toast toast = Toast.makeText(getActivity(), text, duration);

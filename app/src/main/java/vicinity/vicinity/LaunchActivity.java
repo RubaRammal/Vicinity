@@ -6,6 +6,7 @@ import android.os.Bundle;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.content.Context;
+
 import java.sql.SQLException;
 import java.util.Timer;
 import java.util.TimerTask;
@@ -13,6 +14,7 @@ import java.util.TimerTask;
 
 import vicinity.Controller.MainController;
 import vicinity.model.DBHandler;
+import vicinity.model.Globals;
 
 /**
  * Launch activity displays the app's logo
@@ -53,8 +55,9 @@ public class LaunchActivity extends Activity {
                      then navigate to the timeline directly,
                      if not then display NameActivity to register
                      */
-                    final MainController controller = new MainController(context);
+                    MainController controller = new MainController(context);
                     if (controller.retrieveCurrentUsername()==null) {
+                        Globals.isNewUser=true;
                         Intent intent = new Intent(context, NameActivity.class);
                         startActivity(intent);
                         finish();

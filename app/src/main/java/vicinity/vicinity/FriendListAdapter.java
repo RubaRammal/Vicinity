@@ -85,7 +85,6 @@ public class FriendListAdapter extends BaseAdapter {
 
                                 new RequestsManager().execute(deleteFriend);
 
-                                TabsActivity.controller.deleteFriend(deleteFriend.getDeviceAddress());
                                 NeighborSectionFragment.updateDeletedFriend(deleteFriend);
                                 CharSequence text = deleteFriend.getInstanceName()+" is deleted.";
                                 int duration = Toast.LENGTH_LONG;

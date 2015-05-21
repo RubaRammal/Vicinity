@@ -71,6 +71,7 @@ public class RequestServer extends Thread{
                             try {
                                 outputStream.writeBoolean(reply);
                                 outputStream.flush();
+
                             } catch (IOException e) {
                                 e.printStackTrace();
                             }

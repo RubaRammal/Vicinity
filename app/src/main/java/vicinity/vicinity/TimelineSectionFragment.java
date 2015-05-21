@@ -276,30 +276,24 @@ public class TimelineSectionFragment extends Fragment {
             public void onMediaScannerConnected() {
 
                 msConn.scanFile(imageFileName, null);
-                Log.i("msClient obj  in Photo Utility", "connection established");
+                Log.i("Photo Utility", "connection established");
             }
 
             @Override
             public void onScanCompleted(String path, Uri uri) {
                 msConn.disconnect();
-                Log.i("msClient obj in Photo Utility","scan completed");
+                Log.i("Photo Utility","scan completed");
 
             }
         });
         msConn.connect();
     }
 
-    /*
-    private void TimerMethod()
-    {
-        getActivity().runOnUiThread(Timer_Tick);
-    }
+   public static void clearPosts(){
 
-    private Runnable Timer_Tick = new Runnable() {
-        public void run() {
-            adapter.notifyDataSetChanged();
-        }
-    };*/
+       adapter.notifyDataSetChanged();
+
+   }
 
 
 

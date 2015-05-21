@@ -1,7 +1,6 @@
 package vicinity.ConnectionManager;
 
 import android.app.Service;
-import android.content.ComponentName;
 import android.content.Intent;
 import android.os.IBinder;
 import android.content.Context;
@@ -29,7 +28,6 @@ import vicinity.Controller.MainController;
 import vicinity.model.DBHandler;
 import vicinity.model.Globals;
 import vicinity.model.Neighbor;
-import vicinity.vicinity.ChatActivity;
 import vicinity.vicinity.FriendListAdapter;
 import vicinity.vicinity.NeighborListAdapter;
 import vicinity.vicinity.NeighborSectionFragment;
@@ -112,7 +110,7 @@ public class ConnectAndDiscoverService extends Service
         disconnectPeers();
         db.deleteDatabase();
 
-        /*Remove advertised service request
+        //Remove advertised service request
         if (serviceRequest != null)
             manager.removeServiceRequest(channel, serviceRequest,
                     new WifiP2pManager.ActionListener() {
@@ -124,7 +122,7 @@ public class ConnectAndDiscoverService extends Service
                         @Override
                         public void onFailure(int arg0) {
                         }
-                    });*/
+                    });
 
     }
 
@@ -250,20 +248,6 @@ public class ConnectAndDiscoverService extends Service
         config.wps.setup = WpsInfo.PBC;//Wifi permission Push Button
 
 
-        /*//I've deleted this cause it stops service discovery after connection
-        and we do not want that
-        if (serviceRequest != null)
-            manager.removeServiceRequest(channel, serviceRequest,
-                    new WifiP2pManager.ActionListener() {
-
-                        @Override
-                        public void onSuccess() {
-                        }
-
-                        @Override
-                        public void onFailure(int arg0) {
-                        }
-                    });*/
 
             manager.connect(channel, config, new WifiP2pManager.ActionListener() {
 
@@ -305,13 +289,6 @@ public class ConnectAndDiscoverService extends Service
         Log.i(TAG, "onConnectionAvailable");
         Thread handler = null;
 
-
-         /*
-         * The group owner accepts connections using a server socket and then spawns a
-         * client socket for every client. This is handled by {@code
-         * GroupOwnerSocketHandler}
-         */
-        //TODO a condition for neighbor and friend
         GOIP = p2pInfo.groupOwnerAddress;
         try {
         if (p2pInfo.isGroupOwner) {
@@ -348,25 +325,7 @@ public class ConnectAndDiscoverService extends Service
 
     }
 
-    ///IGNORE THIS RUBBISH
-    @Override
-    public void chatWithFriend(Neighbor friend){
-        startChatting();
-    }
 
-
-
-    public void startChatting(){
-        Intent intent = new Intent();
-        intent.putExtra("MSG_ID", 5);
-        intent.setAction(Intent.ACTION_MAIN);
-        intent.addCategory(Intent.CATEGORY_LAUNCHER);
-        intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-        ComponentName cn = new ComponentName(this, ChatActivity.class);
-        intent.setComponent(cn);
-        startActivity(intent);
-
-    }
 
     /**
      * Get Group Owner's IP address of the current network

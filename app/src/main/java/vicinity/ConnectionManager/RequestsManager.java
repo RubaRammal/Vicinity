@@ -35,8 +35,10 @@ public class RequestsManager extends AsyncTask<Neighbor,Void,Boolean> {
 
     @Override
     protected Boolean doInBackground(Neighbor... param) {
+        Log.i(TAG,"REQUEST: Do in bg");
 
         try {
+
             controller = new MainController(TabsActivity.ctx);
             //Peer
             requestedTo = param[0];
@@ -59,6 +61,13 @@ public class RequestsManager extends AsyncTask<Neighbor,Void,Boolean> {
             if (controller.isThisMyFriend(requestedTo.getDeviceAddress())) {
                 outToServer.writeObject(me);
                 outToServer.flush();
+
+                reply = inputStream.readBoolean();
+                Log.i(TAG, "isAccepted: " + reply);
+                controller.isDeleted=true;
+                controller.deleteFriend(requestedTo.getDeviceAddress());
+
+
             } else {
 
                 //Sending the object
@@ -67,6 +76,8 @@ public class RequestsManager extends AsyncTask<Neighbor,Void,Boolean> {
                 //Receiving acceptance or rejection
                 reply = inputStream.readBoolean();
                 Log.i(TAG, "isAccepted: " + reply);
+                controller.isDeleted=false;
+
 
             }
 
@@ -92,6 +103,8 @@ public class RequestsManager extends AsyncTask<Neighbor,Void,Boolean> {
         //and update the friends list accordingly
         try{
         controller.alertUserOfRequestReply(result,requestedTo);
+            controller.isDeleted=false;
+
         }
         catch(SQLException e){
             e.printStackTrace();

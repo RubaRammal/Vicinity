@@ -12,6 +12,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.ListView;
+import android.widget.TextView;
 
 import java.util.ArrayList;
 import java.util.Iterator;
@@ -19,6 +20,7 @@ import java.util.Iterator;
 import vicinity.ConnectionManager.ChatClient;
 import vicinity.ConnectionManager.ConnectAndDiscoverService;
 import vicinity.Controller.MainController;
+import vicinity.model.Globals;
 import vicinity.model.Neighbor;
 
 /**
@@ -42,7 +44,6 @@ public class NeighborSectionFragment extends Fragment {
 
     public interface DeviceClickListener {
         public void connectP2p(Neighbor wifiP2pService);
-        public void chatWithFriend(Neighbor neighbor);
 
     }
 
@@ -142,11 +143,14 @@ public class NeighborSectionFragment extends Fragment {
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
                 Log.i(TAG,"Clicked: "+friendListAdapter.getItem(position-1).toString()) ;
                 final Neighbor friend = (Neighbor) friendListAdapter.getItem(position-1);
-
+                if(Globals.isConnectedToANetwork){
                 Intent intent = new Intent(ctx, ChatActivity.class);
                 intent.putExtra("FRIEND", friend);
 
-                startActivity(intent);
+                startActivity(intent);}
+                else{
+                    ((DeviceClickListener) ConnectAndDiscoverService.ctx).connectP2p(friend);
+                }
 
             }
         });
