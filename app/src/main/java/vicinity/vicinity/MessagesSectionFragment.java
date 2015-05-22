@@ -17,6 +17,7 @@ import java.net.UnknownHostException;
 import java.util.ArrayList;
 
 import vicinity.Controller.MainController;
+import vicinity.model.Neighbor;
 import vicinity.model.VicinityMessage;
 
 /**
@@ -31,8 +32,9 @@ public class MessagesSectionFragment extends Fragment {
     private MessageListAdapter adapter;
     private ArrayList<VicinityMessage> history;
     private ArrayList<VicinityMessage> chatMsgs;
-    private Bundle state;
     private ListView lv;
+    private Neighbor chatFriend;
+
     public MessagesSectionFragment(){}
 
 
@@ -58,9 +60,8 @@ public class MessagesSectionFragment extends Fragment {
 
         super.onSaveInstanceState(outState);
         outState.putSerializable("MESSAGES_LIST", chatMsgs);
-        state = outState;
 
-        Log.i(TAG,"onSaveInstanceState MESSAGES_LIST");
+        Log.i(TAG,"onSaveInstanceState");
 
     }
     @Override
@@ -69,7 +70,6 @@ public class MessagesSectionFragment extends Fragment {
         Log.i(TAG,"onActivityCreated");
         setRetainInstance(true);
         if (savedInstanceState != null) {
-            state = savedInstanceState;
             chatMsgs = (ArrayList<VicinityMessage>) savedInstanceState.getSerializable("MESSAGES_LIST");
             adapter = new MessageListAdapter(this.getActivity(), chatMsgs);
 
@@ -89,6 +89,7 @@ public class MessagesSectionFragment extends Fragment {
 
         //Returns the chat IDs of all messages
         ArrayList<VicinityMessage> vicinityMessages = controller.viewAllMessages();
+
         ArrayList<String> stringIPs = controller.viewChatIps();
 
 
@@ -103,17 +104,12 @@ public class MessagesSectionFragment extends Fragment {
                 break;
 
                 chatMsgs.add(temp.get(temp.size() - 1));
-
         }
         }
         catch (ArrayIndexOutOfBoundsException e){
             e.printStackTrace();
         }
 
-        for (int i=0; i<chatMsgs.size() ;i++){
-        Log.i(TAG, "last msg: "+chatMsgs.get(i).getMessageBody());
-        Log.i(TAG, "last ip: "+chatMsgs.get(i).getFrom());
-        }
 
         adapter = new MessageListAdapter(this.getActivity(), chatMsgs);
 
@@ -132,10 +128,15 @@ public class MessagesSectionFragment extends Fragment {
                         VicinityMessage msg = ((VicinityMessage) adapter.getItem(position));
                         Log.i(TAG, ((VicinityMessage) adapter.getItem(position)).getMessageBody());
                         setMsgs(msg.getFrom());
-                        Intent intent = new Intent(ctx, ChatActivity.class);
-                        intent.putExtra("MSG", msg);
-                        startActivity(intent);
-                        Log.i(TAG, "ItemClicked");
+                        chatFriend = controller.getFriend(msg.getFrom());
+
+                        if(!(chatFriend == null))
+                        {
+                            Intent intent = new Intent(ctx, ChatActivity.class);
+                            intent.putExtra("MSG", msg);
+                            startActivity(intent);
+                            Log.i(TAG, "ItemClicked");
+                        }
                     }
                 }
         );
@@ -144,11 +145,6 @@ public class MessagesSectionFragment extends Fragment {
         return rootView;
     }
 
-
-
-    public ArrayList<VicinityMessage> getMsgs(){
-        return history;
-    }
 
     public void setMsgs(String id){
         history = controller.getChatMessages(id);
@@ -204,27 +200,22 @@ public class MessagesSectionFragment extends Fragment {
                             VicinityMessage msg = ((VicinityMessage) adapter.getItem(position));
                             Log.i(TAG, ((VicinityMessage) adapter.getItem(position)).getMessageBody());
                             setMsgs(msg.getFrom());
-                            Intent intent = new Intent(ctx, ChatActivity.class);
-                            intent.putExtra("MSG", msg);
-                            startActivity(intent);
-                            Log.i(TAG, "ItemClicked");
+                            chatFriend = controller.getFriend(msg.getFrom());
+
+                                Intent intent = new Intent(ctx, ChatActivity.class);
+                                intent.putExtra("MSG", msg);
+                                startActivity(intent);
+                                Log.i(TAG, "ItemClicked");
+
                         }
                     }
             );
 
 
+
         }
     }
 
-    @Override
-    public void onResume() {
-        super.onResume();
-    }
-
-    @Override
-    public void onStart() {
-        super.onStart();
-    }
 }
 
 

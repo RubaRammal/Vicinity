@@ -54,7 +54,7 @@ public class RequestServer extends Thread{
                 ObjectInputStream inputStream = new ObjectInputStream(clientSocket.getInputStream());
                 final ObjectOutputStream outputStream = new ObjectOutputStream(clientSocket.getOutputStream());
                 Neighbor requestFrom = (Neighbor) inputStream.readObject();
-                requestFrom.setIpAddress(requestIP);
+                requestFrom.setIpAddress(requestIP.getHostAddress());
 
                 Log.i(TAG, "Received a request from: " + requestFrom.toString() + " IP: " + requestFrom.getIpAddress());
 

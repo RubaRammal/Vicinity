@@ -47,7 +47,7 @@ public class RequestsManager extends AsyncTask<Neighbor,Void,Boolean> {
             me = WiFiDirectBroadcastReceiver.getMyP2pInfo();
 
             //Getting neighbor's IP address
-            requestedTo.setIpAddress(UDPpacketListner.getPeerAddress(requestedTo.getDeviceAddress()));
+            requestedTo.setIpAddress(UDPpacketListner.getPeerAddress(requestedTo.getDeviceAddress()).getHostAddress());
 
             Log.i(TAG, "Sending request to.." + requestedTo.toString());
             //Initializing sockets and streams
@@ -64,6 +64,7 @@ public class RequestsManager extends AsyncTask<Neighbor,Void,Boolean> {
 
                 reply = inputStream.readBoolean();
                 Log.i(TAG, "isAccepted: " + reply);
+                controller.deleteMessages(requestedTo.getIpAddress().getHostAddress());
                 controller.isDeleted=true;
                 controller.deleteFriend(requestedTo.getDeviceAddress());
 

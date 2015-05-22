@@ -92,8 +92,15 @@ public class PostListAdapter  extends BaseAdapter {
         holder.imageView.setVisibility(View.GONE);
 
         holder.txtName.setText(posts.get(position).getPostedBy());
-        holder.txtComments.setText("0 comments");
         holder.txtDate.setText(posts.get(position).getPostedAt());
+
+        if(controller.getPostComments(posts.get(position).getPostID()) == null){
+            holder.txtComments.setText("0 comments");
+
+        } else {
+            holder.txtComments.setText((controller.getPostComments(posts.get(position).getPostID())).size()+" comments");
+
+        }
 
         if(!posts.get(position).getPostBody().equals("")){
             holder.txtPost.setVisibility(View.VISIBLE);

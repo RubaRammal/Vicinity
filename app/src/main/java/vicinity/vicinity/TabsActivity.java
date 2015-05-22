@@ -81,6 +81,8 @@ public class TabsActivity extends FragmentActivity implements ActionBar.TabListe
                 }
                 else if(controller.isThisMyFriend(receivedRequest.getDeviceAddress())){
                     Toast.makeText(TabsActivity.ctx,"You are not friends with "+receivedRequest.getInstanceName()+" anymore!",Toast.LENGTH_LONG).show();
+                    // I added this to delete messages when friend is deleted - Ruba
+                    controller.deleteMessages(receivedRequest.getIpAddress().getHostAddress());
                     controller.deleteFriend(receivedRequest.getDeviceAddress());
                     NeighborListAdapter.addToNeighbors(receivedRequest);
 

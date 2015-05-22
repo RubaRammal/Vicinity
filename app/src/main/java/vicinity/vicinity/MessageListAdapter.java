@@ -1,6 +1,8 @@
 package vicinity.vicinity;
 
 import android.content.Context;
+import android.graphics.Color;
+import android.graphics.Typeface;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -9,6 +11,8 @@ import android.widget.TextView;
 
 import java.util.ArrayList;
 
+import vicinity.Controller.MainController;
+import vicinity.model.Neighbor;
 import vicinity.model.VicinityMessage;
 
 /**
@@ -18,12 +22,14 @@ import vicinity.model.VicinityMessage;
 public class MessageListAdapter  extends BaseAdapter {
     ArrayList<VicinityMessage> vicinityMessages;
     private LayoutInflater mInflater;
+    private MainController controller;
 
 
 
     public MessageListAdapter(Context context, ArrayList<VicinityMessage> vicinityMessages){
         this.vicinityMessages = vicinityMessages;
         mInflater = LayoutInflater.from(context);
+        controller = new MainController(context);
     }
 
     @Override
@@ -61,8 +67,9 @@ public class MessageListAdapter  extends BaseAdapter {
 
 
             holder.textDate.setText(vicinityMessages.get(position).getDate());
-            holder.textName.setText(vicinityMessages.get(position).getFriendID());
             holder.textMessage.setText(vicinityMessages.get(position).getMessageBody());
+            holder.textName.setText(controller.getFriend(vicinityMessages.get(position).getFrom()).getInstanceName());
+
 
 
 

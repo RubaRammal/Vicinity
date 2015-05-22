@@ -79,7 +79,7 @@ public class WiFiDirectBroadcastReceiver extends BroadcastReceiver {
             me = new Neighbor(device.deviceName,device.deviceAddress,ConnectAndDiscoverService.getDeviceStatus(device.status));
             if(Globals.MY_IP!=null)
             {
-                me.setIpAddress(Globals.MY_IP);
+                me.setIpAddress(Globals.MY_IP.getHostAddress());
             }
             if(Globals.MY_MAC == null)
                 {

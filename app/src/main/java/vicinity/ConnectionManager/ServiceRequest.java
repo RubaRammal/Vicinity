@@ -18,13 +18,14 @@ import vicinity.model.VicinityMessage;
 import vicinity.vicinity.ChatActivity;
 
 /**
- * Created by macproretina on 5/18/15.
+ * A class that implements Runnable.
+ * It listens for packets from a client socket it is connected to
+ * and either notify the user of the received packets or send them to the UI thread.
  */
 public class ServiceRequest implements Runnable {
     private Socket socket;
     private final static String TAG = "ServiceRequest";
     private LocalBroadcastManager toChat;
-    private ObjectInputStream inputStream;
     private Intent intent;
     private MainController controller;
 
@@ -40,15 +41,12 @@ public class ServiceRequest implements Runnable {
         try {
             Log.i(TAG, "Chat thread server has started...");
 
+            InetAddress socketIp = socket.getInetAddress();
+            Log.i(TAG, "Friend : " + socketIp + " started a chat");
 
-            InetAddress serverThreadId = socket.getInetAddress();
-            Log.i(TAG, "Friend : " + serverThreadId + " started a chat");
-
-
-            inputStream = new ObjectInputStream(socket.getInputStream());
+            ObjectInputStream inputStream = new ObjectInputStream(socket.getInputStream());
 
             while (Globals.stopServer) {
-
 
                 VicinityMessage msg = (VicinityMessage) inputStream.readObject();
                 msg.setFrom(socket.getInetAddress().getHostAddress());
@@ -56,10 +54,6 @@ public class ServiceRequest implements Runnable {
                 Log.i(TAG, "Received a message: " + msg.toString());
 
                 controller.addMessage(msg);
-
-
-                //VicinityNotifications.newMessageNotification(msg);
-
 
                 if(Globals.chatActive && ChatActivity.friendsIp.equals(msg.getFrom())){
                     Intent intent = new Intent("MESSAGE");

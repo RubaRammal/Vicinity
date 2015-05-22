@@ -6,22 +6,18 @@ import android.app.PendingIntent;
 import android.content.Intent;
 import android.util.Log;
 
-import vicinity.ConnectionManager.ChatClient;
 import vicinity.ConnectionManager.ConnectAndDiscoverService;
-import vicinity.model.Globals;
 import vicinity.model.VicinityMessage;
 import vicinity.vicinity.ChatActivity;
 import vicinity.vicinity.R;
 
 /**
- * This class handles user notifications
+ * This class displays and handles message notifications.
  */
 public class VicinityNotifications {
 
 
     private static final String TAG = "Notify";
-    public static ChatClient chatClient;
-    public static boolean isRunning = false;
 
     /**
      * Notifies receiver about new messages.
@@ -32,8 +28,18 @@ public class VicinityNotifications {
         NotificationManager notificationManager = (NotificationManager) ConnectAndDiscoverService.ctx.getSystemService(ConnectAndDiscoverService.ctx.NOTIFICATION_SERVICE);
         Notification notification = new Notification(R.drawable.vicinity_logo, newMsg.getMessageBody(), System.currentTimeMillis());
         notification.defaults |= Notification.DEFAULT_VIBRATE;
-        CharSequence title = newMsg.getFriendID();//TODO change this to the friend's name
-        CharSequence text = newMsg.getMessageBody();
+        CharSequence title = newMsg.getFriendName();//TODO change this to the friend's name
+        CharSequence text;
+        if(!newMsg.getMessageBody().equals(""))
+        {
+            text = newMsg.getMessageBody();
+        }
+        else
+        {
+            text = "Sent a photo";
+
+        }
+
 
 
 

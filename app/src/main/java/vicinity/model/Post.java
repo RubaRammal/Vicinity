@@ -4,11 +4,11 @@ package vicinity.model;
 import java.io.Serializable;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
-import java.util.ArrayList;
 import java.util.Date;
 
 /**
- * Class that holds the structure of timeline posts
+ * This class implements Serializable.
+ * It is responsible for holding the structure of Timeline posts.
  */
 public class Post  implements Serializable {
 
@@ -16,103 +16,75 @@ public class Post  implements Serializable {
     private String postedAt;
     private String postedBy;
     private String postBody;
-    private ArrayList<Comment> postComments;
     private int commentsCount;
-    private String PhotoPath;
     private String image;
 
-
-    public Post()
-    {
+    public Post(){
         image = "";
-
+        Date currentDate= new Date();
+        DateFormat dF=  new SimpleDateFormat("yyyy/MM/dd");
+        postedAt= dF.format(currentDate);
     }
-
 
     /**
-     * Public constructor
-     * @param postedBy username
-     * @param postBody a String containing the post
+     * Setters And Getters
      */
-    public Post(String postedBy, String postBody){
-        //Date and time the post was sent:
-        Date currentDate= new Date();
-        DateFormat dF=  new SimpleDateFormat("yyyy/MM/dd HH:mm:ss");
-        postedAt= dF.format(currentDate);
-        this.postBody=postBody;
-        this.postedBy=postedBy;
-        postComments = new ArrayList<Comment>();
-        commentsCount=0;
-        image = "";
-    }
 
-    /*------Setters and Getters-----*/
-    public int getPostID(){
+    public int getPostID()
+    {
         return this.postID;
     }
-    public String getPostedAt(){
+
+    public String getPostedAt()
+    {
         return this.postedAt;
     }
-    public boolean setPostedBy(String postedBy){
-        this.postedBy=postedBy;
+
+    public boolean setPostedBy(String postedBy)
+    {
+        this.postedBy = postedBy;
         return true;
     }
-    public String getPostedBy(){
+
+    public String getPostedBy()
+    {
         return this.postedBy;
     }
-    public boolean setPostBody(String postBody){
-        this.postBody=postBody;
+
+    public boolean setPostBody(String postBody)
+    {
+        this.postBody = postBody;
         return true;
     }
-    public String getPostBody(){
+
+    public String getPostBody()
+    {
         return this.postBody;
     }
-    public ArrayList<Comment> getComments(){
-        return this.postComments;
-    }
 
-    public void setPostID(int p){
+    public void setPostID(int p)
+    {
         this.postID = p;
     }
-    public void setPostedAt(String postedAt) {
-               this.postedAt=postedAt;
-           }
-    public void setPostDate(){
-        Date currentDate= new Date();
-        DateFormat dF=  new SimpleDateFormat("yyyy/MM/dd HH:mm:ss");
-        postedAt= dF.format(currentDate);
+
+    public void setPostedAt(String postedAt)
+    {
+        this.postedAt = postedAt;
     }
 
-    public int getCommentsCount(){
-        return commentsCount;
-    }
-
-    public void setCommentCount(int c){
-        commentsCount = c;
-    }
-
-    public String getPhotoPath(){
-        return  PhotoPath;}
-
-    public void setPhotoPath(String PhotoPath){
-        this.PhotoPath = PhotoPath;}
-
-    public void setBitmap(String img){
+    public void setBitmap(String img)
+    {
         image = img;
     }
 
-    public String getBitmap(){
+    public String getBitmap()
+    {
         return image;
     }
 
-         /**
-          * adds a comment to the ArrayList postComments
-          * @param comment
-          */
-        public void addAcomment (Comment comment) {
-                postComments.add(comment);
-           }
-
+    /**
+     * toString()
+     */
     public String toString()
     {
         return "Posted by: "+postedBy+ " Post Content: "+ postBody+" Date: "+ postedAt+" PostID: "+postID;

@@ -19,6 +19,7 @@ import java.sql.SQLException;
 import java.util.ArrayList;
 
 import vicinity.ConnectionManager.RequestsManager;
+import vicinity.Controller.MainController;
 import vicinity.model.Neighbor;
 
 
@@ -26,11 +27,13 @@ public class FriendListAdapter extends BaseAdapter {
     private LayoutInflater mInflater;
     ArrayList<Neighbor> services;
     private ImageButton deleteFriend, editFriendName;
+    private MainController controller;
 
     private static final String TAG ="FriendsListAdpt";
     public FriendListAdapter(Context context, ArrayList<Neighbor> services){
         this.services = services;
         mInflater = LayoutInflater.from(context);
+        controller = new MainController(context);
 
     }
 
@@ -86,6 +89,8 @@ public class FriendListAdapter extends BaseAdapter {
                                 new RequestsManager().execute(deleteFriend);
 
                                 NeighborSectionFragment.updateDeletedFriend(deleteFriend);
+                                // I added this to delete messages when friend is deleted - Ruba
+                                controller.deleteMessages(deleteFriend.getIpAddress().getHostAddress());
                                 CharSequence text = deleteFriend.getInstanceName()+" is deleted.";
                                 int duration = Toast.LENGTH_LONG;
                                 Toast toast = Toast.makeText(TabsActivity.ctx, text, duration);

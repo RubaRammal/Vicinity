@@ -38,17 +38,11 @@ public class NeighborSectionFragment extends Fragment {
     private ListView lvf;
     private static NeighborListAdapter neighborListAdapter;
     private static FriendListAdapter friendListAdapter;
-    public static ChatClient chatClient;
 
 
 
     public interface DeviceClickListener {
         public void connectP2p(Neighbor wifiP2pService);
-
-    }
-
-    public interface Handling {
-        public Handler getHandler();
 
     }
 
@@ -214,7 +208,5 @@ public class NeighborSectionFragment extends Fragment {
             neighborListAdapter.notifyDataSetChanged();
         }
     }
-
-
 
 }

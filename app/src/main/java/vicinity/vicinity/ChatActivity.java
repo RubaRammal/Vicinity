@@ -35,9 +35,7 @@ import java.sql.SQLException;
 import java.util.ArrayList;
 
 import vicinity.ConnectionManager.ChatClient;
-import vicinity.ConnectionManager.ServiceRequest;
 import vicinity.Controller.MainController;
-import vicinity.Controller.VicinityNotifications;
 import vicinity.model.Globals;
 import vicinity.model.Neighbor;
 import vicinity.model.VicinityMessage;
@@ -54,7 +52,6 @@ public class ChatActivity extends ActionBarActivity {
     private static ChatAdapter adapter;
     public static Context ctx;
     private MainController controller;
-    private int chatID;
     private static final int SELECT_PICTURE_ACTIVITY_REQUEST_CODE = 0;
     private VicinityMessage imgMsg;
     private static String TAG = "ChatActivity";
@@ -102,16 +99,9 @@ public class ChatActivity extends ActionBarActivity {
         ArrayList<VicinityMessage> vicinityMessages = controller.viewAllMessages();
 
 
-        imgMsg = new VicinityMessage();
-        imgMsg.setChatId(5);
-        imgMsg.setIsMyMsg(true);
-        imgMsg.setMessageBody("");
 
-        try {
-            imgMsg.setFriendID(controller.retrieveCurrentUsername());
-        } catch (SQLException e) {
-            e.printStackTrace();
-        }
+
+
 
         chatListView.setAdapter(adapter);
         chatListView.setTranscriptMode(AbsListView.TRANSCRIPT_MODE_ALWAYS_SCROLL);
@@ -128,7 +118,7 @@ public class ChatActivity extends ActionBarActivity {
             else if(savedInstanceState.getSerializable("MSG") instanceof VicinityMessage){
                 message = (VicinityMessage) savedInstanceState.getSerializable("MSG");
                 chatClient = new ChatClient(message.getFrom());
-                textviewTitle.setText(message.getFriendID());
+                textviewTitle.setText(controller.getFriend(message.getFrom()).getInstanceName());
                 friendsIp = message.getFrom();
 
             }
@@ -143,20 +133,6 @@ public class ChatActivity extends ActionBarActivity {
         chatThread = new Thread(chatClient);
         chatThread.start();
 
-
-/*
-        if(!(NeighborSectionFragment.chatClient == null)){
-            Log.i(TAG, "Chat client from neighbor fragment");
-        }
-        else if(!chatThread.isAlive()){
-            Log.i(TAG, "Chat client from chat activity");
-        }
-*/
-
-        //chatThread = new Thread(chatClient);
-            //chatThread.start();
-
-        //controller.addClientThread(chatClient);
 
 
         chatListView.getAdapter().registerDataSetObserver(new DataSetObserver() {
@@ -175,20 +151,12 @@ public class ChatActivity extends ActionBarActivity {
                             Log.i(TAG, "onClick ");
 
                             //Message
-                            vicinityMessage = new VicinityMessage(ctx, controller.retrieveCurrentUsername(),
-                                    5, true, chatText.getText().toString());
+                            vicinityMessage = new VicinityMessage(controller.retrieveCurrentUsername(),
+                                     true, chatText.getText().toString());
 
                             vicinityMessage.setFrom(friendsIp);
                             //Display Message to user
                             pushMessage(vicinityMessage);
-
-                            /*if(!(NeighborSectionFragment.chatClient == null)){
-                                NeighborSectionFragment.chatClient.write(vicinityMessage);
-                                Log.i(TAG, "Writing vicinityMessage successful");
-                            }
-                            else {
-                                Log.i(TAG, "Writing vicinityMessage successful");
-                            }*/
 
                             chatClient.write(vicinityMessage);
 
@@ -420,6 +388,15 @@ public class ChatActivity extends ActionBarActivity {
         byte[] imageBytes = baos.toByteArray();
         String encodedImage = Base64.encodeToString(imageBytes, Base64.DEFAULT);
 
+        try {
+            imgMsg = new VicinityMessage();
+            imgMsg.setIsMyMsg(true);
+            imgMsg.setMessageBody("");
+            imgMsg.setFriendName(controller.retrieveCurrentUsername());
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+
         imgMsg.setImageString(encodedImage);
         imgMsg.setFrom(friendsIp);
         Log.i(TAG, "Chat img ip: " +friendsIp);
@@ -427,6 +404,9 @@ public class ChatActivity extends ActionBarActivity {
         pushMessage(imgMsg);
         chatClient.write(imgMsg);
         gettingImage = false;
+
+        controller.addMessage(imgMsg);
+
 
 
     }

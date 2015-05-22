@@ -1,26 +1,12 @@
 package vicinity.ConnectionManager;
 
-import android.content.ComponentName;
-import android.content.Intent;
-import android.support.v4.content.LocalBroadcastManager;
-import android.util.Log;
-
 import java.io.IOException;
-import java.io.ObjectInputStream;
-import java.net.InetAddress;
 import java.net.ServerSocket;
 import java.net.Socket;
-import java.sql.SQLException;
-import java.util.ArrayList;
-import java.util.List;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
-import vicinity.Controller.MainController;
-import vicinity.Controller.VicinityNotifications;
 import vicinity.model.Globals;
-import vicinity.model.VicinityMessage;
-import vicinity.vicinity.ChatActivity;
 
 
 public class ChatServer implements Runnable{

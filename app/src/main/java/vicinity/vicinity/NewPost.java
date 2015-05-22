@@ -21,6 +21,7 @@ import android.view.Gravity;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.view.WindowManager;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.TextView;
@@ -56,7 +57,7 @@ public class NewPost extends ActionBarActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_new_post);
 
-
+        getWindow().setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_ADJUST_PAN);
 
         final ActionBar abar = getSupportActionBar();
         abar.setBackgroundDrawable(new ColorDrawable(Color.parseColor("#01aef0")));//line under the action bar
@@ -140,7 +141,6 @@ public class NewPost extends ActionBarActivity {
             if(Globals.isConnectedToANetwork){
                 aPost.setPostBody(postText);
                 aPost.setPostedBy(mc.retrieveCurrentUsername());
-                aPost.setPostDate();
                 aPost.setPostID(r.nextInt((1000 - 1) + 1) + 1);
                 broadcastManager.setPost(aPost);
                 broadcastManager.execute();

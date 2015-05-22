@@ -3,6 +3,7 @@ package vicinity.vicinity;
 import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+import android.print.PrintAttributes;
 import android.util.Base64;
 import android.view.Gravity;
 import android.view.LayoutInflater;
@@ -76,9 +77,12 @@ public class ChatAdapter extends ArrayAdapter<VicinityMessage> {
 
         if(!vicinityMessages.get(position).isMyMsg()){
             params.gravity = Gravity.LEFT;
+            params.rightMargin = 120;
         }
         else{
             params.gravity = Gravity.RIGHT;
+            params.leftMargin = 120;
+
         }
 
         holder.chat_text.setVisibility(View.GONE);
@@ -89,7 +93,7 @@ public class ChatAdapter extends ArrayAdapter<VicinityMessage> {
             holder.chat_text.setText(vicinityMessages.get(position).getMessageBody());
             holder.chat_text.setBackgroundDrawable(vicinityMessages.get(position).isMyMsg() ?
                     ctx.getResources().getDrawable(R.drawable.chatboxright) : ctx.getResources().getDrawable(R.drawable.chatboxleft));
-            holder.name_text.setText(vicinityMessages.get(position).isMyMsg() ? "" : vicinityMessages.get(position).getFriendID());
+            holder.name_text.setText(vicinityMessages.get(position).isMyMsg() ? "" : vicinityMessages.get(position).getFriendName());
             holder.chat_text.setLayoutParams(params);
 
 
@@ -102,7 +106,7 @@ public class ChatAdapter extends ArrayAdapter<VicinityMessage> {
             holder.chat_image.setImageBitmap(decodedByte);
             holder.chat_image.setBackgroundDrawable(vicinityMessages.get(position).isMyMsg() ?
                     ctx.getResources().getDrawable(R.drawable.chatboxright) : ctx.getResources().getDrawable(R.drawable.chatboxleft));
-            holder.name_text.setText(vicinityMessages.get(position).isMyMsg() ? "" : vicinityMessages.get(position).getFriendID());
+            holder.name_text.setText(vicinityMessages.get(position).isMyMsg() ? "" : vicinityMessages.get(position).getFriendName());
             holder.chat_image.setLayoutParams(params);
 
 

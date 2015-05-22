@@ -40,9 +40,9 @@ public class MainController {
     private ArrayList<Post> postList;
     private ArrayList<VicinityMessage> allMessages;
     private ArrayList<VicinityMessage> allChatMessages;
+    private ArrayList<Neighbor> allFriends;
     public String query;
     public Cursor cursor;
-    private ArrayList<Comment> commentsList;
     private ArrayList<ChatClient> clientThreads;
 
     public static ArrayList<Neighbor> mutedNeighbors = new ArrayList<>();
@@ -160,7 +160,7 @@ public class MainController {
         if(!isUserMuted(neighbor)) {
             if (UDPpacketListner.doesAddressExist(neighbor.getDeviceAddress())) {
                 //Get the neighbor's IP
-                neighbor.setIpAddress(UDPpacketListner.getPeerAddress(neighbor.getDeviceAddress()));
+                neighbor.setIpAddress(UDPpacketListner.getPeerAddress(neighbor.getDeviceAddress()).getHostAddress());
 
                 isMuted = mutedNeighbors.add(neighbor);
                 Log.i("mute", neighbor.getInstanceName() + " is muted? " + isMuted);
@@ -245,6 +245,7 @@ public class MainController {
             ContentValues values = new ContentValues();
             values.put("Username", requestedTo.getInstanceName());
             values.put("deviceID", requestedTo.getDeviceAddress());
+            values.put("IP", requestedTo.getIpAddress().getHostAddress());
             Log.i(TAG,"Adding.. "+requestedTo.getDeviceAddress());
             isAdded=database.insert("Friend", null, values)>0;
             dbH.close();
@@ -254,6 +255,48 @@ public class MainController {
             e.printStackTrace();
         }
         return isAdded;
+    }
+
+    /**
+     * Fetches friends from the database
+     * @return allFriends
+     */
+    public ArrayList<Neighbor> getAllFriends()
+
+    {
+        allFriends = new ArrayList<Neighbor>();
+
+        try
+        {
+            database = dbH.getReadableDatabase();
+            dbH.openDataBase();
+            String query = "SELECT * FROM Friend WHERE 1";
+            Cursor c = database.rawQuery(query, null);
+            if (c.moveToFirst())
+            {
+                do
+                {
+                    Neighbor friend = new Neighbor();
+                    friend.setDeviceAddress(c.getString(c.getColumnIndex("deviceID")));
+                    friend.setIpAddress(c.getString(c.getColumnIndex("IP")));
+                    friend.setInstanceName(c.getString(c.getColumnIndex("Username")));
+
+                    allFriends.add(friend);
+                } while (c.moveToNext());
+            }
+
+            else
+            {
+                Log.i(TAG, "There are no posts in the DB.");
+            }
+            c.close();
+            dbH.close();
+        }
+        catch (SQLException e)
+        {
+            e.printStackTrace();
+        }
+        return allFriends;
     }
 
     /**
@@ -349,6 +392,22 @@ public class MainController {
         return isFriend;
 
     }
+
+    public Neighbor getFriend(String ip){
+        ArrayList<Neighbor> n = this.getAllFriends();
+        Neighbor friend;
+
+        for (int i = 0; i < n.size() ; i++) {
+           if (n.get(i).getIpAddress().getHostAddress().equals(ip)){
+               friend = n.get(i);
+               Log.i(TAG, "My friend is " +friend.toString());
+               return friend;
+           }
+        }
+
+        return null;
+    }
+
 
     /*--------------------------------------------------------------------------------------*/
 
@@ -502,7 +561,7 @@ public class MainController {
      */
     public ArrayList<Comment> getPostComments(int postID)
     {
-        commentsList = new ArrayList<Comment>();
+        ArrayList<Comment> commentsList = new ArrayList<>();
         try
         {
             database = dbH.getReadableDatabase();
@@ -601,15 +660,10 @@ public class MainController {
 
                     msg = new VicinityMessage();
                     msg.setMessageBody(c.getString(3));
-                    msg.setFriendID(c.getString(2));
-                    msg.setChatId(c.getInt(c.getColumnIndex("chatId")));
+                    msg.setFriendName(c.getString(2));
                     msg.setFrom(c.getString(c.getColumnIndex("fromIP")));
                     msg.setImageString(c.getString(c.getColumnIndex("image")));
-
-
-
                     msg.setDate(c.getString(1));
-                    //contact.setPicture(c.getBlob(3));
 
                     // Adding message to allMessages
                     allChatMessages.add(msg);
@@ -651,14 +705,11 @@ public class MainController {
 
                     msg = new VicinityMessage();
                     msg.setMessageBody(c.getString(3));
-                    msg.setFriendID(c.getString(2));
+                    msg.setFriendName(c.getString(2));
                     msg.setIsMyMsg(c.getInt(c.getColumnIndex("isMyMsg"))>0);
-                    msg.setChatId(c.getInt(c.getColumnIndex("chatId")));
                     msg.setFrom(c.getString(c.getColumnIndex("fromIP")));
                     msg.setImageString(c.getString(c.getColumnIndex("image")));
-
                     msg.setDate(c.getString(1));
-                    //contact.setPicture(c.getBlob(3));
 
                     // Adding message to allMessages
                     allMessages.add(msg);
@@ -719,28 +770,22 @@ public class MainController {
 
     /**
      * Deletes a message from the database given an ID
-     * @param messageID A to-be deleted Message's ID.
+     * @param ip A to-be deleted Message's ID.
      * @return isDeleted A boolean that equals true if operation is successful, false otherwise.
      */
-    public boolean deleteMessage(int messageID)
-    {
+    public boolean deleteMessages(String ip){
         boolean isDeleted=false;
-        try
-        {
+        try{
             database=dbH.getReadableDatabase();
             dbH.openDataBase();
-            isDeleted=database.delete("Message","_id="+"'"+messageID+"'",null)==1;
-            Log.i(TAG,"Is Message deleted? "+isDeleted);
+            isDeleted=database.delete("Message","fromIP="+"'"+ip+"'",null)>=1;
+            Log.i(TAG,"Are messages deleted? "+isDeleted);
             dbH.close();
         }
-        catch(SQLException e)
-        {
+        catch(SQLException e){
             e.printStackTrace();
         }
-
-
         return isDeleted;
-
     }
 
     /**
@@ -775,10 +820,9 @@ public class MainController {
             ContentValues values = new ContentValues();
             values.put("messageBody", message.getMessageBody());
             values.put("isMyMsg", message.isMyMsg());
-            values.put("chatId", message.getChatId());
-            values.put("sentBy", message.getFriendID());
+            values.put("sentBy", message.getFriendName());
             values.put("msgTimestamp", message.getDate());
-            values.put("fromIP", message.getFrom().toString());
+            values.put("fromIP", message.getFrom());
             values.put("image" , message.getImageString());
 
 
@@ -801,7 +845,7 @@ public class MainController {
      */
     public ArrayList<VicinityMessage> getChatMessages(String fromIp){
 
-        ArrayList<VicinityMessage> chat = new ArrayList<VicinityMessage>();
+        ArrayList<VicinityMessage> chat = new ArrayList<>();
 
         for(int i=0; i<this.allMessages.size(); i++){
 
@@ -818,13 +862,6 @@ public class MainController {
 
     /*--------------------------------------------------------------------------------------*/
 
-    public void addClientThread(ChatClient c){
-        clientThreads.add(c);
-    }
-
-    public ArrayList<ChatClient> getClientThreads(){
-        return clientThreads;
-    }
 
 }
 

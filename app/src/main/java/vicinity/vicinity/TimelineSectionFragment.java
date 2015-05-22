@@ -210,24 +210,6 @@ public class TimelineSectionFragment extends Fragment {
         );
 
 
-    /*
-        try {
-
-        Timer myTimer;
-        myTimer = new Timer();
-        myTimer.schedule(new TimerTask() {
-            @Override
-            public void run() {
-                TimerMethod();
-            }
-
-        }, 0, 10000);
-
-    }
-    catch(NullPointerException e){
-        e.printStackTrace();
-    }
-    */
         return rootView;
     } //END onCreateView
 
@@ -295,6 +277,9 @@ public class TimelineSectionFragment extends Fragment {
 
    }
 
-
-
+    @Override
+    public void onStart() {
+        super.onStart();
+        adapter.notifyDataSetChanged();
+    }
 }

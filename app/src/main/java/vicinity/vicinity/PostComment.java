@@ -56,7 +56,6 @@ public class PostComment extends ActionBarActivity {
     private int postID;
     private String TAG = "PostComment";
     private MainController controller;
-    private int commentCount;
     private UdpBroadcastManager broadcastManager;//-Lama
     private MediaScannerConnection msConn ;
 
@@ -93,7 +92,6 @@ public class PostComment extends ActionBarActivity {
 
 
         commentsList = controller.getPostComments(postID);
-        commentCount = commentsList.size();
         commentListView = (ListView) findViewById(R.id.commentsList);
         adapter = new CommentListAdapter(ctx, commentsList);
         View cHeader = getLayoutInflater().inflate(R.layout.comment_header, null);
@@ -171,7 +169,6 @@ public class PostComment extends ActionBarActivity {
                         commentsList.add(comment);
                         adapter.notifyDataSetChanged();
                         commentTextField.setText("");
-                        commentedOn.setCommentCount(commentCount);
 
                         //finish();
 
@@ -250,13 +247,13 @@ public class PostComment extends ActionBarActivity {
             public void onMediaScannerConnected() {
 
                 msConn.scanFile(imageFileName, null);
-                Log.i("msClient obj  in Photo Utility", "connection established");
+                Log.i(TAG, "connection established");
             }
 
             @Override
             public void onScanCompleted(String path, Uri uri) {
                 msConn.disconnect();
-                Log.i("msClient obj in Photo Utility","scan completed");
+                Log.i(TAG,"scan completed");
 
             }
         });
