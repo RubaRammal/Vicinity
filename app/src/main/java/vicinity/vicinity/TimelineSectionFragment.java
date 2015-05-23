@@ -40,87 +40,69 @@ import vicinity.model.Post;
 
 public class TimelineSectionFragment extends Fragment {
 
-    private static PostListAdapter adapter;
-    private Context ctx;
     private static String TAG = "Timeline";
+    private static PostListAdapter adapter; // Binds Post objects with the fragment's ListView
+    private Context ctx; // The parent Activity's context
     private MainController controller;
-    //private static ArrayList<Post> posts ;
-    BroadcastReceiver updateUI;
     private MediaScannerConnection msConn ;
 
-    @Override
-    public void onAttach(Activity activity) {
-        super.onAttach(activity);
-        try {
-            Log.i(TAG, "OnAttach");
-        } catch (ClassCastException e) {
-            throw new ClassCastException(activity.toString()
-                    + " must implement TimelineInterface");
-        }
-    }
 
-    @Override
-    public void onDetach() {
-        super.onDetach();
-    }
+        /*---------Overridden Methods------------*/
 
-    @Override
-    public void onSaveInstanceState(final Bundle outState) {
-        super.onSaveInstanceState(outState);
-
-    }
     @Override
     public void onActivityCreated(Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
         Log.i(TAG, "onActivityCreated");
         setRetainInstance(true);
         if (savedInstanceState != null) {
-            // Restore last state for checked position.
+           // Restore last state for checked position.
         }
 
     }
 
+    @Override
+    public void onStart()
+    {
+        super.onStart();
+        adapter.notifyDataSetChanged();
+    }
 
     @Override
     public View onCreateView(final LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         View rootView = inflater.inflate(R.layout.fragment_timeline, container, false);
 
+        // Initialization
         ctx = this.getActivity();
         controller = new MainController(ctx);
-        //posts = new ArrayList<Post>();
-        //posts.addAll(controller.viewAllPosts());
-        final Button addPost = (Button) rootView.findViewById(R.id.add_post);
-
-        final ListView lv = (ListView) rootView.findViewById(android.R.id.list);
-        //adapter = new PostListAdapter(this.getActivity(), posts);
+        Button addPost = (Button) rootView.findViewById(R.id.add_post);
+        ListView lv = (ListView) rootView.findViewById(android.R.id.list);
         adapter = new PostListAdapter(this.getActivity());
-        //UDPpacketListner.setPostListAdapter(adapter);
-        //adapter.notifyDataSetChanged();
         lv.setAdapter(adapter);
+
+        // When the item is clicked the ID of the Post bound to it
+        // is obtained and added to an Intent that calls the CommentActivity
         lv.setOnItemClickListener(
                 new AdapterView.OnItemClickListener() {
                     @Override
-                    public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-
-                        //((ClickedPost) PostComment.ctx).sendClickedPost((Post) adapter.getItem(position));
+                    public void onItemClick(AdapterView<?> parent, View view, int position, long id)
+                    {
                         int postID = ((Post) adapter.getItem(position)).getPostID();
                         Log.i(TAG, ((Post) adapter.getItem(position)).getPostBody());
-                        Intent intent = new Intent(getActivity(), PostComment.class);
+                        Intent intent = new Intent(getActivity(), CommentActivity.class);
                         intent.putExtra("POST_ID", postID);
                         startActivity(intent);
-                        Log.i(TAG, "ItemClicked");
                     }
                 }
         ); //END setOnItemClickListener
 
+        //AMAL'S
         lv.setOnItemLongClickListener(new AdapterView.OnItemLongClickListener() {
 
             public boolean onItemLongClick(AdapterView<?> parent, View view,
                                            final int position, long id) {
 
 
-                //int postID = ((Post) adapter.getItem(position)).getPostID();
                 if(!((Post) adapter.getItem(position)).getBitmap().equals("")){
 
                     new AlertDialog.Builder(TabsActivity.ctx)
@@ -158,52 +140,51 @@ public class TimelineSectionFragment extends Fragment {
             }
         });
 
-        updateUI = new BroadcastReceiver() {
+        // Receives objects from LocalBroadcastManager
+        BroadcastReceiver updateUI = new BroadcastReceiver() {
             @Override
             public void onReceive(Context context, Intent intent) {
                 try {
                     final Bundle bundle = intent.getExtras();
 
-                    if(intent.getAction().equals("POST")) {
-                        Log.i(TAG,"onReceive");
+                    // If the object is a Post object
+                    if (intent.getAction().equals("POST"))
+                    {
+                        // Push the Post to the ListView using the adapter
                         Post receivedPost = (Post) bundle.getSerializable("NEW_POST");
-                        Log.i(TAG,"Received in timeline: "+receivedPost.toString());
+                        Log.i(TAG, "Received in timeline: " + receivedPost.toString());
                         adapter.addPost(receivedPost);
 
-                    } else if (intent.getAction().equals("COMMENT")){
-
+                    }
+                    // If the object is a Comment object
+                    else if (intent.getAction().equals("COMMENT"))
+                    {
                         Comment receivedComment = (Comment) bundle.getSerializable("NEW_COMMENT");
-                        Log.i(TAG,"Received in timeline: "+receivedComment.getCommentBody());
+                        Log.i(TAG, "Received in timeline: " + receivedComment.getCommentBody());
 
+                        // Add the Comment to the database
                         controller.addAcomment(receivedComment);
-
                     }
 
-
-
-                }
-                catch (NullPointerException e){
+                } catch (NullPointerException e) {
                     e.printStackTrace();
                 }
 
 
-
-
             }
         };
+
         IntentFilter filter = new IntentFilter();
         filter.addAction("POST");
         filter.addAction("COMMENT");
-        LocalBroadcastManager.getInstance(getActivity()).registerReceiver((updateUI),
-                filter
-        );
+        LocalBroadcastManager.getInstance(getActivity()).registerReceiver((updateUI), filter);
 
 
-        //When Post is clicked
+        // Click on Post Button calls the NewPostActivity
         addPost.setOnClickListener(
                 new Button.OnClickListener() {
                     public void onClick(View v) {
-                        Intent intent = new Intent(getActivity(), NewPost.class);
+                        Intent intent = new Intent(getActivity(), NewPostActivity.class);
                         startActivity(intent);
                     }
                 }
@@ -214,6 +195,7 @@ public class TimelineSectionFragment extends Fragment {
     } //END onCreateView
 
 
+    //AMAL'S
     public void saveImage(Bitmap bmp)
     {
         File imageFileFolder = new File(Environment.getExternalStorageDirectory(),"Rotate");
@@ -241,16 +223,15 @@ public class TimelineSectionFragment extends Fragment {
         }
     }
 
-
+    //AMAL'S
     public String fromInt(int val)
     {
         return String.valueOf(val);
     }
 
-
+    //AMAL'S
     public void scanPhoto(final String imageFileName)
     {
-
 
         msConn = new MediaScannerConnection(ctx , new MediaScannerConnection.MediaScannerConnectionClient() {
 
@@ -271,15 +252,11 @@ public class TimelineSectionFragment extends Fragment {
         msConn.connect();
     }
 
-   public static void clearPosts(){
 
+   public static void clearPosts()
+   {
        adapter.notifyDataSetChanged();
-
    }
 
-    @Override
-    public void onStart() {
-        super.onStart();
-        adapter.notifyDataSetChanged();
-    }
+
 }

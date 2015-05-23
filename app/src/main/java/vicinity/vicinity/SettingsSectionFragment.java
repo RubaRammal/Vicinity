@@ -96,10 +96,9 @@ public class SettingsSectionFragment extends Fragment {
                                 timer.schedule(new TimerTask() {
 
                                     public void run() {
-                                        getActivity().stopService(new Intent(getActivity(), ConnectAndDiscoverService.class));
-                                        getActivity().stopService(new Intent(getActivity(), UDPpacketListner.class));
+                                        getActivity().stopService(new Intent(ConnectAndDiscoverService.ctx, ConnectAndDiscoverService.class));
+                                        getActivity().stopService(new Intent(ConnectAndDiscoverService.ctx, UDPpacketListner.class));
                                         controller.deleteAccount();
-                                        getActivity().finish();
                                         Intent intent = new Intent(getActivity(), LaunchActivity.class);
                                         startActivity(intent);
                                     }

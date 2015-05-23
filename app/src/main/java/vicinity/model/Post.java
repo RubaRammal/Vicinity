@@ -16,7 +16,6 @@ public class Post  implements Serializable {
     private String postedAt;
     private String postedBy;
     private String postBody;
-    private int commentsCount;
     private String image;
 
     public Post(){

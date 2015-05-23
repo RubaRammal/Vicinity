@@ -1,13 +1,11 @@
 package vicinity.ConnectionManager;
 
-import android.content.ComponentName;
 import android.content.Intent;
 import android.support.v4.content.LocalBroadcastManager;
 import android.util.Log;
 
 import java.io.IOException;
 import java.io.ObjectInputStream;
-import java.net.InetAddress;
 import java.net.Socket;
 import java.sql.SQLException;
 
@@ -23,62 +21,67 @@ import vicinity.vicinity.ChatActivity;
  * and either notify the user of the received packets or send them to the UI thread.
  */
 public class ServiceRequest implements Runnable {
-    private Socket socket;
+
     private final static String TAG = "ServiceRequest";
+    // The client socket
+    private Socket socket;
+    // Broadcasts the received messages to the ChatActivity
     private LocalBroadcastManager toChat;
-    private Intent intent;
+    // To insert received messages in the database
     private MainController controller;
 
+    /**
+     * Public constructor
+     */
     public ServiceRequest(Socket connection) throws IOException {
         this.socket = connection;
         toChat = LocalBroadcastManager.getInstance(ConnectAndDiscoverService.ctx);
-        intent = new Intent();
         controller = new MainController(ConnectAndDiscoverService.ctx);
     }
 
+        /*---------Overridden Methods------------*/
+
+    @Override
     public void run() {
 
         try {
             Log.i(TAG, "Chat thread server has started...");
 
-            InetAddress socketIp = socket.getInetAddress();
-            Log.i(TAG, "Friend : " + socketIp + " started a chat");
-
+            // Initialize object input stream to receive objects from the client socket
             ObjectInputStream inputStream = new ObjectInputStream(socket.getInputStream());
 
-            while (Globals.stopServer) {
-
+            while (Globals.stopServer)
+            {
+                // Read new message
                 VicinityMessage msg = (VicinityMessage) inputStream.readObject();
+                // Set the IP address of the message to the IP address of the sender
                 msg.setFrom(socket.getInetAddress().getHostAddress());
+                // Set that the message is received from a friend
                 msg.setIsMyMsg(false);
+
                 Log.i(TAG, "Received a message: " + msg.toString());
 
+                // Add the message to the database
                 controller.addMessage(msg);
 
-                if(Globals.chatActive && ChatActivity.friendsIp.equals(msg.getFrom())){
+                // If the ChatActivity is active and the IP address of
+                // the friend in it equals the client's IP address
+                if(Globals.chatActive && ChatActivity.friendsIp.equals(socket.getInetAddress().getHostAddress()))
+                {
+                    // Broadcast the message to the active ChatActivity
                     Intent intent = new Intent("MESSAGE");
                     intent.putExtra("NEW_MESSAGE", msg);
                     toChat.sendBroadcast(intent);
-                } else {
-                    VicinityNotifications.newMessageNotification(msg);
-                    intent.putExtra("MSG", msg);
-                    intent.setAction(Intent.ACTION_MAIN);
-                    intent.addCategory(Intent.CATEGORY_LAUNCHER);
-                    intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-                    ComponentName cn = new ComponentName(ConnectAndDiscoverService.ctx, ChatActivity.class);
-                    intent.setComponent(cn);
                 }
-
+                else
+                {
+                    // Display the message as a notification to the user
+                    VicinityNotifications.newMessageNotification(msg);
+                }
             }
-
             socket.close();
-
         }
-        catch (IOException e) {
-            e.printStackTrace();
-        } catch (ClassNotFoundException e) {
-            e.printStackTrace();
-        } catch (SQLException e) {
+        catch (IOException | ClassNotFoundException | SQLException e) {
             e.printStackTrace();
         }
 

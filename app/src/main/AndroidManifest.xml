@@ -44,7 +44,7 @@
             android:uiOptions="splitActionBarWhenNarrow" >
         </activity>
         <activity
-            android:name=".PostComment"
+            android:name=".CommentActivity"
             android:label="Comment"
             android:parentActivityName=".TabsActivity"
             android:screenOrientation="portrait" >
@@ -72,7 +72,7 @@
         </service>
 
         <activity
-            android:name=".NewPost"
+            android:name=".NewPostActivity"
             android:label="@string/title_activity_new_post"
             android:screenOrientation="portrait" >
         </activity>

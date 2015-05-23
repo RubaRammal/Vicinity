@@ -40,30 +40,35 @@ import vicinity.Controller.MainController;
 import vicinity.model.Comment;
 import vicinity.model.Post;
 
-public class PostComment extends ActionBarActivity {
+/**
+ * Displays the post selected in the TimelineSectionFragment
+ * and the list of comments on that post.
+ * Allows sending a comment to the selected post.
+ */
+public class CommentActivity extends ActionBarActivity {
 
-    private ListView commentListView;
-    private EditText commentTextField;
-    private Button sendCommentButton;
-    private TextView commentedOnName;
-    private TextView commentedOnText;
-    private ImageView commentedOnImage;
-    private Comment comment;
-    private static CommentListAdapter adapter;
-    public static Context ctx;
-    private static ArrayList<Comment> commentsList;
-    private Post commentedOn;
-    private int postID;
     private String TAG = "PostComment";
+    private ListView commentListView; // Comments' list view
+    private EditText commentTextField; // Text field for adding a comment
+    private Button sendCommentButton; // Button for sending the comment
+    private Comment comment; // Comment to be sent
+    private static CommentListAdapter adapter; // Binds the comments list with a ListView
+    public static Context ctx; // Activity's context
+    private static ArrayList<Comment> commentsList; // An ArrayList of Comment objects
+    private Post commentedOn; // The selected Post in TimelineSectionFragment
+    private int postID; // The selected Post's ID
     private MainController controller;
-    private UdpBroadcastManager broadcastManager;//-Lama
     private MediaScannerConnection msConn ;
+
+
+            /*----------Overridden Methods------------*/
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_post_comment);
 
+        /*----------Change the style of the ActionBar------------*/
         final ActionBar abar = getSupportActionBar();
         abar.setBackgroundDrawable(new ColorDrawable(Color.parseColor("#01aef0")));//line under the action bar
         View viewActionBar = getLayoutInflater().inflate(R.layout.actionbar_layout, null);
@@ -72,35 +77,37 @@ public class PostComment extends ActionBarActivity {
                 ActionBar.LayoutParams.MATCH_PARENT,
                 Gravity.CENTER);
         TextView textviewTitle = (TextView) viewActionBar.findViewById(R.id.actionbar_textview);
-        textviewTitle.setText("Comments");
+        textviewTitle.setText("Comments");//ActionBar title
         abar.setCustomView(viewActionBar, params);
         abar.setDisplayShowCustomEnabled(true);
         abar.setDisplayShowTitleEnabled(false);
-        // I disabled the back button in the action bar cuz it causes an error
         abar.setDisplayHomeAsUpEnabled(false);
         abar.setHomeButtonEnabled(true);
 
 
 
+        // Initialization
         ctx = this;
         controller = new MainController(ctx);
-        comment = new Comment();//-Lama
+        comment = new Comment();
+        // Obtain the selected Post's ID in the TimelineSectionFragment from the Intent
         Bundle extras = getIntent().getExtras();
         postID = extras.getInt("POST_ID");
-
+        // Retrieve the Post from the database
         commentedOn = controller.getPost(postID);
-
-
+        // Retrieve the list of comments of the post from the databse
         commentsList = controller.getPostComments(postID);
         commentListView = (ListView) findViewById(R.id.commentsList);
         adapter = new CommentListAdapter(ctx, commentsList);
         View cHeader = getLayoutInflater().inflate(R.layout.comment_header, null);
+        // Add a header to label the comments' ListView
         commentListView.addHeaderView(cHeader);
         commentListView.setAdapter(adapter);
         commentListView.setTranscriptMode(AbsListView.TRANSCRIPT_MODE_ALWAYS_SCROLL);
 
 
 
+        //AMJAD'S
         commentListView.getAdapter().registerDataSetObserver(new DataSetObserver() {
             @Override
             public void onChanged() {
@@ -110,17 +117,20 @@ public class PostComment extends ActionBarActivity {
         });
 
         commentTextField = (EditText) findViewById(R.id.commentTextField);
-        commentedOnName = (TextView) findViewById(R.id.commentedOnName);
-        commentedOnText = (TextView) findViewById(R.id.commentedOn);
-        commentedOnImage = (ImageView) findViewById(R.id.commentedOnImage);
-        commentedOnName.setText(commentedOn.getPostedBy());
+        TextView commentedOnName = (TextView) findViewById(R.id.commentedOnName);
+        TextView commentedOnText = (TextView) findViewById(R.id.commentedOn);
+        ImageView commentedOnImage = (ImageView) findViewById(R.id.commentedOnImage);
 
+        // Display the post's attributes
+        commentedOnName.setText(commentedOn.getPostedBy());
+        // Make the post body's TextView invisible if the text equals null
         if(!commentedOn.getPostBody().equals("")){
             commentedOnText.setText(commentedOn.getPostBody());
         }else {
             commentedOnText.setVisibility(View.GONE);
         }
 
+        // Display an ImageView and set an image to it if an image existed
         if(!commentedOn.getBitmap().equals("")){
             String imageBitmap = commentedOn.getBitmap();
             byte[] decodedString = Base64.decode(imageBitmap, Base64.DEFAULT);
@@ -130,6 +140,8 @@ public class PostComment extends ActionBarActivity {
         else {
             commentedOnImage.setVisibility(View.GONE);
         }
+
+        // Enables the send button only if the EditText is not empty
         sendCommentButton = (Button) findViewById(R.id.sendCommentButton);
         sendCommentButton.setEnabled(false);
         commentTextField.addTextChangedListener(new TextWatcher() {
@@ -150,13 +162,13 @@ public class PostComment extends ActionBarActivity {
         });
 
 
-        // When send button is clicked
+        // Send comment button is clicked
         sendCommentButton.setOnClickListener(
                 new Button.OnClickListener() {
                     public void onClick(View view) {
                         String commentText = commentTextField.getText().toString();
                         try {
-
+                            //
                             comment.setCommentBody(commentText);
                             comment.setCommentedBy(controller.retrieveCurrentUsername());
                             comment.setPostID(postID);
@@ -166,17 +178,18 @@ public class PostComment extends ActionBarActivity {
                         } catch (SQLException e) {
                             Log.i(TAG, "A problem in adding comment to DB");
                         }
+                        // Add the comment to the comment adapter and update the list
                         commentsList.add(comment);
                         adapter.notifyDataSetChanged();
                         commentTextField.setText("");
-
-                        //finish();
-
 
                     }
                 }
         );
     }//End onCreate
+
+
+    //AMAL'S
     public void imageClick(View view) {
         new AlertDialog.Builder(this)
                 .setTitle("Save image")
@@ -205,6 +218,8 @@ public class PostComment extends ActionBarActivity {
                 .setIcon(android.R.drawable.ic_dialog_alert)
                 .show();
     }
+
+    //AMAL'S
     public void saveImage(Bitmap bmp)
     {
         File imageFileFolder = new File(Environment.getExternalStorageDirectory(),"Rotate");
@@ -232,14 +247,15 @@ public class PostComment extends ActionBarActivity {
         }
     }
 
+    //AMAL'S
     public String fromInt(int val)
     {
         return String.valueOf(val);
     }
 
+    //AMAL'S
     public void scanPhoto(final String imageFileName)
     {
-
 
         msConn = new MediaScannerConnection(ctx , new MediaScannerConnection.MediaScannerConnectionClient() {
 
@@ -261,8 +277,14 @@ public class PostComment extends ActionBarActivity {
     }
 
 
+    /**
+     * Sets the added comment in a UdpBroadcastManager instance
+     * that extends AsyncTask and executes it to broadcast
+     * the comment to the connected devices
+     * @param comment the Comment to be broadcasted
+     */
     private void postComment(Comment comment){
-        broadcastManager = new UdpBroadcastManager();//-Lama
+        UdpBroadcastManager broadcastManager = new UdpBroadcastManager();
         broadcastManager.setComment(comment);
         broadcastManager.execute();
     }

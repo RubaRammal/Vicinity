@@ -1,5 +1,7 @@
 package vicinity.ConnectionManager;
 
+import android.util.Log;
+
 import java.io.IOException;
 import java.net.ServerSocket;
 import java.net.Socket;
@@ -8,34 +10,42 @@ import java.util.concurrent.Executors;
 
 import vicinity.model.Globals;
 
-
+/**
+ * A class that implements Runnable.
+ * It listens for clients’ requests
+ * and executes threads to handle the received packets.
+ */
 public class ChatServer implements Runnable{
 
     private final static String TAG ="ChatServer";
 
-    private static ChatServer server;
-    private ServerSocket serverSocket;
+    // Manages the execution of ServiceRequest objects
     private ExecutorService executorService = Executors.newFixedThreadPool(20);
 
+    /*---------Overridden Methods------------*/
     @Override
     public void run() {
         try {
-            System.out.println("Starting Server");
-            serverSocket = new ServerSocket(Globals.CHAT_PORT);
+            Log.i(TAG, "Starting Server");
+            // Initialize a server socket
+            ServerSocket serverSocket = new ServerSocket(Globals.CHAT_PORT);
 
-            while(true) {
-                System.out.println("Waiting for request");
+            while(Globals.isChatServerRunning) {
+                Log.i(TAG,"Waiting for request");
                 try {
+                    // Listens for clients' requests
                     Socket s = serverSocket.accept();
-                    System.out.println("Processing request");
+                    Log.i(TAG, "Processing request");
+                    // Submit a new ServiceRequest with the client socket
+                    // to the executeService to manage the thread
                     executorService.submit(new ServiceRequest(s));
                 } catch(IOException ioe) {
-                    System.out.println("Error accepting connection");
+                    Log.i(TAG, "Error accepting connection");
                     ioe.printStackTrace();
                 }
             }
-        }catch(IOException e) {
-            System.out.println("Error starting Server on "+Globals.CHAT_PORT);
+        } catch(IOException e) {
+            Log.i(TAG, "Error starting Server on "+Globals.CHAT_PORT);
             e.printStackTrace();
         }
     }

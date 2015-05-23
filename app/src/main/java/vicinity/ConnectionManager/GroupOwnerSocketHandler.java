@@ -21,7 +21,6 @@ import vicinity.model.Globals;
 public class GroupOwnerSocketHandler extends Thread {
 
     private ServerSocket socket = null;
-    private Socket clientSocket = null;
     private static final String TAG = "GroupOwner";
     private UdpBroadcastManager udpBroadcastManager = new UdpBroadcastManager();
     private HashMap<String, InetAddress> clientsaddresses = new HashMap<>();
@@ -47,10 +46,11 @@ public class GroupOwnerSocketHandler extends Thread {
     @Override
     public void run() {
 
-        while (true) {
+        while (true)
+        {
             getClientAddress();
-
-        }}
+        }
+    }
 
 
     /**
@@ -62,7 +62,7 @@ public class GroupOwnerSocketHandler extends Thread {
     public void getClientAddress(){
         try{
 
-        clientSocket = socket.accept();
+        Socket clientSocket = socket.accept();
         BufferedReader bufferedReader = new BufferedReader(new InputStreamReader(clientSocket.getInputStream()));
         //getting client's IP from the socket
         InetAddress clientIP = clientSocket.getInetAddress();

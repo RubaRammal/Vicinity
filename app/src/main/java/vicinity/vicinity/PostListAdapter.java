@@ -50,7 +50,6 @@ public class PostListAdapter  extends BaseAdapter {
         } catch (SQLException e) {
             e.printStackTrace();
         }
-
     }
 
     @Override

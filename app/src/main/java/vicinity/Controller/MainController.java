@@ -19,7 +19,6 @@ import vicinity.ConnectionManager.ChatClient;
 import vicinity.ConnectionManager.ConnectAndDiscoverService;
 import vicinity.ConnectionManager.UDPpacketListner;
 import vicinity.model.Comment;
-import vicinity.model.CurrentUser;
 import vicinity.model.DBHandler;
 import vicinity.model.Neighbor;
 import vicinity.model.Post;
@@ -88,12 +87,11 @@ public class MainController {
      */
     public boolean createNewUser(String username){
         boolean isCreated=false;
-        CurrentUser newUser=new CurrentUser(context,username);
         try{
 
             database = dbH.getWritableDatabase();
             dbH.openDataBase();
-            database.execSQL("INSERT INTO CurrentUser (Username) VALUES ('" + newUser.getUsername() + "');");
+            database.execSQL("INSERT INTO CurrentUser (Username) VALUES ('" + username + "');");
             isCreated=true;
             dbH.close();
         }
