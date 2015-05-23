@@ -26,20 +26,19 @@ public class ClientSocketHandler extends Thread {
     /*---------Overridden Methods------------*/
     @Override
     public void run() {
-            sendMyMAC();
+        sendMyMAC();
     }
 
     /**
      * Sends MAC address to group owner
      * when first connected to a group
      */
-    private void sendMyMAC(){
+    private void sendMyMAC() throws NullPointerException{
         try{
             Socket macSocket = new Socket();
             DataOutputStream toGO;
             //Writing mac address to group owner:
             if(Globals.MY_MAC!=null){
-                //macSocket.bind(null);
                 macSocket.connect(new InetSocketAddress(mAddress.getHostAddress(),
                         Globals.SERVER_PORT), 5000);
                 toGO = new DataOutputStream(macSocket.getOutputStream());

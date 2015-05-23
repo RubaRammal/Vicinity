@@ -96,7 +96,6 @@ public class MainController {
             dbH.close();
         }
         catch (SQLException e){
-            Log.i(TAG, "SQLEXception IN createProfile > currentUser");
         }
         return isCreated;
     }

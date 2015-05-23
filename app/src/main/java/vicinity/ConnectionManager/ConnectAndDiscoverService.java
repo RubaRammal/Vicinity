@@ -44,12 +44,13 @@ public class ConnectAndDiscoverService extends Service
 
 
     private final String TAG = "ConService";
-    static public Context ctx;
+    public static Context ctx;
     private WifiP2pManager manager;
     private final IntentFilter intentFilter = new IntentFilter();
     private Channel channel;
     private BroadcastReceiver receiver = null;
     private WifiP2pDnsSdServiceRequest serviceRequest;
+    private WifiP2pDnsSdServiceInfo localService;
     public static NeighborListAdapter neighborListAdapter;
     public static FriendListAdapter friendListAdapter;
     private MainController controller;
@@ -106,23 +107,11 @@ public class ConnectAndDiscoverService extends Service
         Log.i(TAG,"Service destroyed");
         unregisterReceiver(receiver);
 
-        //TODO delete those lines later
         disconnectPeers();
-        db.deleteDatabase();
-
-        //Remove advertised service request
-        if (serviceRequest != null)
-            manager.removeServiceRequest(channel, serviceRequest,
-                    new WifiP2pManager.ActionListener() {
-
-                        @Override
-                        public void onSuccess() {
-                        }
-
-                        @Override
-                        public void onFailure(int arg0) {
-                        }
-                    });
+        db.deleteDatabase();        //TODO delete this line later
+        removeLocalRequest();
+        cancelConnection();
+        stopServers();
 
     }
 
@@ -136,8 +125,8 @@ public class ConnectAndDiscoverService extends Service
     private void startRegistrationAndDiscovery() {
         Map<String, String> record = new HashMap<String, String>();
         record.put(Globals.TXTRECORD_PROP_AVAILABLE, "visible");
-        WifiP2pDnsSdServiceInfo service = WifiP2pDnsSdServiceInfo.newInstance(Globals.SERVICE_NAME, Globals.SERVICE_REG_TYPE, record);
-        manager.addLocalService(channel, service, new WifiP2pManager.ActionListener() {
+        localService = WifiP2pDnsSdServiceInfo.newInstance(Globals.SERVICE_NAME, Globals.SERVICE_REG_TYPE, record);
+        manager.addLocalService(channel, localService, new WifiP2pManager.ActionListener() {
             @Override
             public void onSuccess() {
                 Log.i(TAG,"_vicinityapp Service registered");
@@ -169,17 +158,17 @@ public class ConnectAndDiscoverService extends Service
                         /*---Filtering services so the user can only see Vicinity users---*/
                         if (instanceName.equals(Globals.SERVICE_NAME)) {
 
-                                Neighbor service = new Neighbor(srcDevice.deviceName,srcDevice.deviceAddress,getDeviceStatus(srcDevice.status));
-                                Log.i(TAG,"Neighbor: "+service.toString());
+                            Neighbor service = new Neighbor(srcDevice.deviceName,srcDevice.deviceAddress,getDeviceStatus(srcDevice.status));
+                            Log.i(TAG,"Neighbor: "+service.toString());
 
                             //Check if whether the peer is a friend or not
-                                if(controller.isThisMyFriend(srcDevice.deviceAddress))
-                                {
-                                    NeighborSectionFragment.addToFriendsList(service);
-                                }
-                                else{
-                                    NeighborSectionFragment.addToNeighborsList(service);
-                                }
+                            if(controller.isThisMyFriend(srcDevice.deviceAddress))
+                            {
+                                NeighborSectionFragment.addToFriendsList(service);
+                            }
+                            else{
+                                NeighborSectionFragment.addToNeighborsList(service);
+                            }
 
 
                         }
@@ -249,7 +238,7 @@ public class ConnectAndDiscoverService extends Service
 
 
 
-            manager.connect(channel, config, new WifiP2pManager.ActionListener() {
+        manager.connect(channel, config, new WifiP2pManager.ActionListener() {
 
             @Override
             public void onSuccess() {
@@ -291,29 +280,38 @@ public class ConnectAndDiscoverService extends Service
 
         GOIP = p2pInfo.groupOwnerAddress;
         try {
-        if (p2pInfo.isGroupOwner) {
-            Log.i(TAG, "Connected as group owner");
-
-                handler = new GroupOwnerSocketHandler();
+            //If peer becomes a group owner:
+            if (p2pInfo.isGroupOwner) {
+                Log.i(TAG, "Connected as group owner");
+                //Start the group owner server if it was not running already
+                if(!Globals.isGroupOwnerRunning)
+                {
+                    Globals.isGroupOwnerRunning=true;
+                    Thread groupOwnerSocketHandler = new GroupOwnerSocketHandler();
+                    groupOwnerSocketHandler.start();
+                }
+            }
+            //If peer is just a peer
+            else {
+                Log.d(TAG, "Connected as peer");
+                Thread.sleep(1000);
+                handler = new ClientSocketHandler(p2pInfo.groupOwnerAddress);
                 handler.start();
-                Thread requestServer = new RequestServer();
+            }
+
+            //Start the requests server if it was not running already
+            if(!Globals.isRequestServerRunning){
+                RequestServer requestServer = new RequestServer();
+                Globals.isRequestServerRunning=true;
                 requestServer.start();
-            ChatServer chatSocket = new ChatServer();
-            new Thread(chatSocket).start();
 
-        }
+            }
+            if(!Globals.isChatServerRunning){
+                Globals.isChatServerRunning=true;
+                ChatServer chatSocket = new ChatServer();
+                new Thread(chatSocket).start();
+            }
 
-        else {
-            Log.d(TAG, "Connected as peer");
-
-            Thread.sleep(1000);
-            handler = new ClientSocketHandler(p2pInfo.groupOwnerAddress);
-            handler.start();
-            Thread requestServer = new RequestServer();
-            requestServer.start();
-            ChatServer chatSocket = new ChatServer();
-            new Thread(chatSocket).start();
-        }
         }catch (IOException e) {
             Log.d(TAG,"Failed to create a server thread - " + e.getMessage());
             return;
@@ -346,7 +344,7 @@ public class ConnectAndDiscoverService extends Service
 
         try{
             Method m = manager.getClass().getMethod("setDeviceName",new Class[] { WifiP2pManager.Channel.class, String.class,
-                            WifiP2pManager.ActionListener.class });
+                    WifiP2pManager.ActionListener.class });
 
             m.invoke(manager,channel, username, new WifiP2pManager.ActionListener() {
                 public void onSuccess() {
@@ -387,6 +385,60 @@ public class ConnectAndDiscoverService extends Service
 
             });
         }
+
+    }
+
+    /**
+     * Removes advertised service request from the local network
+     */
+    private void removeLocalRequest(){
+        //Remove advertised service request
+        if (serviceRequest != null)
+            manager.removeServiceRequest(channel, serviceRequest,
+                    new WifiP2pManager.ActionListener() {
+
+                        @Override
+                        public void onSuccess() {
+                            Log.i(TAG,"Removed local service");
+                        }
+
+                        @Override
+                        public void onFailure(int arg0) {
+                        }
+                    });
+        if(localService!=null)
+            manager.removeLocalService(channel,localService,new WifiP2pManager.ActionListener() {
+                @Override
+                public void onSuccess() {
+                    Log.i(TAG,"Local service removed");
+                }
+
+                @Override
+                public void onFailure(int reason) {
+
+                }
+            });
+    }
+
+
+    /**
+     * Cancels any attempt to connect to another peer
+     * this method is implemented to avoid getting stuck while
+     * connection failure
+     */
+    private void cancelConnection(){
+        manager.cancelConnect(channel, new WifiP2pManager.ActionListener() {
+            @Override
+            public void onSuccess() {
+                Log.i(TAG,"Connection cancelled");
+            }
+
+
+            @Override
+            public void onFailure(int reason) {
+                Log.i(TAG,"Reason: "+getFailureReason(reason));
+            }
+        });
 
     }
 
@@ -435,6 +487,22 @@ public class ConnectAndDiscoverService extends Service
             default:
                 return "Unknown = " + reasonCode;
         }
+    }
+
+    /**
+     * To stop running server threads
+     * GroupOwnerSocketHandler
+     * RequestServer
+     * ChatServer
+     */
+    public void stopServers(){
+        if(Globals.isChatServerRunning&&Globals.isRequestServerRunning&&Globals.isGroupOwnerRunning)
+            Log.i(TAG,"All servers are running");
+        Globals.isRequestServerRunning=false;
+        Globals.isGroupOwnerRunning=false;
+        Globals.isChatServerRunning=false;
+        if(!Globals.isChatServerRunning&&!Globals.isRequestServerRunning&&!Globals.isGroupOwnerRunning)
+            Log.i(TAG,"Servers have been shut down successfully");
     }
 
     /**

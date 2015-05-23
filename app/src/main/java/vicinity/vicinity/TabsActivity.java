@@ -61,11 +61,16 @@ public class TabsActivity extends FragmentActivity implements ActionBar.TabListe
         try {
             if (!Globals.isNewUser)
                 Toast.makeText(TabsActivity.ctx, "Welcome back " + controller.retrieveCurrentUsername(), Toast.LENGTH_LONG).show();
+            Toast.makeText(TabsActivity.ctx, "To save battery, make sure you turn off Wi-Fi Direct after you finish using Vicinity", Toast.LENGTH_LONG).show();
+
         }
         catch(SQLException e){
             e.printStackTrace();
         }
 
+        //Starting the services
+        startService(new Intent(this, ConnectAndDiscoverService.class));
+        startService(new Intent(this, UDPpacketListner.class));
         final LocalBroadcastManager replyToRequest = LocalBroadcastManager.getInstance(this);
 
 
@@ -139,9 +144,6 @@ public class TabsActivity extends FragmentActivity implements ActionBar.TabListe
                 new IntentFilter("REQUEST")
         );
 
-        //Starting the service
-        startService(new Intent(this, ConnectAndDiscoverService.class));
-        startService(new Intent(this, UDPpacketListner.class));
 
         requestWindowFeature(Window.FEATURE_ACTION_BAR);
 
@@ -201,12 +203,10 @@ public class TabsActivity extends FragmentActivity implements ActionBar.TabListe
 
     @Override
     protected void onDestroy(){
-        Log.i(TAG,"TabsActivity are destroyed");
         super.onDestroy();
-        //Destroying ConnectAndDiscover service
-        //This means the service is only stopped when the user shuts down the app completely
-        stopService(new Intent(this, ConnectAndDiscoverService.class));
-        stopService(new Intent(this, UDPpacketListner.class));
+        stopService(new Intent(ctx,ConnectAndDiscoverService.class));
+        stopService(new Intent(ctx,UDPpacketListner.class));
+
     }
 
         /*----------Implementation of ActionBar.TabListener methods------------*/

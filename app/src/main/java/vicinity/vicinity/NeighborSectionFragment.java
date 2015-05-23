@@ -188,6 +188,7 @@ public class NeighborSectionFragment extends Fragment {
      * @param friend A Neighbor object that contains an online friend
      */
     public static void addToFriendsList(Neighbor friend){
+        if(friendServices!=null)
         if(!friendServices.contains(friend)){
             friendServices.add(friend);
             friendListAdapter.notifyDataSetChanged();
@@ -200,6 +201,7 @@ public class NeighborSectionFragment extends Fragment {
      * @param neighbor A Neighbor object that contains an online peer
      */
     public static void addToNeighborsList (Neighbor neighbor)throws NullPointerException{
+        if(listOfServices!=null)
         if(!listOfServices.contains(neighbor)){
             listOfServices.add(neighbor);
             neighborListAdapter.notifyDataSetChanged();
