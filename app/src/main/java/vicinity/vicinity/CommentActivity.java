@@ -189,7 +189,15 @@ public class CommentActivity extends ActionBarActivity {
     }//End onCreate
 
 
-    //AMAL'S
+    /**
+     * Displays a dialog that prompts the user to choose
+     * whether to save an image to gallery or not. If yes,
+     * it gets the image attribute from the post object,
+     * after it decodes the String to bitmap.
+     * @param view A View occupies a rectangular area on
+     *             the screen and is responsible for
+     *             drawing and event handling
+     */
     public void imageClick(View view) {
         new AlertDialog.Builder(this)
                 .setTitle("Save image")
@@ -219,7 +227,11 @@ public class CommentActivity extends ActionBarActivity {
                 .show();
     }
 
-    //AMAL'S
+    /**
+     * Takes the image bitmap and creates a unique metadata
+     * for it in order to store it in the phone gallery (external storage) using an OutPutStream.
+     * @param bmp bitmap of the image
+     */
     public void saveImage(Bitmap bmp)
     {
         File imageFileFolder = new File(Environment.getExternalStorageDirectory(),"Rotate");
@@ -247,13 +259,23 @@ public class CommentActivity extends ActionBarActivity {
         }
     }
 
-    //AMAL'S
+    /**
+     * Converts the retrieved int values from calendar to a String
+     * @param val int calender value
+     * @return String
+     */
     public String fromInt(int val)
     {
         return String.valueOf(val);
     }
 
-    //AMAL'S
+    /**
+     * Triggers the MediaScannerConnection which provides a way
+     * for applications to pass an image file to the media scanner
+     * service. The media scanner service will read metadata from
+     * the file and add the file to the media content provider.
+     * @param imageFileName String for the image path
+     */
     public void scanPhoto(final String imageFileName)
     {
 

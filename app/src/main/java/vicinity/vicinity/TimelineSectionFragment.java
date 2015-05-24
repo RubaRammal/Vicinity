@@ -1,6 +1,5 @@
 package vicinity.vicinity;
 
-import android.app.Activity;
 import android.app.AlertDialog;
 import android.content.BroadcastReceiver;
 import android.content.Context;
@@ -96,9 +95,20 @@ public class TimelineSectionFragment extends Fragment {
                 }
         ); //END setOnItemClickListener
 
-        //AMAL'S
-        lv.setOnItemLongClickListener(new AdapterView.OnItemLongClickListener() {
 
+        lv.setOnItemLongClickListener(new AdapterView.OnItemLongClickListener() {
+            /**
+             * Prompts the user to choose whether to save the image or
+             * to cancel. Then gets the image attribute from the post
+             * object, after it decodes the String to bitmap.
+             * @param parent returns the adapter view where the click occurred
+             * @param view A View occupies a rectangular area on
+             *             the screen and is responsible for
+             *             drawing and event handling
+             * @param position position of the clicked item
+             * @param id id of the item
+             * @return
+             */
             public boolean onItemLongClick(AdapterView<?> parent, View view,
                                            final int position, long id) {
 
@@ -195,7 +205,11 @@ public class TimelineSectionFragment extends Fragment {
     } //END onCreateView
 
 
-    //AMAL'S
+    /**
+     * Takes the image bitmap and creates a unique metadata
+     * for it in order to store it in the phone gallery (external storage) using an OutPutStream.
+     * @param bmp image bitmap
+     */
     public void saveImage(Bitmap bmp)
     {
         File imageFileFolder = new File(Environment.getExternalStorageDirectory(),"Rotate");
@@ -223,13 +237,23 @@ public class TimelineSectionFragment extends Fragment {
         }
     }
 
-    //AMAL'S
+    /**
+     * Converts the retrieved int values from calendar to a String
+     * @param val calender value
+     * @return String
+     */
     public String fromInt(int val)
     {
         return String.valueOf(val);
     }
 
-    //AMAL'S
+    /**
+     * Triggers the MediaScannerConnection which provides a way
+     * for the application to pass an image file to the media scanner
+     * service. The media scanner service will read metadata from
+     * the file and add the file to the media content provider.
+     * @param imageFileName String for the image path
+     */
     public void scanPhoto(final String imageFileName)
     {
 
