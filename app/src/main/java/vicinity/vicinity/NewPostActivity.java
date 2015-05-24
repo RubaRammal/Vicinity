@@ -132,7 +132,12 @@ public class NewPostActivity extends ActionBarActivity {
         }
     }
 
-
+    /**
+     * Gets the filepath and bitmap of the selected image from gallery
+     * @param requestCode helps identify the request
+     * @param resultCode to check whether the result status is OK or CANCELLED
+     * @param imageReturnedIntent carries the additional data (image)
+     */
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent imageReturnedIntent) {
         super.onActivityResult(requestCode, resultCode, imageReturnedIntent);
@@ -199,6 +204,12 @@ public class NewPostActivity extends ActionBarActivity {
     }
 
 
+    /**
+     * Changes the rotation of the image in order for
+     * it to be displayed in an imageView correctly
+     * @param imagePath  String of the image path
+     * @return int value of the rotation
+     */
     public static int getImageOrientation(String imagePath) {
         int rotate = 0;
         try {
@@ -305,6 +316,10 @@ public class NewPostActivity extends ActionBarActivity {
     }
 
 
+    /**
+     * Creates the image attribute in aPost object that will be sent
+     * @param b image to be sent bitmap
+     */
     public void sendPhotoObj(Bitmap b)  {
         ByteArrayOutputStream baos = new ByteArrayOutputStream();
         Bitmap resized = Bitmap.createScaledBitmap(b,(int)(b.getWidth()*0.3), (int)(b.getHeight()*0.3), true);
@@ -318,6 +333,9 @@ public class NewPostActivity extends ActionBarActivity {
                 Toast.LENGTH_LONG).show();
     }
 
+    /**
+     * Opens the device media gallery and activates the ActivityForResult method
+     */
     private void selectPicture() {
         Intent intent = new Intent(Intent.ACTION_PICK);
         intent.setType("image/*");
