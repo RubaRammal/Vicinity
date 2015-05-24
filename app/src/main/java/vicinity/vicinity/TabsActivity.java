@@ -144,7 +144,6 @@ public class TabsActivity extends FragmentActivity implements ActionBar.TabListe
                 new IntentFilter("REQUEST")
         );
 
-
         requestWindowFeature(Window.FEATURE_ACTION_BAR);
 
         // Specify that we will be displaying activity_tabs in the action bar.

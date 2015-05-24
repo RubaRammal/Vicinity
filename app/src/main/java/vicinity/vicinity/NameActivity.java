@@ -6,9 +6,6 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.text.Editable;
 import android.text.TextWatcher;
-import android.util.Log;
-import android.view.Menu;
-import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
@@ -29,6 +26,8 @@ public class NameActivity extends Activity {
     final Context context = this;
     public String username;
     MainController controller;
+
+        /*---------Overridden Methods------------*/
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {

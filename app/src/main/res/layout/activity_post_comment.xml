@@ -39,7 +39,8 @@
         android:adjustViewBounds="true"
         android:paddingBottom="10dp"
         android:layout_below="@+id/commentedOn"
-        android:layout_centerHorizontal="true" />
+        android:layout_centerHorizontal="true"
+        android:contentDescription="@string/comment_image" />
 
 
     <ListView

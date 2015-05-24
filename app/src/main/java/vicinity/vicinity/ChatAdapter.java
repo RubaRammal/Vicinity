@@ -3,17 +3,16 @@ package vicinity.vicinity;
 import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
-import android.print.PrintAttributes;
 import android.util.Base64;
 import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.ViewGroup.LayoutParams;
 import android.widget.ArrayAdapter;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
-import android.view.ViewGroup.LayoutParams;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -21,8 +20,9 @@ import java.util.List;
 import vicinity.model.VicinityMessage;
 
 /**
- * This class is responsible for displaying
- * message objects in activity_chat
+ * An adapter that takes a list of VicinityMessage objects
+ * and binds it to a ListView,  each list item
+ * representing a VicinityMessage object
  */
 public class ChatAdapter extends ArrayAdapter<VicinityMessage> {
 
@@ -30,7 +30,11 @@ public class ChatAdapter extends ArrayAdapter<VicinityMessage> {
     private LayoutInflater mInflater;
     private Context ctx;
 
-    //Constructor
+    /**
+     * Public constructor
+     * @param context Context
+     * @param resource int
+     */
     public ChatAdapter(Context context, int resource) {
         super(context, resource);
         vicinityMessages = new ArrayList<>();
@@ -38,6 +42,8 @@ public class ChatAdapter extends ArrayAdapter<VicinityMessage> {
         ctx = context;
 
     }
+
+                    /*----------Overridden Methods------------*/
 
     @Override
     public void add(VicinityMessage object) {
@@ -67,27 +73,30 @@ public class ChatAdapter extends ArrayAdapter<VicinityMessage> {
             holder.name_text = (TextView) convertView.findViewById(R.id.nameOfFriend);
             holder.chat_image = (ImageView) convertView.findViewById(R.id.chatImage);
 
-
-
             convertView.setTag(holder);
         } else {
             holder = (ViewHolder) convertView.getTag();
         }
 
-
+        // Changes the position of the message based on whether
+        // it is sent or received and adds a margin to it.
+        // Sent messages are placed on the right and received
+        // messages are placed on the left side of the screen.
         if(!vicinityMessages.get(position).isMyMsg()){
             params.gravity = Gravity.LEFT;
             params.rightMargin = 120;
         }
-        else{
+        else {
             params.gravity = Gravity.RIGHT;
             params.leftMargin = 120;
-
         }
 
+        // ImageView and message TextView are initially invisible
         holder.chat_text.setVisibility(View.GONE);
         holder.chat_image.setVisibility(View.GONE);
 
+        // If the message body is not empty shows the message's
+        // TextView and set the text to it
         if(!vicinityMessages.get(position).getMessageBody().equals("")){
             holder.chat_text.setVisibility(View.VISIBLE);
             holder.chat_text.setText(vicinityMessages.get(position).getMessageBody());
@@ -96,9 +105,10 @@ public class ChatAdapter extends ArrayAdapter<VicinityMessage> {
             holder.name_text.setText(vicinityMessages.get(position).isMyMsg() ? "" : vicinityMessages.get(position).getFriendName());
             holder.chat_text.setLayoutParams(params);
 
-
         }
-        else{
+        // If the message body is empty then it contains a photo
+        // makes the ImageView visible and sets the photo.
+        else {
             holder.chat_image.setVisibility(View.VISIBLE);
             String imageBitmap = vicinityMessages.get(position).getImageString();
             byte[] decodedString = Base64.decode(imageBitmap, Base64.DEFAULT);
@@ -108,7 +118,6 @@ public class ChatAdapter extends ArrayAdapter<VicinityMessage> {
                     ctx.getResources().getDrawable(R.drawable.chatboxright) : ctx.getResources().getDrawable(R.drawable.chatboxleft));
             holder.name_text.setText(vicinityMessages.get(position).isMyMsg() ? "" : vicinityMessages.get(position).getFriendName());
             holder.chat_image.setLayoutParams(params);
-
 
         }
 

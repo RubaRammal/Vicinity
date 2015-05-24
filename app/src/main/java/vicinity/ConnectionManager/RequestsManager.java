@@ -64,7 +64,6 @@ public class RequestsManager extends AsyncTask<Neighbor,Void,Boolean> {
 
                 reply = inputStream.readBoolean();
                 Log.i(TAG, "isAccepted: " + reply);
-                controller.deleteMessages(requestedTo.getIpAddress().getHostAddress());
                 controller.isDeleted=true;
                 controller.deleteFriend(requestedTo.getDeviceAddress());
 

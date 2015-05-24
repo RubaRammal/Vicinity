@@ -6,7 +6,7 @@
     <TextView
         android:layout_width="fill_parent"
         android:layout_height="match_parent"
-        android:text="Comments"
+        android:text="@string/comment_header"
         android:background="#BFBFBF"
         android:textSize="18dp"
         android:textStyle="bold"
@@ -16,7 +16,7 @@
         android:layout_width="fill_parent"
         android:layout_height="match_parent"
         android:background="#ff9c9c9c"
-        android:text=" "
+        android:text="@string/line_comment_header"
         android:textSize=".4dip"/>
 
 </LinearLayout>

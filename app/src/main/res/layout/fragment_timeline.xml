@@ -25,7 +25,7 @@
         <Button
             android:layout_width="fill_parent"
             android:layout_height="wrap_content"
-            android:text="Post"
+            android:text="@string/post_button"
             android:id="@+id/add_post" />
     </LinearLayout>
 

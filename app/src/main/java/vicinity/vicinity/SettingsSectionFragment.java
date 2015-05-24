@@ -24,7 +24,7 @@ import vicinity.Controller.MainController;
 import vicinity.model.Globals;
 
 /**
- * Settings tab
+ * Provides control options for the user.
  */
 public class SettingsSectionFragment extends Fragment {
 
@@ -42,16 +42,7 @@ public class SettingsSectionFragment extends Fragment {
         }
     }
 
-    @Override
-    public void onDetach() {
-        super.onDetach();
-    }
 
-    @Override
-    public void onSaveInstanceState(final Bundle outState) {
-        super.onSaveInstanceState(outState);
-
-    }
     @Override
     public void onActivityCreated(Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
@@ -99,8 +90,11 @@ public class SettingsSectionFragment extends Fragment {
                                         getActivity().stopService(new Intent(ConnectAndDiscoverService.ctx, ConnectAndDiscoverService.class));
                                         getActivity().stopService(new Intent(ConnectAndDiscoverService.ctx, UDPpacketListner.class));
                                         controller.deleteAccount();
+
                                         Intent intent = new Intent(getActivity(), LaunchActivity.class);
                                         startActivity(intent);
+                                        getActivity().finish();
+
                                     }
 
 

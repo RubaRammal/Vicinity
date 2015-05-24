@@ -23,15 +23,14 @@ import vicinity.vicinity.ChatActivity;
 public class ServiceRequest implements Runnable {
 
     private final static String TAG = "ServiceRequest";
-    // The client socket
-    private Socket socket;
-    // Broadcasts the received messages to the ChatActivity
-    private LocalBroadcastManager toChat;
-    // To insert received messages in the database
-    private MainController controller;
+    private Socket socket; // The client socket
+    private LocalBroadcastManager toChat; // Broadcasts the received messages to the ChatActivity
+    private MainController controller; // To insert received messages in the database
+
 
     /**
      * Public constructor
+     * @param connection client Socket
      */
     public ServiceRequest(Socket connection) throws IOException {
         this.socket = connection;

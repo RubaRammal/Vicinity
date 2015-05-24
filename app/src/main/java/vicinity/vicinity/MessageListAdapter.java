@@ -1,8 +1,6 @@
 package vicinity.vicinity;
 
 import android.content.Context;
-import android.graphics.Color;
-import android.graphics.Typeface;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -12,7 +10,6 @@ import android.widget.TextView;
 import java.util.ArrayList;
 
 import vicinity.Controller.MainController;
-import vicinity.model.Neighbor;
 import vicinity.model.VicinityMessage;
 
 /**
@@ -25,12 +22,18 @@ public class MessageListAdapter  extends BaseAdapter {
     private MainController controller;
 
 
-
+    /**
+     * Public constructor
+     * @param context Context
+     * @param vicinityMessages ArrayList of VicinityMessage objects
+     */
     public MessageListAdapter(Context context, ArrayList<VicinityMessage> vicinityMessages){
         this.vicinityMessages = vicinityMessages;
         mInflater = LayoutInflater.from(context);
         controller = new MainController(context);
     }
+
+                /*----------Overridden Methods------------*/
 
     @Override
     public int getCount() {
@@ -80,6 +83,9 @@ public class MessageListAdapter  extends BaseAdapter {
         TextView textDate, textMessage,textName;
     }
 
+    /**
+     * Clears the messages array and updates the list.
+     */
     public void clearAdapter(){
         vicinityMessages.clear();
     }

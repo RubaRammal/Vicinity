@@ -9,12 +9,10 @@ public class Comment implements Serializable{
 
     private static final String TAG = "CommentClass";
 
-    //Comment Atts
-    private int commentID;
-    private int postID;
-    private String commentBody;
-    private String commentedBy;
-
+    private int commentID; // Comment ID
+    private int postID; // Post ID
+    private String commentBody; // Comment body
+    private String commentedBy; // Commenter
 
 
     /**

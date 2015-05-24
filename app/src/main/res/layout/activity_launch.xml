@@ -12,7 +12,7 @@
         android:layout_height="wrap_content"
         android:id="@+id/imageView2"
         android:src="@drawable/vicinity_logo"
-        android:contentDescription="Launcher logo"
+        android:contentDescription="@string/launcher_logo"
         android:layout_centerVertical="true"
         android:layout_centerHorizontal="true" />
 

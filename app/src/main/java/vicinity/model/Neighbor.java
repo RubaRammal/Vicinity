@@ -13,14 +13,14 @@ import java.net.InetAddress;
  */
 public class Neighbor implements Serializable{
 
-    protected String instanceName;//Device name
-    protected String deviceAddress;//Device P2P MAC address
-    private String _aliasName;//for friends only
-    private InetAddress ipAddress;//Device local IP address
-    private String status;//device status
+    protected String instanceName; // Device name
+    protected String deviceAddress; // Device P2P MAC address
+    private String _aliasName; // For friends only
+    private InetAddress ipAddress; // Device local IP address
+    private String status; // Device status
 
     /**
-     * Default constructor
+     * Public constructor
      */
     public Neighbor(){}
 

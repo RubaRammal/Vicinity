@@ -19,12 +19,16 @@ import vicinity.model.Globals;
 import vicinity.model.Neighbor;
 
 
-public class   NeighborListAdapter extends BaseAdapter {
+/**
+ * An adapter that takes a list of Neighbor objects
+ * and displays it in a ListView,  each list item
+ * representing a Neighbor object
+ */
+public class NeighborListAdapter extends BaseAdapter {
 
     private LayoutInflater mInflater;
     public static ArrayList<Neighbor> services;
-    private static ImageButton mute, addFriend;
-    private MainController controller;
+    private static ImageButton mute;
     private static final String TAG = "NeighborListAdapter";
 
     /**
@@ -34,13 +38,10 @@ public class   NeighborListAdapter extends BaseAdapter {
      */
     public NeighborListAdapter(Context context, ArrayList<Neighbor> services2){
         services = services2;
-        controller = new MainController(context);
         mInflater = LayoutInflater.from(context);
     }
 
-
-
-
+                /*----------Overridden Methods------------*/
 
     @Override
     public int getCount() {
@@ -105,7 +106,9 @@ public class   NeighborListAdapter extends BaseAdapter {
 
                     }
                     else{
-                        Toast.makeText(TabsActivity.ctx, "You cannot mute this neighbor, you are not connected to a network.", Toast.LENGTH_LONG).show();
+                        Toast.makeText(TabsActivity.ctx,
+                                "You cannot mute this neighbor, you are not connected to a network.",
+                                Toast.LENGTH_LONG).show();
                     }}
                 catch(Resources.NotFoundException e){
                     e.printStackTrace();
@@ -121,21 +124,20 @@ public class   NeighborListAdapter extends BaseAdapter {
         });
 
         /*----Add neighbor as a friend  button-----*/
-        addFriend = (ImageButton)convertView.findViewById(R.id.addAsFriend);
+        ImageButton addFriend = (ImageButton) convertView.findViewById(R.id.addAsFriend);
         addFriend.setOnClickListener(new View.OnClickListener() {
 
             @Override
             public void onClick(View v) {
-                Log.i(TAG,"Add friend clicked");
-                if(Globals.isConnectedToANetwork){
+                Log.i(TAG, "Add friend clicked");
+                if (Globals.isConnectedToANetwork) {
 
 
                     final Neighbor neighbor = (Neighbor) getItem(position);
-                    if(MainController.isThisIPMuted(neighbor.getIpAddress())){
+                    if (MainController.isThisIPMuted(neighbor.getIpAddress())) {
                         Toast.makeText(TabsActivity.ctx, "You have to unmute this neighbor first", Toast.LENGTH_LONG).show();
 
-                    }
-                    else{
+                    } else {
                         new AlertDialog.Builder(TabsActivity.ctx)
                                 .setTitle("Add a friend")
                                 .setMessage("Do you want to add " + neighbor.getInstanceName() + " as a friend?")
@@ -153,9 +155,9 @@ public class   NeighborListAdapter extends BaseAdapter {
                                     }
                                 })
                                 .setIcon(android.R.drawable.ic_dialog_alert)
-                                .show();}
-                }
-                else {
+                                .show();
+                    }
+                } else {
 
                     Toast.makeText(TabsActivity.ctx, "You cannot add this neighbor, you are not connected to a network.", Toast.LENGTH_LONG).show();
                 }

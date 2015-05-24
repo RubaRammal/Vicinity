@@ -11,7 +11,7 @@
         android:background="@android:color/transparent"
         android:paddingTop="0dp"
         android:src="@drawable/chaticon"
-        android:contentDescription="Tabs icons"
+        android:contentDescription="@string/chat_icon"
         android:layout_alignParentTop="true"
         android:layout_centerHorizontal="true"
         android:layout_marginTop="7dp" />
@@ -20,7 +20,7 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_alignParentBottom="true"
-        android:text="Chat"
+        android:text="@string/chat_title"
         android:paddingBottom="6dp"
         android:textSize="10sp"
         android:textStyle="bold"

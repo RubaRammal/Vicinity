@@ -7,7 +7,7 @@
     <TextView
         android:layout_width="fill_parent"
         android:layout_height="fill_parent"
-        android:text="Friend"
+        android:text="@string/friend_header"
         android:background="#BFBFBF"
         android:textSize="18dp"
         android:textStyle="bold"
@@ -17,7 +17,7 @@
         android:layout_width="fill_parent"
         android:layout_height="match_parent"
         android:background="#ff9c9c9c"
-        android:text=" "
+        android:text="@string/line_friend_header"
         android:textSize="0.4dip"/>
 
 </LinearLayout>

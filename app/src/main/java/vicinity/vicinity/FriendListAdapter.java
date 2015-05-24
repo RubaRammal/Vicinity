@@ -23,13 +23,23 @@ import vicinity.Controller.MainController;
 import vicinity.model.Neighbor;
 
 
+/**
+ * An adapter that takes a list of Neighbor objects
+ * and displays it in a ListView,  each list item
+ * representing a Neighbor object
+ */
 public class FriendListAdapter extends BaseAdapter {
-    private LayoutInflater mInflater;
-    ArrayList<Neighbor> services;
-    private ImageButton deleteFriend, editFriendName;
-    private MainController controller;
 
     private static final String TAG ="FriendsListAdpt";
+    private LayoutInflater mInflater;
+    ArrayList<Neighbor> services;
+    private MainController controller;
+
+    /**
+     * Public constructor
+     * @param context Context
+     * @param services ArrayList of Neighbor objects
+     */
     public FriendListAdapter(Context context, ArrayList<Neighbor> services){
         this.services = services;
         mInflater = LayoutInflater.from(context);
@@ -37,7 +47,7 @@ public class FriendListAdapter extends BaseAdapter {
 
     }
 
-
+                /*----------Overridden Methods------------*/
 
     @Override
     public int getCount() {
@@ -72,16 +82,16 @@ public class FriendListAdapter extends BaseAdapter {
         /*
         * Delete Friend button
          */
-        deleteFriend= (ImageButton)convertView.findViewById(R.id.deleteButton);
+        ImageButton deleteFriend = (ImageButton) convertView.findViewById(R.id.deleteButton);
         deleteFriend.setOnClickListener(new View.OnClickListener() {
 
             @Override
             public void onClick(View arg0) {
-                final Neighbor deleteFriend = (Neighbor)getItem(position);
-                Log.i("FriendsListAdpt","Clicked delete for: "+deleteFriend.getInstanceName());
+                final Neighbor deleteFriend = (Neighbor) getItem(position);
+                Log.i("FriendsListAdpt", "Clicked delete for: " + deleteFriend.getInstanceName());
                 new AlertDialog.Builder(TabsActivity.ctx)
                         .setTitle("Delete Friend")
-                        .setMessage("Are you sure you want to delete "+deleteFriend.getInstanceName()+" from your friends list?")
+                        .setMessage("Are you sure you want to delete " + deleteFriend.getInstanceName() + " from your friends list?")
                         .setPositiveButton(android.R.string.yes, new DialogInterface.OnClickListener() {
                             public void onClick(DialogInterface dialog, int which) {
                                 Log.i(TAG, "YES");
@@ -91,7 +101,7 @@ public class FriendListAdapter extends BaseAdapter {
                                 NeighborSectionFragment.updateDeletedFriend(deleteFriend);
                                 // I added this to delete messages when friend is deleted - Ruba
                                 controller.deleteMessages(deleteFriend.getIpAddress().getHostAddress());
-                                CharSequence text = deleteFriend.getInstanceName()+" is deleted.";
+                                CharSequence text = deleteFriend.getInstanceName() + " is deleted.";
                                 int duration = Toast.LENGTH_LONG;
                                 Toast toast = Toast.makeText(TabsActivity.ctx, text, duration);
                                 toast.show();
@@ -111,16 +121,17 @@ public class FriendListAdapter extends BaseAdapter {
         /*
          * Edit friend's alias name
          */
-        editFriendName = (ImageButton)convertView.findViewById(R.id.changeName);
+        ImageButton editFriendName = (ImageButton) convertView.findViewById(R.id.changeName);
         editFriendName.setOnClickListener(new View.OnClickListener() {
             final EditText input = new EditText(TabsActivity.ctx);
+
             @Override
             public void onClick(View arg0) {
-                final Neighbor edit = (Neighbor)getItem(position);
-                Log.i("FriendsListAdpt","Clicked changeName for: "+edit.getInstanceName());
+                final Neighbor edit = (Neighbor) getItem(position);
+                Log.i("FriendsListAdpt", "Clicked changeName for: " + edit.getInstanceName());
                 new AlertDialog.Builder(TabsActivity.ctx)
                         .setTitle("Edit Name")
-                        .setMessage("Choose a new name for "+edit.getInstanceName())
+                        .setMessage("Choose a new name for " + edit.getInstanceName())
                         .setView(input)
                         .setPositiveButton("Ok", new DialogInterface.OnClickListener() {
                             public void onClick(DialogInterface dialog, int whichButton) {

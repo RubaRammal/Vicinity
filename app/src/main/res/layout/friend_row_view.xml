@@ -20,7 +20,7 @@
         android:layout_height="wrap_content"
         android:id="@+id/request"
         android:textSize="10sp"
-        android:text="Tap to connect..."
+        android:text="@string/tab_to_connect"
         android:layout_below="@+id/friend_row"
         android:layout_alignParentLeft="true"
         android:layout_alignParentStart="true"
@@ -31,7 +31,8 @@
         android:layout_height="wrap_content"
         android:src="@drawable/deleteicon"
         android:layout_alignParentRight="true"
-        android:id="@+id/deleteButton" />
+        android:id="@+id/deleteButton"
+        android:contentDescription="@string/delete_icon" />
 
     <ImageButton
         android:layout_width="wrap_content"
@@ -40,7 +41,8 @@
         android:id="@+id/changeName"
         android:layout_alignParentTop="true"
         android:layout_toLeftOf="@+id/deleteButton"
-        android:layout_toStartOf="@+id/changeName" />
+        android:layout_toStartOf="@+id/changeName"
+        android:contentDescription="@string/edit_icon" />
 
 
 </RelativeLayout>

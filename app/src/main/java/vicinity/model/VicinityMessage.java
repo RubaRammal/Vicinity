@@ -13,12 +13,12 @@ public class VicinityMessage implements Serializable{
 
     private static final String TAG = "MessageClass";
 
-    private String sentAt;
-    private String friendName;
-    private String from;
-    private boolean isMyMsg;
-    private String messageBody;
-    private String imageString;
+    private String sentAt; // Time the message was sent at
+    private String friendName; // The sender's name
+    private String from; // The sender's IP address
+    private boolean isMyMsg; // Was the message sent or received
+    private String messageBody; // Message's body
+    private String imageString; // The string of an image
 
 
     public VicinityMessage(){}

@@ -18,6 +18,8 @@ import android.provider.MediaStore;
 import android.support.v4.content.LocalBroadcastManager;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.ActionBarActivity;
+import android.text.Editable;
+import android.text.TextWatcher;
 import android.util.Base64;
 import android.util.Log;
 import android.view.Gravity;
@@ -41,37 +43,35 @@ import vicinity.model.Neighbor;
 import vicinity.model.VicinityMessage;
 
 
+/**
+ * Where exchanging private messages/images
+ * between users occur.
+ */
 public class ChatActivity extends ActionBarActivity {
 
-
-    private ListView chatListView;
-    private EditText chatText;
-    private Button send;
-    private Button sendImgButton;
+    private static String TAG = "ChatActivity";
+    private ListView chatListView; // ListView of the messages
+    private EditText chatText; // The text field to send messages
+    private Button send; // Send button to send messages
     private VicinityMessage vicinityMessage;
-    private static ChatAdapter adapter;
+    private static ChatAdapter adapter; // Messages adapter
     public static Context ctx;
     private MainController controller;
-    private static final int SELECT_PICTURE_ACTIVITY_REQUEST_CODE = 0;
-    private VicinityMessage imgMsg;
-    private static String TAG = "ChatActivity";
-
-    private static VicinityMessage message;
-    private BroadcastReceiver newMessage;
-    private ChatClient chatClient;
+    private static final int SELECT_PICTURE_ACTIVITY_REQUEST_CODE = 0; // To select an image from the gallary
+    private VicinityMessage imgMsg; // For sending an image
+    private ChatClient chatClient; // To start the client thread
     public static String friendsIp;
-    private Neighbor friendChat;
-    private Thread chatThread;
-    private boolean gettingImage = false;
+    private boolean gettingImage = false; // So the ChatActivity won't call Finish() onStop()
 
 
-
+                /*----------Overridden Methods------------*/
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_chat);
 
+        /*----------Change the style of the ActionBar------------*/
         final ActionBar abar = getSupportActionBar();
         abar.setBackgroundDrawable(new ColorDrawable(Color.parseColor("#01aef0")));//line under the action bar
         View viewActionBar = getLayoutInflater().inflate(R.layout.actionbar_layout, null);
@@ -92,31 +92,28 @@ public class ChatActivity extends ActionBarActivity {
         adapter = new ChatAdapter(ctx, R.layout.chat_box_layout);
         chatText = (EditText) findViewById(R.id.chatText);
         send = (Button) findViewById(R.id.sendButton);
-        sendImgButton = (Button) findViewById(R.id.sendImage);
+        Button sendImgButton = (Button) findViewById(R.id.sendImage);
         controller = new MainController(ctx);
 
 
         ArrayList<VicinityMessage> vicinityMessages = controller.viewAllMessages();
 
-
-
-
-
-
         chatListView.setAdapter(adapter);
         chatListView.setTranscriptMode(AbsListView.TRANSCRIPT_MODE_ALWAYS_SCROLL);
 
+        // Obtain objects stored inside the intent that started the ChatActivity
+        // Initializes the client socket with the received object's IP address
         try{
             savedInstanceState = getIntent().getExtras();
             if(savedInstanceState.getSerializable("FRIEND") instanceof Neighbor)
             {
-                friendChat = (Neighbor) savedInstanceState.getSerializable("FRIEND");
+                Neighbor friendChat = (Neighbor) savedInstanceState.getSerializable("FRIEND");
                 chatClient = new ChatClient(friendChat.getIpAddress().getHostAddress());
                 friendsIp = friendChat.getIpAddress().getHostAddress();
                 textviewTitle.setText(friendChat.getInstanceName());
             }
             else if(savedInstanceState.getSerializable("MSG") instanceof VicinityMessage){
-                message = (VicinityMessage) savedInstanceState.getSerializable("MSG");
+                VicinityMessage message = (VicinityMessage) savedInstanceState.getSerializable("MSG");
                 chatClient = new ChatClient(message.getFrom());
                 textviewTitle.setText(controller.getFriend(message.getFrom()).getInstanceName());
                 friendsIp = message.getFrom();
@@ -130,9 +127,10 @@ public class ChatActivity extends ActionBarActivity {
         }
 
         getHistory();
-        chatThread = new Thread(chatClient);
-        chatThread.start();
 
+        // Start the client thread
+        Thread chatThread = new Thread(chatClient);
+        chatThread.start();
 
 
         chatListView.getAdapter().registerDataSetObserver(new DataSetObserver() {
@@ -143,25 +141,50 @@ public class ChatActivity extends ActionBarActivity {
             }
         });
 
-        //When button send message is clicked
+        // Enables the send button only if the EditText is not empty
+        chatText.addTextChangedListener(new TextWatcher() {
+            @Override
+            public void beforeTextChanged(CharSequence s, int start, int count, int after) {
+                send.setEnabled(false);
+            }
+            @Override
+            public void onTextChanged(CharSequence s, int start, int before, int count) {
+                if(chatText.getText().toString().equals(null) || chatText.getText().toString().equals("")|| chatText.getText().toString().matches(" "))
+                    send.setEnabled(false);
+                else
+                    send.setEnabled(true);
+            }
+            @Override
+            public void afterTextChanged(Editable s) {
+                if(chatText.getText().toString().equals(null) || chatText.getText().toString().equals("")|| chatText.getText().toString().matches(" "))
+                    send.setEnabled(false);
+                else
+                    send.setEnabled(true);
+            }
+        });
+
+        // Send button click listener.
+        // Pushes the message to the adapter to be displayed to the user.
+        // Stores the message in the database.
+        // Writes the message out to the server using the client thread.
         send.setOnClickListener(
                 new Button.OnClickListener() {
                     public void onClick(View v) {
                         try {
                             Log.i(TAG, "onClick ");
 
-                            //Message
+                            // Message
                             vicinityMessage = new VicinityMessage(controller.retrieveCurrentUsername(),
                                      true, chatText.getText().toString());
 
                             vicinityMessage.setFrom(friendsIp);
-                            //Display Message to user
+                            // Display Message to user
                             pushMessage(vicinityMessage);
 
+                            // Send the message to the server
                             chatClient.write(vicinityMessage);
 
-
-                            //To add vicinityMessage to db
+                            // To add vicinityMessage to db
                             boolean added = controller.addMessage(vicinityMessage);
                             if (added)
                                 Log.i(TAG, "Message added");
@@ -170,13 +193,15 @@ public class ChatActivity extends ActionBarActivity {
                             e.printStackTrace();
                         }
 
-                        //Clear EditText
+                        // Clear EditText
                         chatText.setText(null);
                     }
 
                 }
         );
 
+        // Send image click listener.
+        // Calls the method selectPicture().
         sendImgButton.setOnClickListener(
                 new Button.OnClickListener() {
                     public void onClick(View v) {
@@ -186,21 +211,21 @@ public class ChatActivity extends ActionBarActivity {
                 }
         );
 
-        newMessage = new BroadcastReceiver() {
+        // Receives messages from LocalBroadcastManager.
+        // Displays the received messages in the ListView.
+        BroadcastReceiver newMessage = new BroadcastReceiver() {
             @Override
             public void onReceive(Context context, Intent intent) {
                 try {
                     final Bundle bundle = intent.getExtras();
 
-                    Log.i(TAG,"onReceive");
                     VicinityMessage vMessage = (VicinityMessage) bundle.getSerializable("NEW_MESSAGE");
-                    Log.i(TAG,"Received new message: "+vMessage.getMessageBody());
+                    Log.i(TAG, "Received new message: " + vMessage.getMessageBody());
                     friendsIp = vMessage.getFrom();
                     pushMessage(vMessage);
                     intent.removeExtra("NEW_MESSAGE");
 
-                }
-                catch (NullPointerException e){
+                } catch (NullPointerException e) {
                     e.printStackTrace();
                 }
 
@@ -212,32 +237,20 @@ public class ChatActivity extends ActionBarActivity {
 
     }
 
-    /**
-     * Sends an object VicinityMessage to the Message adapter
-     * to be displayed in the ChatActivity
-     **/
-    public static void pushMessage(VicinityMessage readVicinityMessage) {
-        adapter.add(readVicinityMessage);
-        adapter.notifyDataSetChanged();
+    @Override
+    public void onStart() {
+        super.onStart();
+        Globals.chatActive = true;
     }
 
-
-    private void getHistory() {
-        try {
-            Log.i(TAG, "History: "+ friendsIp);
-
-            ArrayList<VicinityMessage> m = controller.getChatMessages(friendsIp);
-
-            for (int i = 0; i < m.size(); i++) {
-                pushMessage(m.get(i));
-                Log.i(TAG, "History: "+ m.get(i).getMessageBody());
-            }
-
-        } catch (IndexOutOfBoundsException e) {
-            e.printStackTrace();
+    @Override
+    public void onStop() {
+        super.onStop();
+        Globals.chatActive = false;
+        if(!gettingImage){
+            finish();
         }
     }
-
 
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent imageReturnedIntent) {
@@ -407,8 +420,6 @@ public class ChatActivity extends ActionBarActivity {
 
         controller.addMessage(imgMsg);
 
-
-
     }
 
 
@@ -419,25 +430,33 @@ public class ChatActivity extends ActionBarActivity {
     }
 
 
-    @Override
-    public void onStart() {
-        super.onStart();
-        Globals.chatActive = true;
+    /**
+     * Sends an object VicinityMessage to the Message adapter
+     * to be displayed in the ChatActivity.
+     **/
+    public static void pushMessage(VicinityMessage readVicinityMessage) {
+        adapter.add(readVicinityMessage);
+        adapter.notifyDataSetChanged();
     }
 
-    @Override
-    public void onStop() {
-        super.onStop();
-        Globals.chatActive = false;
-        if(!gettingImage){
-            finish();
+
+    /**
+     * Displays previously exchanged messages
+     * between friends if any when the activity starts.
+     **/
+    private void getHistory() {
+        try {
+
+            ArrayList<VicinityMessage> m = controller.getChatMessages(friendsIp);
+
+            for (int i = 0; i < m.size(); i++) {
+                pushMessage(m.get(i));
+                Log.i(TAG, "History: "+ m.get(i).getMessageBody());
+            }
+
+        } catch (IndexOutOfBoundsException e) {
+            e.printStackTrace();
         }
     }
 
-    @Override
-    protected void onDestroy() {
-        super.onDestroy();
-        //chatThread.stop();
-
-    }
 }

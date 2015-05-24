@@ -14,22 +14,26 @@ import vicinity.model.Comment;
 
 
 /**
- * Created by macproretina on 4/2/15.
+ * An adapter that takes a list of Comment objects
+ * and binds it to a ListView,  each list item
+ * representing a Comment object
  */
 public class CommentListAdapter extends BaseAdapter {
 
     private List<Comment> commentsList;
     private LayoutInflater mInflater;
-    private Context ctx;
 
-    //Constructor
+    /**
+     * Public constructor
+     * @param context Context
+     * @param comments ArrayList of Comment objects
+     */
     public CommentListAdapter(Context context, ArrayList<Comment> comments) {
         commentsList = comments;
         mInflater = LayoutInflater.from(context);
-        ctx = context;
-
-
     }
+
+                    /*----------Overridden Methods------------*/
 
     @Override
     public boolean isEnabled(int position) {
@@ -64,9 +68,6 @@ public class CommentListAdapter extends BaseAdapter {
         return commentsList.get(position).getCommentID();
     }
 
-    /**
-     * Google this method if you wanna understand it. - Ruba
-     */
     @Override
     public View getView(int position, View convertView, ViewGroup parent) {
         ViewHolder holder;
@@ -77,39 +78,13 @@ public class CommentListAdapter extends BaseAdapter {
             holder.name_text = (TextView) convertView.findViewById(R.id.commetName);
             holder.body_text = (TextView) convertView.findViewById(R.id.commentBody);
 
-
             convertView.setTag(holder);
         } else {
             holder = (ViewHolder) convertView.getTag();
         }
 
-       /* View row = convertView.findViewById(R.id.commentRow);
-
-        //The post row
-        if(position==0){
-            row.setPadding(30,30,30,30);
-            row.setBackgroundColor(Color.parseColor("#E1E1E1"));
-            holder.name_text.setTextSize(20);
-            holder.body_text.setTextSize(18);
-        }
-
-        //The label Comments row
-        if(position==1){
-            row.setPadding(10,10,10,10);
-            row.setBackgroundColor(Color.parseColor("#BFBFBF"));
-            holder.name_text.setTextColor(Color.parseColor("#000000"));
-            holder.name_text.setTextSize(18);
-            holder.body_text.setTextSize(0);
-            holder.name_text.setPadding(5,5,5,5);
-
-        }*/
-
-
-
         holder.name_text.setText(commentsList.get(position).getCommentedBy());
-
         holder.body_text.setText(commentsList.get(position).getCommentBody());
-
 
         return convertView;
     }

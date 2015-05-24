@@ -22,16 +22,14 @@ import vicinity.model.VicinityMessage;
 public class ChatClient implements Runnable {
 
 
-    private String TAG = "ChatClient";
-    // Stream to send the message to the server
-    private ObjectOutputStream out;
-    // IP address of the server
+    private String TAG = "ChatClient"; // Stream to send the message to the server
+    private ObjectOutputStream out; // IP address of the server
     private InetAddress ip;
 
 
     /**
      * Public constructor
-     * Initializes the IP address
+     * @param ip String
      */
     public ChatClient(String ip)
     {
@@ -68,7 +66,7 @@ public class ChatClient implements Runnable {
     /**
      * Sends a message to the server socket it is connected with
      * through an ObjectOutputStream.
-     * @param message A to-be deleted Message's ID.
+     * @param message A VicinityMessage to-be sent.
      */
     public void write(VicinityMessage message)
     {

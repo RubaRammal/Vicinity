@@ -49,6 +49,7 @@ public class NewPostActivity extends ActionBarActivity {
     private static final int SELECT_PICTURE_ACTIVITY_REQUEST_CODE = 0;
     private Post aPost;
 
+    /*---------Overridden Methods------------*/
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -131,34 +132,6 @@ public class NewPostActivity extends ActionBarActivity {
         }
     }
 
-    public void sendPost(){
-        Random r = new Random();
-        String postText = postTextField.getText().toString();
-        try {
-            //Can send post only if connected to a network
-            if(Globals.isConnectedToANetwork){
-                aPost.setPostBody(postText);
-                aPost.setPostedBy(mc.retrieveCurrentUsername());
-                aPost.setPostID(r.nextInt((1000 - 1) + 1) + 1);
-                broadcastManager.setPost(aPost);
-                broadcastManager.execute();
-                finish();
-
-            }
-            else{
-                CharSequence text = "You are not connected to a network!";
-                int duration = Toast.LENGTH_SHORT;
-                Toast toast = Toast.makeText(NewPostActivity.this, text, duration);
-                toast.setGravity(Gravity.CENTER|Gravity.CENTER, 0, 0);
-                toast.show();
-            }
-
-        } catch (SQLException e) {
-            e.printStackTrace();
-        }
-    }
-
-
 
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent imageReturnedIntent) {
@@ -193,6 +166,38 @@ public class NewPostActivity extends ActionBarActivity {
                 break;
         }
     }
+
+    /**
+     * Sends the post after it checks
+     * that the user is connected to a network.
+     */
+    public void sendPost(){
+        Random r = new Random();
+        String postText = postTextField.getText().toString();
+        try {
+            //Can send post only if connected to a network
+            if(Globals.isConnectedToANetwork){
+                aPost.setPostBody(postText);
+                aPost.setPostedBy(mc.retrieveCurrentUsername());
+                aPost.setPostID(r.nextInt((1000 - 1) + 1) + 1);
+                broadcastManager.setPost(aPost);
+                broadcastManager.execute();
+                finish();
+
+            }
+            else{
+                CharSequence text = "You are not connected to a network!";
+                int duration = Toast.LENGTH_SHORT;
+                Toast toast = Toast.makeText(NewPostActivity.this, text, duration);
+                toast.setGravity(Gravity.CENTER|Gravity.CENTER, 0, 0);
+                toast.show();
+            }
+
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+    }
+
 
     public static int getImageOrientation(String imagePath) {
         int rotate = 0;

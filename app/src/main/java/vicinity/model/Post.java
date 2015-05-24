@@ -12,12 +12,15 @@ import java.util.Date;
  */
 public class Post  implements Serializable {
 
-    private int postID;
-    private String postedAt;
-    private String postedBy;
-    private String postBody;
-    private String image;
+    private int postID; // Post ID
+    private String postedAt; // Time the post was posted
+    private String postedBy; // The name of the post's sender
+    private String postBody; // Post's body
+    private String image; // String of an image
 
+    /**
+     * Public constructor
+     */
     public Post(){
         image = "";
         Date currentDate= new Date();
@@ -81,9 +84,8 @@ public class Post  implements Serializable {
         return image;
     }
 
-    /**
-     * toString()
-     */
+    /*---------Overridden Methods------------*/
+
     public String toString()
     {
         return "Posted by: "+postedBy+ " Post Content: "+ postBody+" Date: "+ postedAt+" PostID: "+postID;

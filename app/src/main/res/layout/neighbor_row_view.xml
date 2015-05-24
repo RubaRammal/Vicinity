@@ -12,15 +12,14 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:id="@+id/neighbor_row"
-        android:textSize="18sp"
-        android:text="hijhj"/>
+        android:textSize="18sp"/>
 
     <TextView
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:id="@+id/request"
         android:textSize="10sp"
-        android:text="Tap to connect..."
+        android:text="@string/tab_to_connect"
         android:layout_below="@+id/neighbor_row"
         android:layout_alignParentLeft="true"
         android:layout_alignParentStart="true"
@@ -32,7 +31,7 @@
         android:src="@drawable/muteicon2"
         android:layout_alignParentRight="true"
         android:id="@+id/muteButton"
-        android:onClick="muteUser" />
+        android:contentDescription="@string/mute_icon" />
 
     <ImageButton
         android:layout_width="wrap_content"

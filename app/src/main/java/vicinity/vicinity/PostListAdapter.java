@@ -24,24 +24,24 @@ import vicinity.model.Post;
 public class PostListAdapter  extends BaseAdapter {
     public static ArrayList<Post> posts;
     private LayoutInflater mInflater;
-    MainController controller;
+    private MainController controller;
 
 
-    public PostListAdapter(Context context, ArrayList<Post> postsList){
-        posts = postsList;
-        mInflater = LayoutInflater.from(context);
-        controller = new MainController(context);
-    }
+    /**
+     * Public constructor.
+     * @param context Context
+     */
     public PostListAdapter(Context context){
         posts = new ArrayList<>();
         controller = new MainController(context);
         posts.addAll(controller.viewAllPosts());
         mInflater = LayoutInflater.from(context);
 
-
     }
 
-
+    /**
+     * Adds a post to the list and updates the ListView.
+     */
     public void addPost(Post p){
         posts.add(p);
         notifyDataSetChanged();
@@ -90,9 +90,11 @@ public class PostListAdapter  extends BaseAdapter {
         holder.txtPost.setVisibility(View.GONE);
         holder.imageView.setVisibility(View.GONE);
 
+        //Set the name of the sender and the date
         holder.txtName.setText(posts.get(position).getPostedBy());
         holder.txtDate.setText(posts.get(position).getPostedAt());
 
+        //Display the number of comments unless no comments were made then display zero
         if(controller.getPostComments(posts.get(position).getPostID()) == null){
             holder.txtComments.setText("0 comments");
 
@@ -101,11 +103,13 @@ public class PostListAdapter  extends BaseAdapter {
 
         }
 
+        //Display the post's body unless it was null
         if(!posts.get(position).getPostBody().equals("")){
             holder.txtPost.setVisibility(View.VISIBLE);
             holder.txtPost.setText(posts.get(position).getPostBody());
         }
 
+        //Display the image if it existed
         try {
             if(!posts.get(position).getBitmap().equals("")){
                 holder.imageView.setVisibility(View.VISIBLE);
@@ -128,7 +132,11 @@ public class PostListAdapter  extends BaseAdapter {
         ImageView imageView;
     }
 
-    public  static void clearPosts(){
+
+    /**
+     * Clears the post array and updates the list.
+     */
+    public static void clearPosts(){
         posts.clear();
         TimelineSectionFragment.clearPosts();
     }
