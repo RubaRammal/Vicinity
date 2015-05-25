@@ -45,6 +45,12 @@ public class RequestServer extends Thread{
     }
 
 
+
+    public static void terminate(){
+        Globals.isRequestServerRunning=false;
+
+    }
+
     @Override
     public void run() {
         try{
