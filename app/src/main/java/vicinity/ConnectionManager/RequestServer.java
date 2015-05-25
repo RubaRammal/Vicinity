@@ -31,7 +31,9 @@ public class RequestServer extends Thread{
     final static String TAG ="Request";
     private ServerSocket requestSocket;
     private ExecutorService executor = Executors.newFixedThreadPool(30);
-    public static  BroadcastReceiver requestsReceiver;
+    private static  BroadcastReceiver requestsReceiver;
+    private Socket clientSocket;
+
 
 
 
@@ -60,7 +62,7 @@ public class RequestServer extends Thread{
 
 
             while (Globals.isRequestServerRunning) {
-                Socket clientSocket = requestSocket.accept();
+                clientSocket = requestSocket.accept();
 
                 executor.submit(new RequestSupporter(clientSocket));
 

@@ -97,14 +97,17 @@ public class FriendListAdapter extends BaseAdapter {
                                 Log.i(TAG, "YES");
 
                                 new RequestsManager().execute(deleteFriend);
-
+                                try{
                                 NeighborSectionFragment.updateDeletedFriend(deleteFriend);
                                 // I added this to delete messages when friend is deleted - Ruba
                                 controller.deleteMessages(deleteFriend.getIpAddress().getHostAddress());
                                 CharSequence text = deleteFriend.getInstanceName() + " is deleted.";
                                 int duration = Toast.LENGTH_LONG;
                                 Toast toast = Toast.makeText(TabsActivity.ctx, text, duration);
-                                toast.show();
+                                toast.show();}
+                                catch (NullPointerException e ){
+                                    e.printStackTrace();
+                                }
 
                             }
                         })
