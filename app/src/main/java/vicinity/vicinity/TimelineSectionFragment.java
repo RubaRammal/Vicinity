@@ -44,7 +44,7 @@ public class TimelineSectionFragment extends Fragment {
     private Context ctx; // The parent Activity's context
     private MainController controller;
     private MediaScannerConnection msConn ;
-
+    private BroadcastReceiver updateUI;
 
         /*---------Overridden Methods------------*/
 
@@ -57,6 +57,17 @@ public class TimelineSectionFragment extends Fragment {
            // Restore last state for checked position.
         }
 
+    }
+
+    @Override
+    public void onDestroy(){
+        super.onDestroy();
+        try {
+                LocalBroadcastManager.getInstance(getActivity()).unregisterReceiver(updateUI);
+        }
+        catch(IllegalStateException e){
+            e.printStackTrace();
+        }
     }
 
     @Override
@@ -151,7 +162,7 @@ public class TimelineSectionFragment extends Fragment {
         });
 
         // Receives objects from LocalBroadcastManager
-        BroadcastReceiver updateUI = new BroadcastReceiver() {
+        updateUI = new BroadcastReceiver() {
             @Override
             public void onReceive(Context context, Intent intent) {
                 try {
@@ -188,7 +199,6 @@ public class TimelineSectionFragment extends Fragment {
         filter.addAction("POST");
         filter.addAction("COMMENT");
         LocalBroadcastManager.getInstance(getActivity()).registerReceiver((updateUI), filter);
-
 
         // Click on Post Button calls the NewPostActivity
         addPost.setOnClickListener(
@@ -276,11 +286,14 @@ public class TimelineSectionFragment extends Fragment {
         msConn.connect();
     }
 
-
+    /**
+     * Clears posts list
+     */
    public static void clearPosts()
    {
        adapter.notifyDataSetChanged();
    }
+
 
 
 }

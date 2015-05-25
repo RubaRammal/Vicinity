@@ -389,7 +389,35 @@ public class MainController {
         return isFriend;
 
     }
+    /**
+     * Checks if a peer is one of the user's friends
+     * @param username of a peer
+     * @return true if this peer is a friend, false otherwise.
+     */
+    public boolean isThisMyFriend2(String username){
+        boolean isFriend=true;
+        try{
+            database=dbH.getReadableDatabase();
+            dbH.openDataBase();
+            query="SELECT * FROM Friend WHERE Username='"+username+"'";
+            cursor = database.rawQuery(query,null);
+            cursor.moveToFirst();
+            if(cursor.getCount()==0)
+                isFriend=false;
+            cursor.close();
+            dbH.close();
+        }
+        catch(SQLException e){
+            e.printStackTrace();
+        }
+        Log.i(TAG,"Is "+username+" your friend? "+isFriend);
+        return isFriend;
 
+    }
+
+    /**
+     * @param ip A String that contains IP address of a friend
+     */
     public Neighbor getFriend(String ip){
         ArrayList<Neighbor> n = this.getAllFriends();
         Neighbor friend;

@@ -24,8 +24,10 @@ import java.sql.SQLException;
 import vicinity.ConnectionManager.ConnectAndDiscoverService;
 import vicinity.ConnectionManager.UDPpacketListner;
 import vicinity.Controller.MainController;
+import vicinity.Controller.VicinityNotifications;
 import vicinity.model.Globals;
 import vicinity.model.Neighbor;
+import vicinity.model.VicinityMessage;
 
 /**
  * Applies the Theme.Holo.Light to get the ActionBar
@@ -44,6 +46,7 @@ public class TabsActivity extends FragmentActivity implements ActionBar.TabListe
     private static Fragment timeline = new TimelineSectionFragment()
             , neighbors = new NeighborSectionFragment(), chat = new MessagesSectionFragment(),
             settings= new SettingsSectionFragment();
+    private BroadcastReceiver requestsReceiver;
 
 
 
@@ -75,7 +78,7 @@ public class TabsActivity extends FragmentActivity implements ActionBar.TabListe
 
 
         //BroadcastReceiver to receive friends requests
-        final BroadcastReceiver requestsReceiver = new BroadcastReceiver() {
+        requestsReceiver = new BroadcastReceiver() {
             @Override
             public void onReceive(Context context, final Intent intent) {
                 final Bundle bundle = intent.getExtras();
@@ -99,6 +102,7 @@ public class TabsActivity extends FragmentActivity implements ActionBar.TabListe
                 }
                 //Display a dialog to the user
                 else if (!controller.isThisMyFriend(receivedRequest.getDeviceAddress())){
+                    VicinityNotifications.newFriendRequestNotification(receivedRequest.getInstanceName());
                     new AlertDialog.Builder(ctx)
                             .setTitle("Friend's Request")
                             .setMessage(receivedRequest.getInstanceName() + " wants to add you as a friend")
@@ -203,6 +207,7 @@ public class TabsActivity extends FragmentActivity implements ActionBar.TabListe
     @Override
     protected void onDestroy(){
         super.onDestroy();
+        LocalBroadcastManager.getInstance(this).unregisterReceiver(requestsReceiver);
         stopService(new Intent(ctx,ConnectAndDiscoverService.class));
         stopService(new Intent(ctx,UDPpacketListner.class));
 

@@ -32,7 +32,7 @@ public class UDPpacketListner extends Service {
     private Integer port = Globals.SERVER_PORT;    //Server port
     private LocalBroadcastManager updateUIThread;     //To update timeline with posts
     private static HashMap<String, InetAddress> addressHashMap;    //HashMap that stores received addresses pairs
-
+    private boolean broadcastFlag;
 
     /*---------Overridden Methods------------*/
     @Override
@@ -40,6 +40,7 @@ public class UDPpacketListner extends Service {
         super.onCreate();
         updateUIThread= LocalBroadcastManager.getInstance(this);
         addressHashMap = new HashMap<>();
+        broadcastFlag=true;
     }
     @Override
     public IBinder onBind(Intent intent) {
@@ -74,6 +75,7 @@ public class UDPpacketListner extends Service {
     @Override
     public void onDestroy(){
         super.onDestroy();
+        broadcastFlag=false;
         Log.i(TAG,"UDP Service destroyed.");
     }
 
@@ -86,7 +88,7 @@ public class UDPpacketListner extends Service {
 
         byte[] buf = new byte[69000];
         try {
-            while (true) {
+            while (broadcastFlag) {
 
                 DatagramPacket packet = new DatagramPacket(buf, buf.length);
                 socket.setBroadcast(true);

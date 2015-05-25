@@ -20,6 +20,7 @@ import java.util.ArrayList;
 
 import vicinity.ConnectionManager.RequestsManager;
 import vicinity.Controller.MainController;
+import vicinity.model.Globals;
 import vicinity.model.Neighbor;
 
 
@@ -88,6 +89,7 @@ public class FriendListAdapter extends BaseAdapter {
             @Override
             public void onClick(View arg0) {
                 final Neighbor deleteFriend = (Neighbor) getItem(position);
+                if(Globals.isConnectedToANetwork){
                 Log.i("FriendsListAdpt", "Clicked delete for: " + deleteFriend.getInstanceName());
                 new AlertDialog.Builder(TabsActivity.ctx)
                         .setTitle("Delete Friend")
@@ -97,14 +99,17 @@ public class FriendListAdapter extends BaseAdapter {
                                 Log.i(TAG, "YES");
 
                                 new RequestsManager().execute(deleteFriend);
-
+                                try{
                                 NeighborSectionFragment.updateDeletedFriend(deleteFriend);
                                 // I added this to delete messages when friend is deleted - Ruba
                                 controller.deleteMessages(deleteFriend.getIpAddress().getHostAddress());
                                 CharSequence text = deleteFriend.getInstanceName() + " is deleted.";
                                 int duration = Toast.LENGTH_LONG;
                                 Toast toast = Toast.makeText(TabsActivity.ctx, text, duration);
-                                toast.show();
+                                toast.show();}
+                                catch (NullPointerException e ){
+                                    e.printStackTrace();
+                                }
 
                             }
                         })
@@ -117,6 +122,11 @@ public class FriendListAdapter extends BaseAdapter {
                         .setIcon(android.R.drawable.ic_dialog_alert)
                         .show();
             }
+                else
+                    Toast.makeText(TabsActivity.ctx, "You cannot delete this friend, you are not connected to a network.", Toast.LENGTH_LONG).show();
+
+            }
+
         });
         /*
          * Edit friend's alias name

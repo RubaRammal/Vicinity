@@ -108,10 +108,10 @@ public class ConnectAndDiscoverService extends Service
         unregisterReceiver(receiver);
 
         disconnectPeers();
-        db.deleteDatabase();        //TODO delete this line later
+        stopServers();
         removeLocalRequest();
         cancelConnection();
-        stopServers();
+
 
     }
 
@@ -162,9 +162,13 @@ public class ConnectAndDiscoverService extends Service
                             Log.i(TAG,"Neighbor: "+service.toString());
 
                             //Check if whether the peer is a friend or not
-                            if(controller.isThisMyFriend(srcDevice.deviceAddress))
+                            if(controller.isThisMyFriend(srcDevice.deviceAddress) && controller.isThisMyFriend2(srcDevice.deviceName))
                             {
                                 NeighborSectionFragment.addToFriendsList(service);
+                            }
+                            else if(controller.isThisMyFriend(srcDevice.deviceAddress) && !controller.isThisMyFriend2(srcDevice.deviceName))
+                            {
+                                controller.deleteFriend(service.getDeviceAddress());
                             }
                             else{
                                 NeighborSectionFragment.addToNeighborsList(service);
@@ -501,6 +505,7 @@ public class ConnectAndDiscoverService extends Service
         Globals.isRequestServerRunning=false;
         Globals.isGroupOwnerRunning=false;
         Globals.isChatServerRunning=false;
+        RequestServer.terminate();
         if(!Globals.isChatServerRunning&&!Globals.isRequestServerRunning&&!Globals.isGroupOwnerRunning)
             Log.i(TAG,"Servers have been shut down successfully");
     }
