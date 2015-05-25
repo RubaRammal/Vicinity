@@ -8,11 +8,27 @@
     android:paddingRight="13dip"
     android:descendantFocusability="blocksDescendants">
 
+
+
     <TextView
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:id="@+id/neighbor_row"
-        android:textSize="18sp"/>
+        android:textSize="18sp"
+        android:layout_alignParentTop="true"
+        android:layout_alignLeft="@+id/request"
+        android:layout_alignStart="@+id/request"
+        android:paddingLeft="5dp"/>
+
+    <ImageView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:src="@drawable/off"
+        android:id="@+id/statusIcon"
+        android:layout_below="@+id/neighbor_row"
+        android:layout_alignParentLeft="true"
+        android:layout_alignParentStart="true"
+        android:paddingTop="2.5dp"/>
 
     <TextView
         android:layout_width="wrap_content"
@@ -20,10 +36,11 @@
         android:id="@+id/request"
         android:textSize="10sp"
         android:text="@string/tab_to_connect"
+        android:textColor="#81020202"
+        android:paddingLeft="5dp"
         android:layout_below="@+id/neighbor_row"
-        android:layout_alignParentLeft="true"
-        android:layout_alignParentStart="true"
-        android:textColor="#81020202"/>
+        android:layout_toRightOf="@+id/statusIcon"
+        android:layout_toEndOf="@+id/statusIcon" />
 
     <ImageButton
         android:layout_width="wrap_content"

@@ -72,10 +72,17 @@ public class ServiceRequest implements Runnable {
                     intent.putExtra("NEW_MESSAGE", msg);
                     toChat.sendBroadcast(intent);
                 }
+                else if(Globals.Notification)
+                {
+                    // Display the message as a notification to the user if Notifications are on.
+                    VicinityNotifications.newMessageNotification(msg);
+                }
                 else
                 {
-                    // Display the message as a notification to the user
-                    VicinityNotifications.newMessageNotification(msg);
+                    // Broadcast the message to the active ChatActivity
+                    Intent intent = new Intent("MESSAGE");
+                    intent.putExtra("NEW_MESSAGE", msg);
+                    toChat.sendBroadcast(intent);
                 }
             }
             socket.close();

@@ -78,6 +78,12 @@ public class ConnectAndDiscoverService extends Service
         db = new DBHandler(this);
 
 
+        // Starting the chat server
+        if(!Globals.isChatServerRunning){
+            Globals.isChatServerRunning = true;
+            ChatServer chatSocket = new ChatServer();
+            new Thread(chatSocket).start();
+        }
 
         //Initializing WiFiP2pManager
         manager = (WifiP2pManager) getSystemService(Context.WIFI_P2P_SERVICE);
@@ -231,7 +237,7 @@ public class ConnectAndDiscoverService extends Service
      * @param service a Neighbor to be connected to
      */
     @Override
-    public void connectP2p(Neighbor service) {
+    public void connectP2p(final Neighbor service) {
         Log.i(TAG,"connectP2P");
 
         //Wi-Fi P2p configuration for setting up a connection
@@ -310,11 +316,7 @@ public class ConnectAndDiscoverService extends Service
                 requestServer.start();
 
             }
-            if(!Globals.isChatServerRunning){
-                Globals.isChatServerRunning=true;
-                ChatServer chatSocket = new ChatServer();
-                new Thread(chatSocket).start();
-            }
+
 
         }catch (IOException e) {
             Log.d(TAG,"Failed to create a server thread - " + e.getMessage());

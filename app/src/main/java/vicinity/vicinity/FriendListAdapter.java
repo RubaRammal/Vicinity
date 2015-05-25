@@ -10,6 +10,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.EditText;
 import android.widget.ImageButton;
+import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.BaseAdapter;
 import android.widget.Toast;
@@ -73,12 +74,19 @@ public class FriendListAdapter extends BaseAdapter {
             convertView = mInflater.inflate(R.layout.friend_row_view, null);
             holder = new ViewHolder();
             holder.textName = (TextView) convertView.findViewById(R.id.friend_row);
+            holder.status = (ImageView) convertView.findViewById(R.id.statusIcon);
+
             convertView.setTag(holder);
         } else {
             holder = (ViewHolder) convertView.getTag();
         }
 
         holder.textName.setText(services.get(position).getInstanceName());
+
+        if(services.get(position).getStatus().equals("Connected"))
+            holder.status.setImageResource(R.drawable.on);
+        else
+            holder.status.setImageResource(R.drawable.off);
 
         /*
         * Delete Friend button
@@ -184,5 +192,6 @@ public class FriendListAdapter extends BaseAdapter {
 
     static class ViewHolder{
         TextView textName;
+        ImageView status;
     }
 }

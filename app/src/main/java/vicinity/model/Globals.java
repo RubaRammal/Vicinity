@@ -48,7 +48,7 @@ public class Globals {
 
     //Server flags
     public static boolean isGroupOwnerRunning = false;
-    public static boolean isRequestServerRunning=false;
+    public static boolean isRequestServerRunning = false;
     public static boolean isChatServerRunning = false;
     public static boolean stopServer = true;
 
