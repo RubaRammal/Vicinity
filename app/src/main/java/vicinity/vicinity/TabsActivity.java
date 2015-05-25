@@ -44,6 +44,7 @@ public class TabsActivity extends FragmentActivity implements ActionBar.TabListe
     private static Fragment timeline = new TimelineSectionFragment()
             , neighbors = new NeighborSectionFragment(), chat = new MessagesSectionFragment(),
             settings= new SettingsSectionFragment();
+    private BroadcastReceiver requestsReceiver;
 
 
 
@@ -75,7 +76,7 @@ public class TabsActivity extends FragmentActivity implements ActionBar.TabListe
 
 
         //BroadcastReceiver to receive friends requests
-        final BroadcastReceiver requestsReceiver = new BroadcastReceiver() {
+        requestsReceiver = new BroadcastReceiver() {
             @Override
             public void onReceive(Context context, final Intent intent) {
                 final Bundle bundle = intent.getExtras();
@@ -203,6 +204,7 @@ public class TabsActivity extends FragmentActivity implements ActionBar.TabListe
     @Override
     protected void onDestroy(){
         super.onDestroy();
+        LocalBroadcastManager.getInstance(this).unregisterReceiver(requestsReceiver);
         stopService(new Intent(ctx,ConnectAndDiscoverService.class));
         stopService(new Intent(ctx,UDPpacketListner.class));
 

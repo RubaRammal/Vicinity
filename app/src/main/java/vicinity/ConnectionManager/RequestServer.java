@@ -29,10 +29,11 @@ import vicinity.model.Neighbor;
 public class RequestServer extends Thread{
 
     final static String TAG ="Request";
-    private ServerSocket requestSocket;
+    private static ServerSocket requestSocket;
     private ExecutorService executor = Executors.newFixedThreadPool(30);
     private static  BroadcastReceiver requestsReceiver;
     private Socket clientSocket;
+    private static boolean bc;
 
 
 
@@ -44,12 +45,22 @@ public class RequestServer extends Thread{
      */
     public RequestServer() throws IOException{
         Log.i(TAG,"Requests Server has started...");
+        bc=false;
     }
 
 
 
     public static void terminate(){
-        Globals.isRequestServerRunning=false;
+        try {
+            Globals.isRequestServerRunning = false;
+            requestSocket.close();
+        }
+        catch (IllegalStateException e){
+            e.printStackTrace();
+        }
+        catch(IOException e){
+            e.printStackTrace();
+        }
 
     }
 
@@ -62,15 +73,29 @@ public class RequestServer extends Thread{
 
 
             while (Globals.isRequestServerRunning) {
-                clientSocket = requestSocket.accept();
-
-                executor.submit(new RequestSupporter(clientSocket));
+                //clientSocket = requestSocket.accept();
+                executor.submit(new RequestSupporter(requestSocket.accept()));
 
             }
         }
 
         catch(IOException e){
             e.printStackTrace();
+        }
+        finally {
+            try{
+            Log.i(TAG,"FINALLY!");
+            if(clientSocket!=null)
+            clientSocket.close();
+            if(requestSocket!=null)
+            requestSocket.close();
+            if(executor!=null)
+            executor.shutdown();
+            }
+            catch (IOException e){
+                executor.shutdown();
+            }
+
         }
     }
 
@@ -94,6 +119,7 @@ public class RequestServer extends Thread{
             Log.i(TAG,"Processing a friend request...from: "+clientSocket2.getInetAddress());
             alertUser = LocalBroadcastManager.getInstance(ConnectAndDiscoverService.ctx);
         }
+
 
         @Override
         public void run() {
@@ -120,6 +146,7 @@ public class RequestServer extends Thread{
                         try {
                             outputStream.writeBoolean(reply);
                             outputStream.flush();
+                            outputStream.close();
 
                         } catch (IOException e) {
                             e.printStackTrace();
@@ -129,6 +156,7 @@ public class RequestServer extends Thread{
                 LocalBroadcastManager.getInstance(ConnectAndDiscoverService.ctx).registerReceiver(requestsReceiver,
                         new IntentFilter("REPLY")
                 );
+                bc = true;
 
 
 

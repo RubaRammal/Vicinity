@@ -505,6 +505,7 @@ public class ConnectAndDiscoverService extends Service
         Globals.isRequestServerRunning=false;
         Globals.isGroupOwnerRunning=false;
         Globals.isChatServerRunning=false;
+        RequestServer.terminate();
         if(!Globals.isChatServerRunning&&!Globals.isRequestServerRunning&&!Globals.isGroupOwnerRunning)
             Log.i(TAG,"Servers have been shut down successfully");
     }
