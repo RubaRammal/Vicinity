@@ -24,8 +24,10 @@ import java.sql.SQLException;
 import vicinity.ConnectionManager.ConnectAndDiscoverService;
 import vicinity.ConnectionManager.UDPpacketListner;
 import vicinity.Controller.MainController;
+import vicinity.Controller.VicinityNotifications;
 import vicinity.model.Globals;
 import vicinity.model.Neighbor;
+import vicinity.model.VicinityMessage;
 
 /**
  * Applies the Theme.Holo.Light to get the ActionBar
@@ -100,6 +102,7 @@ public class TabsActivity extends FragmentActivity implements ActionBar.TabListe
                 }
                 //Display a dialog to the user
                 else if (!controller.isThisMyFriend(receivedRequest.getDeviceAddress())){
+                    VicinityNotifications.newFriendRequestNotification(receivedRequest.getInstanceName());
                     new AlertDialog.Builder(ctx)
                             .setTitle("Friend's Request")
                             .setMessage(receivedRequest.getInstanceName() + " wants to add you as a friend")

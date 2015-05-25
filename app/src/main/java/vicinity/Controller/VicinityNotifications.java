@@ -10,6 +10,7 @@ import vicinity.ConnectionManager.ConnectAndDiscoverService;
 import vicinity.model.VicinityMessage;
 import vicinity.vicinity.ChatActivity;
 import vicinity.vicinity.R;
+import vicinity.vicinity.TabsActivity;
 
 /**
  * This class displays and handles message notifications.
@@ -58,7 +59,22 @@ public class VicinityNotifications {
     }
 
     public static void newFriendRequestNotification(String friendName){
+        // Notifies the user of background events
+        NotificationManager notificationManager = (NotificationManager) ConnectAndDiscoverService.ctx.getSystemService(ConnectAndDiscoverService.ctx.NOTIFICATION_SERVICE);
+        // Initialize notification instance
+        Notification notification = new Notification(R.drawable.vicinity_logo,"You received a friend request from "+friendName, System.currentTimeMillis());
+        // Device vibrates when notification is received
+        notification.defaults |= Notification.DEFAULT_VIBRATE;
+        // Title of the notification is the message sender's name
+        CharSequence title = "Friend Request";
+        CharSequence text=friendName+" wants to add you as a friend";
 
+        Intent notificationIntent = new Intent(ConnectAndDiscoverService.ctx, TabsActivity.class);
+        notificationIntent.putExtra("RQST", friendName);
+        PendingIntent contentIntent = PendingIntent.getActivity(ConnectAndDiscoverService.ctx, 0, notificationIntent, PendingIntent.FLAG_UPDATE_CURRENT | PendingIntent.FLAG_ONE_SHOT);
+
+        notification.setLatestEventInfo(ConnectAndDiscoverService.ctx, title, text, contentIntent);
+        notificationManager.notify(1, notification);
     }
 
 }
