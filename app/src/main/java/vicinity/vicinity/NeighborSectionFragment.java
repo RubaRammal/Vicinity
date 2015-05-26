@@ -132,17 +132,17 @@ public class NeighborSectionFragment extends Fragment {
      */
 
     public static void updateDeletedFriend(Neighbor deletedFriend){
-            Iterator<Neighbor> it = friendServices.iterator();
-            while (it.hasNext()) {
+        Iterator<Neighbor> it = friendServices.iterator();
+        while (it.hasNext()) {
             Neighbor user = it.next();
             if (user.getDeviceAddress().equals(deletedFriend.getDeviceAddress())) {
                 it.remove();
                 friendListAdapter.notifyDataSetChanged();
             }
         }
-                listOfServices.add(deletedFriend);
-                neighborListAdapter.notifyDataSetChanged();
-            }
+        listOfServices.add(deletedFriend);
+        neighborListAdapter.notifyDataSetChanged();
+    }
 
     /**
      * This method is used after sending/accepting a friend request
@@ -151,17 +151,17 @@ public class NeighborSectionFragment extends Fragment {
      * @param neighbor A Neighbor object
      */
     public static void updateAddedFriend(Neighbor neighbor){
-            friendServices.add(neighbor);
-            friendListAdapter.notifyDataSetChanged();
-             Iterator<Neighbor> it = listOfServices.iterator();
-             while (it.hasNext()) {
-             Neighbor user = it.next();
-             if (user.getDeviceAddress().equals(neighbor.getDeviceAddress())) {
+        friendServices.add(neighbor);
+        friendListAdapter.notifyDataSetChanged();
+        Iterator<Neighbor> it = listOfServices.iterator();
+        while (it.hasNext()) {
+            Neighbor user = it.next();
+            if (user.getDeviceAddress().equals(neighbor.getDeviceAddress())) {
                 it.remove();
-             }
-             }
-            neighborListAdapter.notifyDataSetChanged();
+            }
         }
+        neighborListAdapter.notifyDataSetChanged();
+    }
 
     /**
      * This method is used to update friends list
@@ -170,10 +170,10 @@ public class NeighborSectionFragment extends Fragment {
      */
     public static void addToFriendsList(Neighbor friend){
         if(friendServices!=null)
-        if(!friendServices.contains(friend)){
-            friendServices.add(friend);
-            friendListAdapter.notifyDataSetChanged();
-        }
+            if(!friendServices.contains(friend)){
+                friendServices.add(friend);
+                friendListAdapter.notifyDataSetChanged();
+            }
     }
 
     /**
@@ -183,10 +183,10 @@ public class NeighborSectionFragment extends Fragment {
      */
     public static void addToNeighborsList (Neighbor neighbor)throws NullPointerException{
         if(listOfServices!=null)
-        if(!listOfServices.contains(neighbor)){
-            listOfServices.add(neighbor);
-            neighborListAdapter.notifyDataSetChanged();
-        }
+            if(!listOfServices.contains(neighbor)){
+                listOfServices.add(neighbor);
+                neighborListAdapter.notifyDataSetChanged();
+            }
     }
 
 }

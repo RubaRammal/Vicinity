@@ -30,6 +30,8 @@ public class NeighborListAdapter extends BaseAdapter {
     private LayoutInflater mInflater;
     public static ArrayList<Neighbor> services;
     private static ImageButton mute;
+    private static String status;
+    private static String mac;
     private static final String TAG = "NeighborListAdapter";
 
     /**
@@ -69,7 +71,6 @@ public class NeighborListAdapter extends BaseAdapter {
 
             holder = new ViewHolder();
             holder.textName = (TextView) convertView.findViewById(R.id.neighbor_row);
-            holder.status = (ImageView) convertView.findViewById(R.id.statusIcon);
 
             convertView.setTag(holder);
 
@@ -78,12 +79,6 @@ public class NeighborListAdapter extends BaseAdapter {
         }
 
         holder.textName.setText(services.get(position).getInstanceName());
-
-        if(services.get(position).getStatus().equals("Connected"))
-            holder.status.setImageResource(R.drawable.on);
-        else
-            holder.status.setImageResource(R.drawable.off);
-
 
 
         /*----Mute user button-----*/
@@ -180,7 +175,6 @@ public class NeighborListAdapter extends BaseAdapter {
 
     static class ViewHolder{
         TextView textName;
-        ImageView status;
     }
 
     public static void updateNeighborsList(Neighbor neighbor){
@@ -189,7 +183,6 @@ public class NeighborListAdapter extends BaseAdapter {
     public static void addToNeighbors(Neighbor neighbor){
         NeighborSectionFragment.updateDeletedFriend(neighbor);
     }
-
 
 
 }
